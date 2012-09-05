@@ -1,0 +1,9 @@
+1. come up with some good heuristics how to generate initial point for large \gamma
+
+2. on the fly => implement + batches
+
+3. all methods have to start by generating "x"
+
+4.  How to deflate for L1 PCA
+
+5. Applicatin of L\infty PCA
