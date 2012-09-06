@@ -9,7 +9,7 @@
 #define OPTIMIZATION_STATISTICS_H_
 
 #include <vector>
-
+namespace solver_structures {
 class optimization_statistics {
 
 public:
@@ -24,5 +24,5 @@ public:
       it=0;
 	}
 };
-
+}
 #endif /* OPTIMIZATION_STATISTICS_H_ */

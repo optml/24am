@@ -8,6 +8,8 @@
 #ifndef OPTIMIZATION_SETTINGS_H_
 #define OPTIMIZATION_SETTINGS_H_
 
+namespace solver_structures {
+
 enum SparsePCA_Algorithm {
 	L0_penalized_L1_PCA = 0,
 	L0_penalized_L2_PCA,
@@ -57,8 +59,8 @@ public:
 	}
 
 	bool isConstrainedProblem() {
-		if (algorithm == L0_penalized_L1_PCA || algorithm
-				== L0_penalized_L2_PCA || algorithm == L1_penalized_L1_PCA
+		if (algorithm == L0_penalized_L1_PCA || algorithm == L0_penalized_L2_PCA
+				|| algorithm == L1_penalized_L1_PCA
 				|| algorithm == L1_penalized_L2_PCA) {
 			return false;
 		} else {
@@ -68,8 +70,8 @@ public:
 	}
 
 	bool isL1ConstrainedProblem() {
-		if (algorithm == L0_constrained_L1_PCA || algorithm
-				== L0_constrained_L2_PCA) {
+		if (algorithm == L0_constrained_L1_PCA
+				|| algorithm == L0_constrained_L2_PCA) {
 			return false;
 		} else {
 			return true;
@@ -78,8 +80,8 @@ public:
 	}
 
 	bool isL1PenalizedProblem() {
-		if (algorithm == L0_penalized_L1_PCA || algorithm
-				== L0_penalized_L2_PCA) {
+		if (algorithm == L0_penalized_L1_PCA
+				|| algorithm == L0_penalized_L2_PCA) {
 			return false;
 		} else {
 			return true;
@@ -88,5 +90,5 @@ public:
 	}
 
 };
-
+}
 #endif /* OPTIMIZATION_SETTINGS_H_ */

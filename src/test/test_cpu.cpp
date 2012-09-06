@@ -13,6 +13,7 @@ using namespace std;
 #include "../utils/openmp_helper.h"
 #include "../class/optimization_settings.h"
 #include "../class/optimization_statistics.h"
+using namespace solver_structures ;
 #include "../utils/various.h"
 #include "../gpower/sparse_PCA_solver.h"
 //char* filename = "/exports/home/s1052689/costPerSP.dat";
