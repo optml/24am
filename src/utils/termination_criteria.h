@@ -13,7 +13,7 @@
 
 template<typename F>
 F computeTheError(const F fval, const F fval_prev,const optimization_settings* settings) {
-	if (fval_prev > fval+1E-5 && settings->verbose)
+	if (fval_prev > fval+1E-2 && settings->verbose)
 		printf("Error dedected: %1.16f < %1.16f\n", fval_prev, fval);
 
 	return (abs(fval - fval_prev) / fval_prev);
