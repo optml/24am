@@ -9,7 +9,7 @@
 #include <iostream>
 using namespace std;
 #include <stdio.h>
-#include "gpower/timer.h"
+#include "../utils/timer.h"
 
 #include <gsl/gsl_cblas.h>
 #include "gpower/sparse_PCA_solver.h"

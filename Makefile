@@ -1,5 +1,7 @@
 CUDA_INSTALL_PATH= /exports/applications/apps/cuda/rhel5/4.0/cuda
 MKLROOT = /opt/intel/mkl
+MKLLIB=$(MKLROOT)/lib/intel64
+
 
 MPICC = mpicc
 CC = g++
@@ -9,7 +11,7 @@ CUDA_LIB := -L$(CUDA_INSTALL_PATH)/lib -L$(CUDA_INSTALL_PATH)/lib64  -lcublas -l
 
 
 
-MKK_LIBS= -lmkl_scalapack_core  -lmkl_intel -lmkl_sequential -lmkl_core -lmkl_blacs_openmpi
+MKK_LIBS= -lmkl_scalapack_lp64  -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lmkl_blacs_intelmpi_lp64
 
 
 
@@ -17,7 +19,7 @@ MKK_LIBS= -lmkl_scalapack_core  -lmkl_intel -lmkl_sequential -lmkl_core -lmkl_bl
 
 
 UTILS = timer.o gsl_helper.o  my_cblas_wrapper.o  
-OBJS = personal_pc.o  $(UTILS)
+OBJS = multicore_console.o  $(UTILS)
 DEBUG = -g -DDEBUG
 CFLAGS = -Wall -O3 -c $(DEBUG) -fopenmp 
 LFLAGS = -Wall -O3 $(DEBUG) 
@@ -32,7 +34,7 @@ FRONTENDFOLDER=$(SRC)/frontends/
 BUILD_FOLDER=build/
 DISTR_FOLDER=$(SRC)/dgpower/
 
-all: personal_pc test_cpu distributed_console
+all: multicore_console test_cpu distributed_console
 
 
 distributed_time_helper.o:
@@ -49,14 +51,14 @@ mkl_constants_and_headers.o:
 
 
 distributed_PCA_solver.o:
-	$(MPICC)  $(DEBUG) -w -u -I$(MKLROOT)/include -O3 $(DISTR_FOLDER)distributed_PCA_solver.c -c -o $(OBJFOL)distributed_PCA_solver.o
+	$(MPICC)  $(DEBUG) -w -u -I. -I$(MKLROOT)/include -O3 $(DISTR_FOLDER)distributed_PCA_solver.c -c -o $(OBJFOL)distributed_PCA_solver.o
 
 distributed_console.o:
-	$(MPICC)  $(DEBUG) -w -u -O3 -I$(MKLROOT)/include -I/usr/local/include -c -o  $(OBJFOL)distributed_console.o   $(FRONTENDFOLDER)distributed_console.c
+	$(MPICC)  $(DEBUG) -w -u -O3 -I. -I$(MKLROOT)/include -I/usr/local/include -c -o  $(OBJFOL)distributed_console.o   $(FRONTENDFOLDER)distributed_console.c
 
 
 distributed_console: mkl_constants_and_headers.o distributed_console.o distributed_time_helper.o distributed_termination_criteria.o   distributed_PCA_solver.o
-	$(MPICC)  $(DEBUG) -o $(BUILD_FOLDER)distributed_console $(OBJFOL)distributed_console.o $(OBJFOL)termination_criteria.o $(OBJFOL)mkl_constants_and_headers.o $(OBJFOL)time_helper.o $(OBJFOL)distributed_PCA_solver.o -L$(MKLROOT)/lib/ia32 -I/usr/local/include $(MKK_LIBS) -lpthread -lm -lpthread   -lgsl
+	$(MPICC)  $(DEBUG) -o $(BUILD_FOLDER)distributed_console $(OBJFOL)distributed_console.o $(OBJFOL)termination_criteria.o $(OBJFOL)mkl_constants_and_headers.o $(OBJFOL)time_helper.o $(OBJFOL)distributed_PCA_solver.o -L$(MKLLIB) -I/usr/local/include $(MKK_LIBS) -lpthread -lm -lpthread   -lgsl
  
 
 
@@ -77,8 +79,8 @@ tests: test_pc test_distributed
 
 
 
-personal_pc.o :  $(UTILS) 
-	$(CC) $(CFLAGS) $(FRONTENDFOLDER)personal_pc.cpp  -o $(OBJFOL)personal_pc.o
+multicore_console.o :  $(UTILS) 
+	$(CC) $(CFLAGS) $(FRONTENDFOLDER)multicore_console.cpp  -o $(OBJFOL)multicore_console.o
 
 test_cpu.o :  $(UTILS) 
 	$(CC) $(CFLAGS) $(TESTFOLDER)test_cpu.cpp  -o $(OBJFOL)test_cpu.o
@@ -89,8 +91,8 @@ PC_OBJECTS =    $(OBJFOL)timer.o      $(OBJFOL)my_cblas_wrapper.o  $(OBJFOL)gsl_
 
 
 
-personal_pc: $(OBJS)
-	$(CC) $(LFLAGS) $(OBJFOL)personal_pc.o $(PC_OBJECTS)  $(LIBS) -o $(BUILD_FOLDER)personal_pc
+multicore_console: $(OBJS)
+	$(CC) $(LFLAGS) $(OBJFOL)multicore_console.o $(PC_OBJECTS)  $(LIBS) -o $(BUILD_FOLDER)multicore_console
     
 test_cpu: test_cpu.o
 	$(CC) $(LFLAGS) $(OBJFOL)test_cpu.o $(PC_OBJECTS)  $(LIBS) -o $(BUILD_FOLDER)test_cpu
