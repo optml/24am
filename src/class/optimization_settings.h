@@ -21,6 +21,39 @@ enum SparsePCA_Algorithm {
 	L1_constrained_L2_PCA
 };
 
+
+
+template<typename T> // NOTE: We use typename T instead of std::ostream to make this header-only
+T& operator<<(T& stream, SparsePCA_Algorithm& algo) {
+	switch (algo) {
+	case L0_penalized_L1_PCA:
+		stream << "L0_penalized_L1_PCA";
+		break;
+	case L0_penalized_L2_PCA:
+		stream << "L0_penalized_L2_PCA";
+		break;
+	case L1_penalized_L1_PCA:
+		stream << "L1_penalized_L1_PCA";
+		break;
+	case L1_penalized_L2_PCA:
+		stream << "L1_penalized_L2_PCA";
+		break;
+	case L0_constrained_L1_PCA:
+		stream << "L0_constrained_L1_PCA";
+		break;
+	case L0_constrained_L2_PCA:
+		stream << "L0_constrained_L2_PCA";
+		break;
+	case L1_constrained_L1_PCA:
+		stream << "L1_constrained_L1_PCA";
+		break;
+	case L1_constrained_L2_PCA:
+		stream << "L1_constrained_L2_PCA";
+		break;
+	}
+	return stream;
+}
+
 class optimization_settings {
 
 public:
@@ -28,9 +61,11 @@ public:
 	bool verbose;
 	bool hard_tresholding_using_sort;
 	bool gpu_use_k_selection_algorithm;
+	bool double_precission;
 	double penalty;
 	unsigned int constrain;
-
+char* data_file;
+char* result_file;
 	int gpu_sm_count;
 	int gpu_max_threads;
 
@@ -46,16 +81,17 @@ public:
 
 	optimization_settings() {
 		toll = 0.01;
-		constrain = 1;
+		constrain = 10;
 		penalty = 0;
-		verbose = true;
-		starting_points = 1;
+		verbose = false;
+		starting_points = 64;
 		hard_tresholding_using_sort = false;
 		on_the_fly_generation = false;
-		max_it = 1000;
+		max_it = 100;
 		get_values_for_all_points = true;
 		gpu_use_k_selection_algorithm = true;
 		get_it_for_all_points = true;
+		double_precission=false;
 	}
 
 	bool isConstrainedProblem() {

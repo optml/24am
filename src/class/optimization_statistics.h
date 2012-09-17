@@ -17,6 +17,8 @@ public:
 	double fval;
 	double error;
 	double true_computation_time;
+	double total_elapsed_time;
+	unsigned int n;
 	std::vector<double> values;
 	std::vector<int> iters;
 	std::vector<int> cardinalities;

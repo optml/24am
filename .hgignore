@@ -11,9 +11,10 @@ syntax: glob
 24am/
 build/
 objects/
+results/
 benchmark_suite/
 c/GPower/src/output/
-presentations/2012_SCOR/takac_scor2012.ps
+syncsrc.sh
 *.zip
 *.d
 *.tmp

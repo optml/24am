@@ -59,21 +59,6 @@
 //}
 
 
-unsigned int vector_get_nnz(const double * x, int size) {
-	unsigned int nnz = 0;
-#ifdef _OPENMP
-#pragma omp parallel for reduction(+:nnz)
-#endif
-	for (unsigned int i = 0; i < size; i++) {
-		if (x[i] != 0)
-			nnz++;
-	}
-	return nnz;
-}
-
-
-
-
 
 
 

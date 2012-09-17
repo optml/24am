@@ -31,7 +31,6 @@ void getSignleStartingPoint(F* V, F* Z, optimization_settings* settings,
 		cblas_vector_scale(n, V, 1 / sqrt(tmp_norm));
 	} else {
 		myseed = j + batchshift;
-		F tmp_norm = 0;
 		for (unsigned int i = 0; i < n; i++) {
 			F tmp = (F) rand_r(&myseed) / RAND_MAX;
 			tmp = -1 + 2 * tmp;

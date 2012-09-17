@@ -1,8 +1,7 @@
 /*
- * l0_penalized_l2_PCA.h
  *
  *  Created on: Mar 26, 2012
- *      Author: taki
+ *      Author: Martin Takac
  *
  *  min  max_{\|x\|_2 \leq1}  \|Bx\|_2^2 - \gamma \|x\|_0
  *  from paper: XXXXXXXXXXXX
@@ -14,19 +13,12 @@
 
 #define MEMORY_ALIGNMENT 128
 
-#include "../gpower/optimization_settings.h"
-#include <cuda.h>
-//#include "cublas.h"
-#include "cublas_v2.h"
-#include "../gpower/helpers.h"
-#include "../gpower/termination_criteria.h"
-#include "my_cublas_wrapper.h"
-#include <thrust/sort.h>
-#include <thrust/functional.h>
-#include <thrust/iterator/transform_iterator.h>
-#include <thrust/iterator/counting_iterator.h>
-#include <thrust/device_vector.h>
-#include <thrust/advance.h>
+#include "../class/optimization_settings.h"
+#include "../utils/termination_criteria.h"
+#include "gpu_headers.h"
+
+namespace PCA_solver {
+
 /*
  * POPIS TODO
  */
@@ -40,8 +32,8 @@ int gpu_sparse_PCA_solver(cublasHandle_t &handle, const unsigned int m,
 	bool low_memory = false;
 	double total_memory = LD_N * LD_M + LD_N * settings->starting_points * 2
 			+ LD_M * settings->starting_points;
-	total_memory = total_memory * sizeof(F) + LD_N * settings->starting_points
-			* 4;
+	total_memory = total_memory * sizeof(F)
+			+ LD_N * settings->starting_points * 4;
 	total_memory = total_memory / (1024 * 1024 * 1024);
 	printf("Total Memory needed = %f GB\n", total_memory);
 	if (total_memory > 1) {
@@ -52,10 +44,9 @@ int gpu_sparse_PCA_solver(cublasHandle_t &handle, const unsigned int m,
 	thrust::device_vector<F> d_z(LD_M * settings->starting_points, 0);
 	if (!settings->isConstrainedProblem()) {
 		generate_random_number<F> generator(1);
-		thrust::transform(
-				thrust::make_counting_iterator<F>(0),
-				thrust::make_counting_iterator<F>(
-						LD_M * settings->starting_points), d_z.begin(),
+		thrust::transform(thrust::make_counting_iterator < F > (0),
+				thrust::make_counting_iterator < F
+						> (LD_M * settings->starting_points), d_z.begin(),
 				generator);
 	}
 	//alocate vector "x" on device
@@ -69,10 +60,9 @@ int gpu_sparse_PCA_solver(cublasHandle_t &handle, const unsigned int m,
 			d_x_for_sort.resize(LD_N);
 		} else {
 			d_IDX.resize(settings->starting_points * LD_N, 0);
-			thrust::transform(
-					thrust::make_counting_iterator<F>(0),
-					thrust::make_counting_iterator<F>(
-							LD_N * settings->starting_points), d_IDX.begin(),
+			thrust::transform(thrust::make_counting_iterator < F > (0),
+					thrust::make_counting_iterator < F
+							> (LD_N * settings->starting_points), d_IDX.begin(),
 					init_sequence_with_LDN(LD_N));
 			dataToSort.resize(LD_N * settings->starting_points);
 		}
@@ -92,7 +82,7 @@ int gpu_sparse_PCA_solver(cublasHandle_t &handle, const unsigned int m,
 	F ONE = 1;
 	F norm_of_z = 0;
 	F norm_of_x = 0;
-	stat->it = settings-> max_it;
+	stat->it = settings->max_it;
 	F error = 0;
 	value_coordinate_holder<F>* vals = (value_coordinate_holder<F>*) calloc(
 			settings->starting_points, sizeof(value_coordinate_holder<F> ));
@@ -120,7 +110,7 @@ int gpu_sparse_PCA_solver(cublasHandle_t &handle, const unsigned int m,
 					gpu_compute_l1_Norm(handle, &z[LD_M * i], m, vals[i].val);
 				}
 				thrust::transform(d_z.begin(), d_z.end(), d_z.begin(),
-						gpu_sgn_transformator<F> ());
+						gpu_sgn_transformator<F>());
 			}
 
 			// Multiply x = B'*z
@@ -158,7 +148,7 @@ int gpu_sparse_PCA_solver(cublasHandle_t &handle, const unsigned int m,
 					|| settings->algorithm == L1_penalized_L1_PCA) {
 				//z=sgn(z)
 				thrust::transform(d_z.begin(), d_z.end(), d_z.begin(),
-						gpu_sgn_transformator<F> ());
+						gpu_sgn_transformator<F>());
 			} else {
 				for (unsigned int i = 0; i < settings->starting_points; i++) {
 					gpu_computeNorm(handle, &z[i * LD_M], m, norm_of_z);
@@ -177,7 +167,7 @@ int gpu_sparse_PCA_solver(cublasHandle_t &handle, const unsigned int m,
 		}
 		error = 0;
 		for (unsigned int i = 0; i < settings->starting_points; i++) {
-			F tmp = computeTheError(vals[i].val, vals[i].prev_val,settings);
+			F tmp = computeTheError(vals[i].val, vals[i].prev_val, settings);
 			if (tmp > error)
 				error = tmp;
 			vals[i].prev_val = vals[i].val;
@@ -212,4 +202,5 @@ int gpu_sparse_PCA_solver(cublasHandle_t &handle, const unsigned int m,
 	return 0;
 }
 
+}
 #endif /* GPU_SPARSE_PCA_SOLVER_H__ */

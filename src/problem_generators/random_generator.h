@@ -37,28 +37,6 @@ void generate_random_instance(int n, int m, gsl_matrix * B, gsl_matrix * BT,
 }
 
 
-template<typename F>
-int generateProblem(const int n, const int m, F* h_B) {
-
-	printf("%d x %d \n", m, n);
-
-	char final_file[1000];
-	unsigned int seed = 0;
-	for (int i = 0; i < n; i++) {
-		F total = 0;
-		for (int j = 0; j < m; j++) {
-			F tmp = (F) rand_r(&seed) / RAND_MAX;
-			tmp = -1 + 2 * tmp;
-			h_B[j + i * m] = tmp;
-			total += tmp * tmp;
-		}
-		total = sqrt(total);
-		for (int j = 0; j < m; j++) {
-			h_B[j + i * m] = h_B[j + i * m] / total;
-		}
-	}
-	return 0;
-}
 
 
 #endif /* RANDOM_GENERATOR_H_ */

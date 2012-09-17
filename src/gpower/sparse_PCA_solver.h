@@ -22,26 +22,32 @@
 
 #include "../utils/my_cblas_wrapper.h"
 
-
 #include "gpower_commons.h"
 
 /*
  * Matrix B is stored in column order (Fortran Based)
  */
 
-
-
+namespace PCA_solver {
 
 template<typename F>
-F sparse_PCA_solver(const F * B, const int ldB, F * x, const unsigned int m,
+F dense_PCA_solver(const F * B, const int ldB, F * x, const unsigned int m,
 		const unsigned int n, optimization_settings* settings,
 		optimization_statistics* stat) {
-	stat->it = settings-> max_it;
-	F FLOATING_ZERO = 0;
-	if (settings->batch_size==0){
-		settings->batch_size=settings->starting_points;
+	if (settings->verbose){
+		cout << "Solver started "<<endl;
 	}
-	int number_of_batches = settings->starting_points / settings->batch_size;
+	if (settings->constrain > n){
+		settings->constrain=n;
+	}
+
+
+	stat->it = settings->max_it;
+	F FLOATING_ZERO = 0;
+	if (settings->batch_size == 0) {
+		settings->batch_size = settings->starting_points;
+	}
+	unsigned int number_of_batches = settings->starting_points / settings->batch_size;
 	if (number_of_batches * settings->batch_size < settings->starting_points)
 		number_of_batches++;
 	settings->starting_points = number_of_batches * settings->batch_size;
@@ -74,7 +80,8 @@ F sparse_PCA_solver(const F * B, const int ldB, F * x, const unsigned int m,
 	stat->it = 0;
 	if (settings->on_the_fly_generation) {
 		settings->get_it_for_all_points = false;
-		cblas_vector_scale(n * number_of_experiments_per_batch, V, FLOATING_ZERO);
+		cblas_vector_scale(n * number_of_experiments_per_batch, V,
+				FLOATING_ZERO);
 		initialize_starting_points(V, Z, settings, stat,
 				number_of_experiments_per_batch, n, m, ldB, B, 0);
 		unsigned int generated_points = number_of_experiments_per_batch;
@@ -83,8 +90,8 @@ F sparse_PCA_solver(const F * B, const int ldB, F * x, const unsigned int m,
 
 		std::vector<unsigned int> current_iteration(
 				number_of_experiments_per_batch, 0);
-		std::vector<unsigned int> current_order(
-				number_of_experiments_per_batch, 0);
+		std::vector<unsigned int> current_order(number_of_experiments_per_batch,
+				0);
 		for (unsigned int i = 0; i < number_of_experiments_per_batch; i++) {
 			current_order[i] = i;
 		}
@@ -108,8 +115,8 @@ F sparse_PCA_solver(const F * B, const int ldB, F * x, const unsigned int m,
 			for (unsigned int i = 0; i < number_of_experiments_per_batch; i++) {
 				current_iteration[i]++;
 				if (termination_criteria(vals[i].current_error,
-						current_iteration[i], settings) || current_iteration[i]
-						>= settings->max_it) {
+						current_iteration[i], settings)
+						|| current_iteration[i] >= settings->max_it) {
 					// this point reached it convergence criterion, stat again....
 					if (the_best_solution_value < vals[i].val) {
 						the_best_solution_value = vals[i].val;
@@ -132,7 +139,8 @@ F sparse_PCA_solver(const F * B, const int ldB, F * x, const unsigned int m,
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-				for (unsigned int j = 0; j < number_of_experiments_per_batch; j++) {
+				for (unsigned int j = 0; j < number_of_experiments_per_batch;
+						j++) {
 					if (current_iteration[j] == 0) {
 						if (settings->isConstrainedProblem()) {
 							cblas_vector_scale(n, &V[j * n], FLOATING_ZERO);
@@ -148,11 +156,12 @@ F sparse_PCA_solver(const F * B, const int ldB, F * x, const unsigned int m,
 		//====================== MAIN LOOP THROUGHT BATCHES
 		for (unsigned int batch = 0; batch < number_of_batches; batch++) {
 			unsigned int statistical_shift = batch * settings->batch_size;
-			cblas_vector_scale(n * number_of_experiments_per_batch, V, FLOATING_ZERO);
+			cblas_vector_scale(n * number_of_experiments_per_batch, V,
+					FLOATING_ZERO);
 			initialize_starting_points(V, Z, settings, stat,
 					number_of_experiments_per_batch, n, m, ldB, B,
 					statistical_shift);
-			for (int j = 0; j < number_of_experiments_per_batch; j++) {
+			for (unsigned int j = 0; j < number_of_experiments_per_batch; j++) {
 				vals[j].reset();
 			}
 			double start_time_of_iterations = gettime();
@@ -163,12 +172,12 @@ F sparse_PCA_solver(const F * B, const int ldB, F * x, const unsigned int m,
 				}
 				if (settings->isConstrainedProblem()) {
 					perform_one_iteration_for_constrained_pca(V, Z, settings,
-							stat, number_of_experiments_per_batch, n, m, ldB,
-							B, max_errors, vals, buffer, it, statistical_shift);
+							stat, number_of_experiments_per_batch, n, m, ldB, B,
+							max_errors, vals, buffer, it, statistical_shift);
 				} else {
 					perform_one_iteration_for_penalized_pca(V, Z, settings,
-							stat, number_of_experiments_per_batch, n, m, ldB,
-							B, max_errors, vals, it, statistical_shift);
+							stat, number_of_experiments_per_batch, n, m, ldB, B,
+							max_errors, vals, it, statistical_shift);
 				}
 				error = max_errors[cblas_vector_max_index(TOTAL_THREADS,
 						max_errors, 1)];
@@ -201,15 +210,15 @@ F sparse_PCA_solver(const F * B, const int ldB, F * x, const unsigned int m,
 	stat->it = total_iterations;
 	//compute corresponding x
 	F norm_of_x = cblas_l2_norm(n, x, 1);
-	cblas_vector_scale(n, x, 1 / norm_of_x);//Final x
+	cblas_vector_scale(n, x, 1 / norm_of_x); //Final x
 	free(Z);
 	free(V);
 	free(vals);
+	stat->fval=the_best_solution_value;
 	return the_best_solution_value;
 }
 
-
-
+}
 
 #endif /* SPARSE_PCA_SOLVER_H__ */
 //		const gsl_rng_type * T;

@@ -16,6 +16,7 @@ using namespace std;
 using namespace solver_structures ;
 #include "../utils/various.h"
 #include "../gpower/sparse_PCA_solver.h"
+#include "../problem_generators/gpower_problem_generator.h"
 //char* filename = "/exports/home/s1052689/costPerSP.dat";
 	char* filename = "/tmp/generated.dat.";
 char final_file[1000];
@@ -108,7 +109,7 @@ int test() {
 					<= 128 * 8*4; //
 			settings->starting_points = settings->starting_points * 2+1) {
 				mt->start();
-				stat->fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n,
+				stat->fval = PCA_solver::dense_PCA_solver(&h_B[0], m, &x[0], m, n,
 						settings, stat);
 				mt->end();
 				printf(

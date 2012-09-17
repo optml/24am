@@ -34,9 +34,12 @@ template<typename T> int sgn(T val) {
 
 
 template<typename F>
-unsigned int vector_get_nnz(F * x, int length) {
+unsigned int vector_get_nnz(const F * x,unsigned int size) {
 	unsigned int nnz = 0;
-	for (unsigned int i = 0; i < length; i++) {
+#ifdef _OPENMP
+#pragma omp parallel for reduction(+:nnz)
+#endif
+	for (unsigned int i = 0; i < size; i++) {
 		if (x[i] != 0)
 			nnz++;
 	}
@@ -44,12 +47,14 @@ unsigned int vector_get_nnz(F * x, int length) {
 }
 
 
+
+
 void getFileSize(const char* filename, int& DIM_M, int& DIM_N) {
 	FILE * fin = fopen(filename, "r");
 	if (fin == NULL) {
 
 	} else {
-		fscanf(fin, "%d;%d", &DIM_M, &DIM_N);
+		int status = fscanf(fin, "%d;%d", &DIM_M, &DIM_N);
 		fclose(fin);
 	}
 }
@@ -60,11 +65,11 @@ void readFromFile(const char* filename, int& DIM_M, int& DIM_N, gsl_matrix * B,
 	FILE * fin = fopen(filename, "r");
 	if (fin == NULL) {
 	} else {
-		fscanf(fin, "%d;%d", &DIM_M, &DIM_N);
+		int status = fscanf(fin, "%d;%d", &DIM_M, &DIM_N);
 		for (j = 0; j < DIM_M; j++) {
 			for (i = 0; i < DIM_N; i++) {
 				float tmp = -1;
-				fscanf(fin, "%f;", &tmp);
+				status = fscanf(fin, "%f;", &tmp);
 				gsl_matrix_set(B, j, i, tmp);
 				gsl_matrix_set(BT, i, j, tmp);
 			}

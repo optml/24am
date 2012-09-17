@@ -8,6 +8,8 @@
 #ifndef MY_CUBLAS_WRAPPER_H_
 #define MY_CUBLAS_WRAPPER_H_
 
+#include <cuda.h>
+#include "cublas_v2.h"
 #include <thrust/random.h>
 
 #include "../ggks/bucketSelect.h"
