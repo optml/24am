@@ -25,8 +25,8 @@ namespace PCA_solver {
 template<typename F>
 int gpu_sparse_PCA_solver(cublasHandle_t &handle, const unsigned int m,
 		const unsigned int n, thrust::device_vector<F> &d_B,
-		thrust::host_vector<F>& h_x, optimization_settings* settings,
-		optimization_statistics* stat, const unsigned int LD_M,
+		thrust::host_vector<F>& h_x, solver_structures::optimization_settings* settings,
+		solver_structures::optimization_statistics* stat, const unsigned int LD_M,
 		const unsigned int LD_N) {
 
 	bool low_memory = false;

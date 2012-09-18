@@ -27,8 +27,8 @@ MKK_LIBS= -lmkl_scalapack_lp64  -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lm
 UTILS = timer.o gsl_helper.o  my_cblas_wrapper.o  
 OBJS = multicore_console.o  $(UTILS)
 DEBUG = -g -DDEBUG
-CFLAGS = -Wall -O3 -c $(DEBUG) -fopenmp 
-LFLAGS = -Wall -O3 $(DEBUG) 
+CFLAGS = -Wall -w -O3 -c $(DEBUG) -fopenmp 
+LFLAGS = -Wall -w -O3 $(DEBUG) 
 INCLUDE= -I. -I./frontends  -I/usr/local/include $(GSL_INCLUDE)
 LIBS = -L./ $(BLAS_LIB) -L../objects -fopenmp -lgsl -lgslcblas
 OBJFOL=objects/
@@ -96,7 +96,9 @@ PC_OBJECTS =    $(OBJFOL)timer.o      $(OBJFOL)my_cblas_wrapper.o  $(OBJFOL)gsl_
 
 
 gpu_console: $(OBJS)
-	$(CUDA_COMPILER) -O3 $(GSL_INCLUDE)  $(CUDA_INCLUDES) $(INCLUDE)  $(FRONTENDFOLDER)gpu_console.cu   $(PC_OBJECTS) $(CUDA_LIB) $(GSL_LIB) -lgomp -o $(BUILD_FOLDER)gpu_console
+	$(CUDA_COMPILER) -O3 -w $(GSL_INCLUDE)  $(CUDA_INCLUDES) $(INCLUDE)  $(FRONTENDFOLDER)gpu_console.cu   $(PC_OBJECTS) $(CUDA_LIB) $(GSL_LIB) -lgomp -o $(BUILD_FOLDER)gpu_console
+	nvcc -O3 -w  -I. -I/exports/applications/apps/cuda/rhel5/4.2/cuda/include -I. -I./frontends  -I/usr/local/include   src/frontends/gpu_console.cu   objects/timer.o        -L./  -L../objects  -L/exports/applications/apps/cuda/rhel5/4.2/cuda/lib -L/exports/applications/apps/cuda/rhel5/4.2/cuda/lib64  -lcublas -lm -arch sm_20  -lgomp -o build/gpu_console
+
 
 gpu: gpu_console
 

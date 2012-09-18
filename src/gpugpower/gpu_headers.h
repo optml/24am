@@ -12,8 +12,6 @@
 #include <stdio.h>
 #include "../utils/timer.h"
 #include "../utils/various.h"
-#include <gsl/gsl_cblas.h>
-#include "../gpower/sparse_PCA_solver.h"
 
 #include "../class/optimization_settings.h"
 #include "../class/optimization_statistics.h"
@@ -21,7 +19,6 @@
 #include "thrust_headers.h"
 #include "my_cublas_wrapper.h"
 #include "gpu_sparse_PCA_solver.h"
-#include "gpu_sparse_PCA_solver_single.h"
 #include "gpower_problem_generator.h"
 
 #define IDX2C(i,j,ld) (((j)*(ld))+(i))

@@ -50,14 +50,14 @@ public:
 
 template<typename F>
 bool abs_value_comparator(const F & i, const F &j) {
-	return (abs(i) < abs(j));
+	return (myabs(i) < myabs(j));
 }
 
 template<typename F>
 void vector_sgn(F * y, unsigned int n) { // compute y=sgn(y)
 #ifdef _OPENMP
 #pragma omp parallel for
-#endif various
+#endif
 	for (unsigned int i = 0; i < n; i++) {
 		y[i] = sgn(y[i]);
 	}

@@ -14,7 +14,7 @@
 
 
 template<typename F>
-void load_data_and_run_solver(solver_structures::optimization_settings* settings) {
+int load_data_and_run_solver(solver_structures::optimization_settings* settings) {
 	mytimer* mt = new mytimer();
 	mt->start();
 	solver_structures::optimization_statistics* stat =
@@ -31,7 +31,6 @@ void load_data_and_run_solver(solver_structures::optimization_settings* settings
 	input_ouput_helper::read_csv_file(B_mat, ldB, m, n, settings->data_file);
 	stat->n = n;
 
-	double size = (double) n * m * sizeof(F) / (1024 * 1024 * 1024);
 	const int MEMORY_BANK_FLOAT_SIZE = MEMORY_ALIGNMENT / sizeof(F);
 	const unsigned int LD_M = (
 			m % MEMORY_BANK_FLOAT_SIZE == 0 ?

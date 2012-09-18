@@ -90,8 +90,8 @@ char* get_file_modified_name(const char* base, string suffix) {
 }
 
 template<typename F>
-void save_statistics_and_results(optimization_statistics* stat,
-		optimization_settings * settings, const F* x, unsigned int lenght) {
+void save_statistics_and_results(solver_structures::optimization_statistics* stat,
+		solver_structures::optimization_settings * settings, const F* x, unsigned int lenght) {
 	ofstream result_file;
 	result_file.open(get_file_modified_name(settings->result_file, "x"));
 	for (unsigned int i = 0; i < lenght; i++) {

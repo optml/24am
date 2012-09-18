@@ -625,14 +625,14 @@ void perform_hard_and_soft_tresholding_with_sorting(
 
 template<typename F>
 void perform_hard_and_soft_tresholding_for_penalized(
-		thrust::device_vector<F> &d_V, optimization_settings* settings,
+		thrust::device_vector<F> &d_V, solver_structures::optimization_settings* settings,
 		const unsigned int n, value_coordinate_holder<F>* vals,
 		const unsigned int LDN) {
 }
 
 template<>
 void perform_hard_and_soft_tresholding_for_penalized(
-		thrust::device_vector<double> &d_V, optimization_settings* settings,
+		thrust::device_vector<double> &d_V, solver_structures::optimization_settings* settings,
 		const unsigned int n, value_coordinate_holder<double>* vals,
 		const unsigned int LDN) {
 	thrust::device_vector<double>::iterator it_begin = d_V.begin();

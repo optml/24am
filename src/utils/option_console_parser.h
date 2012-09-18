@@ -14,6 +14,7 @@
 
 #include "../class/optimization_settings.h"
 using namespace std;
+using namespace solver_structures;
 
 void print_usage(){
 	cout << "Usage:"<<endl;
