@@ -196,6 +196,7 @@ int distributed_pca_solver_from_two_dim_files(char* filename, char* outputfile,
 	int i, j, k;
 	blacs_pinfo_(&iam, &nprocs);
 	blacs_get_(&i_negone, &i_zero, &ictxt);
+
 	int MAP_Y = nprocs / MAP_X;
 	if (MAP_X * MAP_Y != nprocs) {
 		if (iam == 0)

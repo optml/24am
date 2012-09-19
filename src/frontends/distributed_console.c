@@ -21,11 +21,9 @@ unsigned int myseed = 0;
 #include "../dgpower/optimization_statistics.h"
 #include "../dgpower/distributed_PCA_solver.h"
 
-
 #ifndef MAXIT
 #define MAXIT 1
 #endif
-
 
 #ifndef FILES
 #define FILES 4
@@ -34,15 +32,20 @@ unsigned int myseed = 0;
 /*==== MAIN FUNCTION =================================================*/
 int main(int argc, char *argv[]) {
 
+	if (argc > 0) /* argc should be 2 for correct execution */
+	{
+		printf("usage: %s -  %s  filename", argv[0],argv[1]);
+	}
+
+
 
 //	char* file = "/exports/work/maths_oro/taki/generated.dat.";
-	char* outputfile = "/exports/work/maths_oro/taki/output.dat";
+	//= "/exports/work/maths_oro/taki/output.dat";
+//	= "/exports/work/scratch/taki/generated.dat.";
+	char* outputfile="/tmp/asdfa";
+	char* file=argv[1];
 
-	char* file = "/exports/work/scratch/taki/generated.dat.";
-
-
-
-	int XGRID = 10;
+	int XGRID = 1;
 	struct optimization_settings settings;
 	struct optimization_statistics stat;
 	settings.toll = 0.00;
@@ -59,14 +62,13 @@ int main(int argc, char *argv[]) {
 	double start_time = gettime();
 	int node = 0;
 //	node = distributed_pca_solver(file, outputfile, files, files, &settings, &stat);
-	node = distributed_pca_solver_from_two_dim_files(file, outputfile, XGRID,   &settings, &stat);
+	node = distributed_pca_solver_from_two_dim_files(file, outputfile, XGRID,
+			&settings, &stat);
 	double end_time = gettime();
 	if (node == 0) {
-		printf("ALG-with total solving time;%f;%d;%f\n", end_time - start_time, stat.it, stat.fval);
+		printf("ALG-with total solving time;%f;%d;%f\n", end_time - start_time,
+				stat.it, stat.fval);
 	}
-
-
-
 
 	return 0;
 }
