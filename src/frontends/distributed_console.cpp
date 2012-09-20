@@ -26,6 +26,8 @@ void run_solver(solver_structures::optimization_settings * settings) {
 	solver_structures::optimization_statistics* stat =
 			new optimization_statistics();
 
+	distributed_pca_solver_from_two_dim_files<F>(settings, stat);
+
 }
 
 int main(int argc, char *argv[]) {
@@ -41,28 +43,9 @@ int main(int argc, char *argv[]) {
 	if (settings->double_precission) {
 		run_solver<double>(settings);
 	} else {
-//		load_data_and_run_solver<float>(settings);
+//		run_solver<float>(settings);
 	}
 	MPI_Finalize();
-	return 0;
-}
-
-/*==== MAIN FUNCTION =================================================*/
-int mainX(int argc, char *argv[]) {
-
-//
-//	int XGRID = 1;
-//
-//	double start_time = gettime();
-//	int node = 0;
-////	node = distributed_pca_solver(file, outputfile, files, files, &settings, &stat);
-//	node = distributed_pca_solver_from_two_dim_files(XGRID, &settings, &stat);
-//	double end_time = gettime();
-//	stat.total_elapsed_time = end_time - start_time;
-//	if (node == 0) {
-//		save_statistics_and_results(&settings, &stat);
-//	}
-
 	return 0;
 }
 

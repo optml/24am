@@ -58,6 +58,7 @@ class optimization_settings {
 
 public:
 	int proccess_node;
+	int distributed_row_grid_file;
 	double toll;
 	bool verbose;
 	bool hard_tresholding_using_sort;
@@ -81,6 +82,7 @@ char* result_file;
 	bool on_the_fly_generation;
 
 	optimization_settings() {
+		distributed_row_grid_file=0;
 		proccess_node=0;
 		toll = 0.01;
 		constrain = 10;

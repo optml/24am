@@ -48,12 +48,16 @@ int parse_console_options(solver_structures::optimization_settings* settings,
 	 * a - algorithm
 	 * n - constrain parameter
 	 * m - penalty parameter
+	 * x - x-dimension of distributed files (FOR DISTRIBUTED METHOD ONLY)
 	 */
 	bool data_file = false;
 	bool result_file = false;
 	bool algorithm = false;
-	while ((c = getopt(argc, argv, "d:f:r:i:t:s:b:u:v:p:a:n:m:")) != -1) {
+	while ((c = getopt(argc, argv, "d:f:r:i:t:s:b:u:v:p:a:n:m:x:")) != -1) {
 		switch (c) {
+		case 'x':
+			settings->distributed_row_grid_file = atoi(optarg);
+			break;
 		case 's':
 			settings->starting_points = atoi(optarg);
 			break;

@@ -14,7 +14,7 @@ int main() {
 //			"/exports/work/maths_oro/taki/generated.dat.";
 //	"/exports/work/scratch/taki/generated.dat.";
 //	"/document/phd/c/GPower/resources/data.txt";
-	const int numOfFiles = 4;
+	const int numOfFiles = 6;
 	const int n = 100;
 //	const int m =  500*1024 * 1024 / 8 / n;
 	const int m= 600;
