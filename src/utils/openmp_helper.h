@@ -1,4 +1,8 @@
 /*
+//HEADER INFO
+ */
+
+/*
  * openmp_helper.h
  *
  *  Created on: Mar 29, 2012

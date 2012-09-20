@@ -57,6 +57,7 @@ T& operator<<(T& stream, SparsePCA_Algorithm& algo) {
 class optimization_settings {
 
 public:
+	int proccess_node;
 	double toll;
 	bool verbose;
 	bool hard_tresholding_using_sort;
@@ -73,13 +74,14 @@ char* result_file;
 
 	bool get_values_for_all_points;
 	bool get_it_for_all_points;
-	unsigned int max_it;
-	unsigned int starting_points;
-	unsigned int batch_size;
+	int max_it;
+	int starting_points;
+	int batch_size;
 
 	bool on_the_fly_generation;
 
 	optimization_settings() {
+		proccess_node=0;
 		toll = 0.01;
 		constrain = 10;
 		penalty = 0;

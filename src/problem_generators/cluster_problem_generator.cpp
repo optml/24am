@@ -1,10 +1,7 @@
-//============================================================================
-// Name        : GPower.cpp
-// Author      : Martin Takac
-// Version     :
-// Copyright   : GNU
-// Description : GPower Method
-//============================================================================
+/*
+//HEADER INFO
+ */
+
 
 #include <iostream>
 using namespace std;

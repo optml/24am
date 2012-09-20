@@ -1,9 +1,8 @@
 /*
- * random_generator.h
- *
- *  Created on: Sep 5, 2012
- *      Author: taki
+//HEADER INFO
  */
+
+
 
 #ifndef RANDOM_GENERATOR_H_
 #define RANDOM_GENERATOR_H_

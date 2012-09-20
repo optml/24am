@@ -1,9 +1,7 @@
 /*
- * sparse_PCA_tresholding.h
- *
- *  Created on: Apr 12, 2012
- *      Author: taki
+//HEADER INFO
  */
+
 
 #ifndef SPARSE_PCA_TRESHOLDING_H_
 #define SPARSE_PCA_TRESHOLDING_H_

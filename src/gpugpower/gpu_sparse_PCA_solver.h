@@ -1,12 +1,7 @@
 /*
- *
- *  Created on: Mar 26, 2012
- *      Author: Martin Takac
- *
- *  min  max_{\|x\|_2 \leq1}  \|Bx\|_2^2 - \gamma \|x\|_0
- *  from paper: XXXXXXXXXXXX
- *
+//HEADER INFO
  */
+
 
 #ifndef GPU_SPARSE_PCA_SOLVER_H_
 #define GPU_SPARSE_PCA_SOLVER_H_

@@ -1,4 +1,6 @@
-
+/*
+//HEADER INFO
+ */
 #ifndef GSL_VARIOUS_H_
 #define GSL_VARIOUS_H_
 

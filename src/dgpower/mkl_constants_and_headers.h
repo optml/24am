@@ -26,10 +26,25 @@
 !      Intel(R) Math Kernel Library PBLAS C example's definitions file
 !
 !******************************************************************************/
-#include <mkl_scalapack.h>
 
 #ifndef  mkl_constants_and_headers_h
 #define  mkl_constants_and_headers_h
+
+#include <mpi.h>
+
+#include <iostream>
+#include <iomanip>
+#include <string>
+#include <fstream>
+#include <sstream>
+
+
+#include <math.h>
+#include <mkl_scalapack.h>
+#include <mkl_blacs.h>
+#include <mkl_pblas.h>
+
+
 
 
 #ifdef _WIN_
@@ -90,17 +105,32 @@
 /* Definition of matrix descriptor */
 typedef MKL_INT MDESC[ 9 ];
 
+extern "C" {
+    /* Cblacs declarations */
+    void Cblacs_pinfo(int*, int*);
+    void Cblacs_get(int, int, int*);
+    void Cblacs_gridinit(int*, const char*, int, int);
+    void Cblacs_pcoord(int, int, int*, int*);
+    void Cblacs_gridexit(int);
+    void Cblacs_barrier(int, const char*);
+    void Cdgerv2d(int, int, int, double*, int, int, int);
+    void Cdgesd2d(int, int, int, double*, int, int, int);
+    void descinit_( int *desc, int *m, int *n, int *mb, int *nb, int *irsrc, int *icsrc,
+                int *ictxt, int *lld, int *info);
+    int numroc_(int*, int*, int*, int*, int*);
+}
 
 
 /* Parameters */
-extern const double zero  , one  , two  , negone ;
-extern const MKL_INT i_zero, i_one, i_four, i_negone;
-extern MKL_INT i_tmp1, i_tmp2, i_tmp3;
-extern const char trans;
-extern const char transNo;
-extern const char C_CHAR_SCOPE_ALL;
-extern const char C_CHAR_SCOPE_ROWS;
-extern const char C_CHAR_SCOPE_COLS;
-extern const char C_CHAR_GENERAL_TREE_CATHER;
+/* Parameters */
+double zero = 0.0e+0, one = 1.0e+0, two = 2.0e+0, negone = -1.0e+0;
+MKL_INT i_zero = 0, i_one = 1, i_four = 4, i_negone = -1;
+MKL_INT i_tmp1, i_tmp2, i_tmp3;
+char trans = 'T';
+char transNo = 'N';
+char C_CHAR_SCOPE_ALL = 'A';
+char C_CHAR_SCOPE_ROWS = 'R';
+char C_CHAR_SCOPE_COLS = 'C';
+char C_CHAR_GENERAL_TREE_CATHER = 'T';
 
 #endif

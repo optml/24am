@@ -1,9 +1,7 @@
 /*
- * data_generation.hasas
- *
- *  Created on: Apr 30, 2012
- *      Author: taki
+//HEADER INFO
  */
+
 
 #ifndef DATA_GENERATION_H_
 #define DATA_GENERATION_H_

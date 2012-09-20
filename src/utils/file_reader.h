@@ -1,8 +1,5 @@
 /*
- * file_reader.h
- *
- *  Created on: Sep 14, 2012
- *      Author: taki
+//HEADER INFO
  */
 
 #ifndef FILE_READER_H_

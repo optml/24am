@@ -1,9 +1,7 @@
 /*
- * gpu_headers.h
- *
- *  Created on: Sep 17, 2012
- *      Author: taki
+//HEADER INFO
  */
+
 
 #ifndef GPU_HEADERS_H_
 #define GPU_HEADERS_H_

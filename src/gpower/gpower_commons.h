@@ -1,9 +1,7 @@
 /*
- * gpower_commons.h
- *
- *  Created on: May 8, 2012
- *      Author: taki
+//HEADER INFO
  */
+
 
 #ifndef GPOWER_COMMONS_H_
 #define GPOWER_COMMONS_H_

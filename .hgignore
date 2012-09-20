@@ -26,7 +26,6 @@ syncsrc.sh
 *.bbl
 *.o
 *.mexglx
-*.mk
 *.backup
 .htaccess
 .buildpath

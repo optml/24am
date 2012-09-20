@@ -1,3 +1,6 @@
+/*
+//HEADER INFO
+ */
 
 #ifndef VARIOUS_H_
 #define VARIOUS_H_
@@ -13,6 +16,7 @@ public:
 	bool done;
 	unsigned int idx;
 	value_coordinate_holder() {
+		idx=0;
 		val = 0;
 		tmp=0;
 		done=false;

@@ -1,9 +1,7 @@
 /*
- * thrust_headers.h
- *
- *  Created on: Sep 17, 2012
- *      Author: taki
+//HEADER INFO
  */
+
 
 #ifndef THRUST_HEADERS_H_
 #define THRUST_HEADERS_H_

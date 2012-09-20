@@ -1,9 +1,7 @@
 /*
- * my_cublas_wrapper.h
- *
- *  Created on: Apr 11, 2012
- *      Author: taki
+//HEADER INFO
  */
+
 
 #ifndef MY_CUBLAS_WRAPPER_H_
 #define MY_CUBLAS_WRAPPER_H_

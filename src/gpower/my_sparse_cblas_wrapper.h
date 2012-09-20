@@ -1,8 +1,5 @@
 /*
- * my_cblas_wrapper.h
- *
- *  Created on: Apr 14, 2012
- *      Author: taki
+//HEADER INFO
  */
 
 #ifndef MY_SPARSE_WRAPPER_H_

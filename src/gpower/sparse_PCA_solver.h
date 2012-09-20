@@ -1,12 +1,5 @@
 /*
- * l0_penalized_l2_PCA.h
- *
- *  Created on: Mar 26, 2012
- *      Author: taki
- *
- *  min  max_{\|x\|_2 \leq1}  \|Bx\|_2^2 - \gamma \|x\|_0
- *  from paper: XXXXXXXXXXXX
- *
+//HEADER INFO
  */
 
 #ifndef SPARSE_PCA_SOLVER_H_

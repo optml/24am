@@ -1,4 +1,8 @@
 /*
+//HEADER INFO
+ */
+
+/*
  * termination_criteria.h
  *
  *  Created on: Apr 11, 2012
@@ -13,7 +17,7 @@
 #include "various.h"
 
 template<typename F>
-F computeTheError(const F fval, const F fval_prev,const optimization_settings* settings) {
+F computeTheError(const F fval, const F fval_prev,const solver_structures::optimization_settings* settings) {
 #ifdef DEBUG
 	if (fval_prev > fval+1E-2 && settings->verbose)
 		printf("Error dedected: %1.16f < %1.16f\n", fval_prev, fval);
@@ -23,7 +27,7 @@ F computeTheError(const F fval, const F fval_prev,const optimization_settings* s
 
 template<typename F>
 bool termination_criteria(const F error, int it,
-		const optimization_settings* settings) {
+		const solver_structures::optimization_settings* settings) {
 	//FIXME CHECK
 	if (it > 0 && error < settings->toll)
 		return true;
@@ -32,7 +36,7 @@ bool termination_criteria(const F error, int it,
 
 template<typename F>
 bool termination_criteria(const F fval, const F fval_prev, int it,
-		const optimization_settings* settings) {
+		const solver_structures::optimization_settings* settings) {
 	//FIXME CHECK
 	if (it > 0 && computeTheError(fval, fval_prev) < settings->toll)
 		return true;

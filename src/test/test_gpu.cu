@@ -1,11 +1,6 @@
-//============================================================================
-// Name        :
-// Author      : Martin Takac
-// Version     :
-// Copyright   : GNU
-// Description : GPower Method
-//============================================================================
-
+/*
+//HEADER INFO
+ */
 
 
 #include "../class/optimization_settings.h"

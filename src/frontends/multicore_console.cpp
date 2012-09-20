@@ -1,7 +1,7 @@
 /*
- *  TODO
- *
+//HEADER INFO
  */
+
 #include "../class/optimization_settings.h"
 #include "../class/optimization_statistics.h"
 using namespace solver_structures;

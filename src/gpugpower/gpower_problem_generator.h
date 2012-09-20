@@ -1,9 +1,7 @@
 /*
- * gpower_problem_generator.h
- *
- *  Created on: Apr 29, 2012
- *      Author: taki
+//HEADER INFO
  */
+
 
 #ifndef GPOWER_PROBLEM_GENERATOR_H_
 #define GPOWER_PROBLEM_GENERATOR_H_

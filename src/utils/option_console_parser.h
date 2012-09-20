@@ -1,4 +1,8 @@
 /*
+//HEADER INFO
+ */
+
+/*
  * option_parser.h
  *
  *  Created on: Sep 12, 2012
@@ -127,7 +131,8 @@ int parse_console_options(solver_structures::optimization_settings* settings,
 	}
 
 	if (!data_file || !result_file || !algorithm) {
-		print_usage();
+		if (settings->proccess_node==0)
+			print_usage();
 		return 1;
 	}
 
