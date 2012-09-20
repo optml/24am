@@ -26,7 +26,9 @@ void load_data_and_run_solver(optimization_settings* settings) {
 	PCA_solver::dense_PCA_solver(B, ldB, x, m, n, settings, stat);
 	double end_wall_time = gettime();
 	stat->total_elapsed_time=end_wall_time-start_wall_time;
-	input_ouput_helper::save_statistics_and_results(stat, settings,&x_vec[0],n);
+	input_ouput_helper::save_results(stat, settings, x, n);
+	input_ouput_helper::save_statistics(stat, settings);
+
 
 }
 

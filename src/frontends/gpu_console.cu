@@ -72,7 +72,8 @@ int load_data_and_run_solver(solver_structures::optimization_settings* settings)
 			LD_M, LD_N);
 	mt->end();
 	stat->total_elapsed_time = mt->getElapsedWallClockTime();
-	input_ouput_helper::save_statistics_and_results(stat, settings, &h_x[0], n);
+	input_ouput_helper::save_results(stat, settings, &h_x[0], n);
+	input_ouput_helper::save_statistics(stat, settings);
 	status = cublasDestroy(handle);
 	if (status != CUBLAS_STATUS_SUCCESS) {
 		fprintf(stderr, "!cublas shutdown error\n");

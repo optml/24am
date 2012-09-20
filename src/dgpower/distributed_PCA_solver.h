@@ -25,17 +25,55 @@ int get_column_coordinate(const int col, const int myCol, const int numCol,
 	return (fillup * (numCol - 1) + myCol) * blocking + col;
 }
 
+namespace PCA_solver {
+namespace distributed_solver {
+
+
+
+class distributed_parameters {
+public:
+	MKL_INT ictxt;
+	MKL_INT row_blocking;
+	MKL_INT col_blocking;
+	MKL_INT x_vector_blocking;
+	MKL_INT DIM_M;
+	MKL_INT DIM_N;
+	distributed_parameters() {
+		row_blocking = 64;
+		col_blocking = 64;
+		x_vector_blocking = 64;
+	}
+};
+
 template<typename F>
-void distributed_sparse_PCA_solver(F * B, double *x, MDESC descB, int nnz_x,
-		MKL_INT ictxt, MKL_INT ROW_BLOCKING, MKL_INT X_VECTOR_BLOCKING,
-		solver_structures::optimization_settings* settings,
+class optimization_data {
+public:
+	std::vector<F> x;
+	std::vector<F> B;
+	MDESC descB;
+	MDESC descx;
+	distributed_parameters params;
+};
+
+template<typename F>
+void distributed_sparse_PCA_solver(PCA_solver::distributed_solver::optimization_data<F>& optimization_data_inst,
+
+solver_structures::optimization_settings* settings,
 		solver_structures::optimization_statistics* stat) {
 	MKL_INT myrow, mycol, nprow, npcol, info;
+	MKL_INT ictxt = optimization_data_inst.params.ictxt;
+	blacs_gridinfo_(&ictxt, &nprow, &npcol, &myrow, &mycol);
+
+	F* B = &optimization_data_inst.B[0];
+	F* x = &optimization_data_inst.x[0];
+
+	MKL_INT ROW_BLOCKING = optimization_data_inst.params.row_blocking;
+	MKL_INT X_VECTOR_BLOCKING = optimization_data_inst.params.x_vector_blocking;
+
 	int i, j;
 	// create vector "z"
-	blacs_gridinfo_(&ictxt, &nprow, &npcol, &myrow, &mycol);
-	MKL_INT M = descB[2];
-	MKL_INT N = descB[3];
+	MKL_INT M = optimization_data_inst.descB[2];
+	MKL_INT N = optimization_data_inst.descB[3];
 	MKL_INT SP_MKL = settings->starting_points;
 	MKL_INT z_mp = numroc_(&M, &ROW_BLOCKING, &myrow, &i_zero, &nprow);
 	MKL_INT z_nq = numroc_(&SP_MKL, &ROW_BLOCKING, &mycol, &i_zero, &npcol);
@@ -117,8 +155,8 @@ void distributed_sparse_PCA_solver(F * B, double *x, MDESC descB, int nnz_x,
 		// Multiply x = B'*z
 		//		sub(C) := alpha*op(sub(A))*op(sub(B)) + beta*sub(C),
 		pdgemm_(&trans, &transNo, &N, &SP_MKL, &M, &one, B, &i_one, &i_one,
-				descB, z, &i_one, &i_one, desc_z, &zero, V, &i_one, &i_one,
-				desc_V);
+				optimization_data_inst.descB, z, &i_one, &i_one, desc_z, &zero,
+				V, &i_one, &i_one, desc_V);
 		// perform thresh-holding operations and compute objective values
 		clear_local_vector(norms, settings->starting_points); // we use NORMS to store objective values
 		if (settings->algorithm == solver_structures::L0_penalized_L1_PCA
@@ -175,8 +213,8 @@ void distributed_sparse_PCA_solver(F * B, double *x, MDESC descB, int nnz_x,
 		}
 		// z= B*V
 		pdgemm_(&transNo, &transNo, &M, &SP_MKL, &N, &one, B, &i_one, &i_one,
-				descB, V, &i_one, &i_one, desc_V, &zero, z, &i_one, &i_one,
-				desc_z);
+				optimization_data_inst.descB, V, &i_one, &i_one, desc_V, &zero,
+				z, &i_one, &i_one, desc_z);
 		if (it > 0 && termination_criteria(max_error, it, settings)) { //FIXME CHECK
 			break;
 		}
@@ -198,7 +236,7 @@ void distributed_sparse_PCA_solver(F * B, double *x, MDESC descB, int nnz_x,
 	double norm_of_x = 0;
 	pdnrm2_(&N, &norm_of_x, x, &i_one, &i_one, desc_x, &i_one);
 	norm_of_x = 1 / norm_of_x;
-	for (i = 0; i < nnz_x; i++) {
+	for (i = 0; i < optimization_data_inst.x.size(); i++) {
 		x[i] = x[i] * norm_of_x;
 	}
 	free(z);
@@ -383,14 +421,15 @@ void distributed_sparse_PCA_solver(F * B, double *x, MDESC descB, int nnz_x,
 //}
 
 template<typename F>
-int distributed_pca_solver_from_two_dim_files(
+int load_data_from_2d_files_and_distribution(
+		PCA_solver::distributed_solver::optimization_data<F> &optimization_data_inst,
 		solver_structures::optimization_settings* settings,
 		solver_structures::optimization_statistics* stat) {
-	MKL_INT ROW_BLOCKING = 64;
-	MKL_INT COL_BLOCKING = ROW_BLOCKING;
+	MKL_INT X_VECTOR_BLOCKING = optimization_data_inst.params.x_vector_blocking;
+	MKL_INT ROW_BLOCKING = optimization_data_inst.params.row_blocking;
+	MKL_INT COL_BLOCKING = optimization_data_inst.params.col_blocking;
 	char* filename = settings->data_file;
 	char* outputfile = settings->result_file;
-	MKL_INT X_VECTOR_BLOCKING = ROW_BLOCKING;
 	MKL_INT iam, nprocs, ictxt, ictxt2, myrow, mycol, nprow, npcol;
 	MKL_INT info;
 	MKL_INT m, n, nb, mb, mp, nq, lld, lld_local;
@@ -406,6 +445,8 @@ int distributed_pca_solver_from_two_dim_files(
 	}
 	blacs_gridinit_(&ictxt, "C", &MAP_X, &MAP_Y); // Create row map
 	blacs_gridinfo_(&ictxt, &nprow, &npcol, &myrow, &mycol);
+	optimization_data_inst.params.ictxt = ictxt;
+
 	/* ===========================================================================================
 	 *                LOAD DATA FROM FILES AND DISTRIBUTE IT ACROS NODES
 	 *
@@ -477,7 +518,7 @@ int distributed_pca_solver_from_two_dim_files(
 
 	// Now, the size of Matrix B is   DIM_M x DIM_n
 	/*  Matrix descriptors */
-	MDESC descB, descB_local;
+	MDESC descB_local;
 	/* Create Local Descriptors + Global Descriptors*/
 	i_tmp1 = numroc_(&DIM_M, &B_Local_row_blocking, &myrow, &i_zero, &nprow);
 	i_tmp1 = MAX(1, i_tmp1);
@@ -487,8 +528,9 @@ int distributed_pca_solver_from_two_dim_files(
 	mp = numroc_(&DIM_M, &ROW_BLOCKING, &myrow, &i_zero, &nprow);
 	nq = numroc_(&DIM_N, &COL_BLOCKING, &mycol, &i_zero, &npcol);
 	lld = MAX(mp, 1);
-	descinit_(descB, &DIM_M, &DIM_N, &ROW_BLOCKING, &COL_BLOCKING, &i_zero,
-			&i_zero, &ictxt, &lld, &info);
+
+	descinit_(optimization_data_inst.descB, &DIM_M, &DIM_N, &ROW_BLOCKING,
+			&COL_BLOCKING, &i_zero, &i_zero, &ictxt, &lld, &info);
 
 	end_time = gettime();
 	if (iam == 0) {
@@ -498,9 +540,11 @@ int distributed_pca_solver_from_two_dim_files(
 	// Distribute data from BLocal => B
 	blacs_barrier_(&ictxt, &C_CHAR_SCOPE_ALL);
 	start_time = gettime();
-	double * B = (double*) calloc(mp * nq, sizeof(double));
+
+	optimization_data_inst.B.resize(mp * nq);
 	pdgeadd_(&transNo, &DIM_M, &DIM_N, &one, B_Local, &i_one, &i_one,
-			descB_local, &zero, B, &i_one, &i_one, descB);
+			descB_local, &zero, &optimization_data_inst.B[0], &i_one, &i_one,
+			optimization_data_inst.descB);
 	free(B_Local);
 
 	end_time = gettime();
@@ -517,78 +561,98 @@ int distributed_pca_solver_from_two_dim_files(
 
 	MKL_INT x_mp = numroc_(&DIM_N, &X_VECTOR_BLOCKING, &myrow, &i_zero, &nprow);
 	MKL_INT x_nq = numroc_(&i_one, &X_VECTOR_BLOCKING, &mycol, &i_zero, &npcol);
-	double * x = (double*) calloc(x_mp * x_nq, sizeof(double));
-	MDESC desc_x;
-	int nnz_x = x_mp * x_nq;
+	optimization_data_inst.x.resize(x_mp * x_nq);
+
 	i_tmp1 = MAX(1, x_mp);
-	descinit_(desc_x, &DIM_N, &i_one, &X_VECTOR_BLOCKING, &X_VECTOR_BLOCKING,
-			&i_zero, &i_zero, &ictxt, &i_tmp1, &info);
-	/* =============================================================
-	 *          CALL SOLVER
-	 * =============================================================
-	 */
+	descinit_(optimization_data_inst.descx, &DIM_N, &i_one, &X_VECTOR_BLOCKING,
+			&X_VECTOR_BLOCKING, &i_zero, &i_zero, &ictxt, &i_tmp1, &info);
 
-	settings->starting_points = 1;
-	start_time = gettime();
-	distributed_sparse_PCA_solver(B, x, descB, nnz_x, ictxt, ROW_BLOCKING,
-			X_VECTOR_BLOCKING, settings, stat);
+	optimization_data_inst.params.DIM_M = DIM_M;
+	optimization_data_inst.params.DIM_N = DIM_N;
 
-	end_time = gettime();
+	return 0;
+}
 
-	int it;
-	for (it = 1; it <= 64; it = it * 4) {
-		settings->max_it = it;
+template<typename F>
+int gather_and_store_best_result_to_file(
+		PCA_solver::distributed_solver::optimization_data<F> &optimization_data_inst,
+		solver_structures::optimization_settings* settings,
+		solver_structures::optimization_statistics* stat) {
 
-		blacs_barrier_(&ictxt, &C_CHAR_SCOPE_ALL);
+//	/* =============================================================
+//	 *          CALL SOLVER
+//	 * =============================================================
+//	 */
+//	settings->max_it = 100;
+//	settings->starting_points = 1;
+//	start_time = gettime();
+//	distributed_sparse_PCA_solver(optimization_data_inst, settings, stat);
+//	end_time = gettime();
+//	if (iam == 0) {
+//		printf("time spend in solver %f; stating points%d; it%d; val%f\n",
+//				end_time - start_time, settings->starting_points,
+//				settings->max_it, stat->fval);
+//	}
 
-		settings->starting_points = 1;
-		start_time = gettime();
-		distributed_sparse_PCA_solver(B, x, descB, nnz_x, ictxt, ROW_BLOCKING,
-				X_VECTOR_BLOCKING, settings, stat);
-
-		end_time = gettime();
-		if (iam == 0) {
-			printf("time spend in solver %f; stating points%d; it%d; val%f\n",
-					end_time - start_time, settings->starting_points,
-					settings->max_it,stat->fval);
-		}
-
-		blacs_barrier_(&ictxt, &C_CHAR_SCOPE_ALL);
-		settings->starting_points = 32;
-		start_time = gettime();
-		distributed_sparse_PCA_solver(B, x, descB, nnz_x, ictxt, ROW_BLOCKING,
-				X_VECTOR_BLOCKING, settings, stat);
-
-		end_time = gettime();
-		if (iam == 0) {
-			printf("time spend in solver %f; stating points%d; it%d; val%f\n",
-					end_time - start_time, settings->starting_points,
-					settings->max_it,stat->fval);
-
-		}
-
-		blacs_barrier_(&ictxt, &C_CHAR_SCOPE_ALL);
-		settings->starting_points = 64;
-		start_time = gettime();
-		distributed_sparse_PCA_solver(B, x, descB, nnz_x, ictxt, ROW_BLOCKING,
-				X_VECTOR_BLOCKING, settings, stat);
-
-		end_time = gettime();
-		if (iam == 0) {
-			printf("time spend in solver %f; stating points%d; it%d; val%f\n",
-					end_time - start_time, settings->starting_points,
-					settings->max_it,stat->fval);
-
-		}
-	}
+//	int it;
+//	for (it = 1; it <= 64; it = it * 4) {
+//		settings->max_it = it;
+//
+//		blacs_barrier_(&ictxt, &C_CHAR_SCOPE_ALL);
+//
+//		settings->starting_points = 1;
+//		start_time = gettime();
+//		distributed_sparse_PCA_solver(optimization_data_inst, x, descB, nnz_x, ictxt, ROW_BLOCKING,
+//				X_VECTOR_BLOCKING, settings, stat);
+//
+//		end_time = gettime();
+//		if (iam == 0) {
+//			printf("time spend in solver %f; stating points%d; it%d; val%f\n",
+//					end_time - start_time, settings->starting_points,
+//					settings->max_it, stat->fval);
+//		}
+//
+//		blacs_barrier_(&ictxt, &C_CHAR_SCOPE_ALL);
+//		settings->starting_points = 32;
+//		start_time = gettime();
+//		distributed_sparse_PCA_solver(optimization_data_inst, x, descB, nnz_x, ictxt, ROW_BLOCKING,
+//				X_VECTOR_BLOCKING, settings, stat);
+//
+//		end_time = gettime();
+//		if (iam == 0) {
+//			printf("time spend in solver %f; stating points%d; it%d; val%f\n",
+//					end_time - start_time, settings->starting_points,
+//					settings->max_it, stat->fval);
+//
+//		}
+//
+//		blacs_barrier_(&ictxt, &C_CHAR_SCOPE_ALL);
+//		settings->starting_points = 64;
+//		start_time = gettime();
+//		distributed_sparse_PCA_solver(optimization_data_inst, x, descB, nnz_x, ictxt, ROW_BLOCKING,
+//				X_VECTOR_BLOCKING, settings, stat);
+//
+//		end_time = gettime();
+//		if (iam == 0) {
+//			printf("time spend in solver %f; stating points%d; it%d; val%f\n",
+//					end_time - start_time, settings->starting_points,
+//					settings->max_it, stat->fval);
+//
+//		}
+//	}
 
 	/* =============================================================
 	 *          STORE RESULT
 	 * =============================================================
 	 */
+	double start_time = gettime();
+	MKL_INT iam, nprocs;
+	blacs_pinfo_(&iam, &nprocs);
+	MKL_INT myrow, mycol, nprow, npcol, info;
+	MKL_INT ictxt = optimization_data_inst.params.ictxt;
+	blacs_gridinfo_(&ictxt, &nprow, &npcol, &myrow, &mycol);
 
-	start_time = gettime();
-
+	MKL_INT DIM_N = optimization_data_inst.params.DIM_N;
 	double* x_local = NULL;
 	if (iam == 0) {
 		x_local = (double*) calloc(DIM_N, sizeof(double));
@@ -601,27 +665,26 @@ int distributed_pca_solver_from_two_dim_files(
 	i_tmp1 = MAX(1, x_local_mq);
 	descinit_(desc_x_local, &DIM_N, &i_one, &DIM_N, &i_one, &i_zero, &i_zero,
 			&ictxt, &i_tmp1, &info);
-	pdgeadd_(&transNo, &DIM_N, &i_one, &one, x, &i_one, &i_one, desc_x, &zero,
-			x_local, &i_one, &i_one, desc_x_local);
+	pdgeadd_(&transNo, &DIM_N, &i_one, &one, &optimization_data_inst.x[0],
+			&i_one, &i_one, optimization_data_inst.descx, &zero, x_local,
+			&i_one, &i_one, desc_x_local);
 	if (iam == 0) {
-		fin = fopen(outputfile, "w");
-		for (i = 0; i < DIM_N; i++) {
+		FILE * fin = fopen(settings->result_file, "w");
+		for (int i = 0; i < DIM_N; i++) {
 			fprintf(fin, "%f;", x_local[i]);
 		}
 		fclose(fin);
 	}
 
-	end_time = gettime();
+	double end_time = gettime();
 	if (iam == 0) {
 		printf("stooring result %f\n", end_time - start_time);
 	}
 
 	free(x_local);
-	free(x);
-	free(B);
-	blacs_gridexit_(&ictxt);
-//	blacs_exit_(&i_zero);
 	return iam;
+}
+}
 }
 
 #endif /* DISTRIBUTED_PCA_SOLVER_H_ */

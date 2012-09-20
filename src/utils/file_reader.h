@@ -86,8 +86,44 @@ char* get_file_modified_name(const char* base, string suffix) {
 	return cstr;
 }
 
+
+void save_statistics(solver_structures::optimization_statistics* stat,
+		solver_structures::optimization_settings * settings){
+	ofstream stat_file;
+		stat_file.open(get_file_modified_name(settings->result_file, "stat"));
+		stat_file << "Solver options " << '\n';
+		stat_file << "Algorithm: " << settings->algorithm << '\n';
+		if (settings->isConstrainedProblem()){
+			stat_file << "Constraint parameter: " << settings->constrain << '\n';
+		}else{
+			stat_file << "Penalty parameter: " << settings->penalty<< '\n';
+		}
+		stat_file << "Max iterations per starting point: " << settings->max_it<< '\n';
+		stat_file << "Starting points: " << settings->starting_points<< '\n';
+		stat_file << "Batch size: " << settings->batch_size<< '\n';
+		stat_file << "Batching strategy (OTF): " << settings->on_the_fly_generation<< '\n';
+		stat_file << "Double precision: " << settings->double_precission<< '\n';
+		stat_file << "Toll: " << settings->toll<< '\n';
+	#ifdef DEBUG
+		stat_file << "DEBUG MODE: " << 1<< '\n';
+	#endif
+
+		stat_file << '\n'<< "Timing " << '\n';
+		stat_file << "Total computational time: "<< setprecision(16) << stat->true_computation_time<< " sec"<< '\n';
+		stat_file << "Total elapsed time: "<< setprecision(16) << stat->total_elapsed_time<< " sec"<<'\n';
+
+		stat_file << '\n'<< "Result " << '\n';
+		stat_file << "Objective value: " << setprecision(16)<< stat->fval<< '\n';
+		stat_file << "Elapsed it (total): " << stat->it<< '\n';
+		stat_file << "Average it (per starting point): "<< setprecision(16) << stat->it*settings->batch_size/(0.0+settings->starting_points)<< '\n';
+
+
+		stat_file.close();
+}
+
+
 template<typename F>
-void save_statistics_and_results(solver_structures::optimization_statistics* stat,
+void save_results(solver_structures::optimization_statistics* stat,
 		solver_structures::optimization_settings * settings, const F* x, unsigned int lenght) {
 	ofstream result_file;
 	result_file.open(get_file_modified_name(settings->result_file, "x"));
@@ -97,38 +133,6 @@ void save_statistics_and_results(solver_structures::optimization_statistics* sta
 		}
 	}
 	result_file.close();
-
-	ofstream stat_file;
-	stat_file.open(get_file_modified_name(settings->result_file, "stat"));
-	stat_file << "Solver options " << '\n';
-	stat_file << "Algorithm: " << settings->algorithm << '\n';
-	if (settings->isConstrainedProblem()){
-		stat_file << "Constraint parameter: " << settings->constrain << '\n';
-	}else{
-		stat_file << "Penalty parameter: " << settings->penalty<< '\n';
-	}
-	stat_file << "Max iterations per starting point: " << settings->max_it<< '\n';
-	stat_file << "Starting points: " << settings->starting_points<< '\n';
-	stat_file << "Batch size: " << settings->batch_size<< '\n';
-	stat_file << "Batching strategy (OTF): " << settings->on_the_fly_generation<< '\n';
-	stat_file << "Double precision: " << settings->double_precission<< '\n';
-	stat_file << "Toll: " << settings->toll<< '\n';
-#ifdef DEBUG
-	stat_file << "DEBUG MODE: " << 1<< '\n';
-#endif
-
-	stat_file << '\n'<< "Timing " << '\n';
-	stat_file << "Total computational time: "<< setprecision(16) << stat->true_computation_time<< " sec"<< '\n';
-	stat_file << "Total elapsed time: "<< setprecision(16) << stat->total_elapsed_time<< " sec"<<'\n';
-
-	stat_file << '\n'<< "Result " << '\n';
-	stat_file << "Objective value: " << setprecision(16)<< stat->fval<< '\n';
-	stat_file << "Elapsed it (total): " << stat->it<< '\n';
-	stat_file << "Average it (per starting point): "<< setprecision(16) << stat->it*settings->batch_size/(0.0+settings->starting_points)<< '\n';
-
-
-	stat_file.close();
-
 }
 
 }
