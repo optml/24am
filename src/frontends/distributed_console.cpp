@@ -27,31 +27,32 @@ void run_solver(solver_structures::optimization_settings * settings) {
 			new optimization_statistics();
 	MKL_INT iam, nprocs;
 	blacs_pinfo_(&iam, &nprocs);
+	double start_all = gettime();
 	PCA_solver::distributed_solver::optimization_data<F> optimization_data_inst;
-	PCA_solver::distributed_solver::load_data_from_2d_files_and_distribution<F>(optimization_data_inst,
-			settings, stat);
+	PCA_solver::distributed_solver::load_data_from_2d_files_and_distribution<F>(
+			optimization_data_inst, settings, stat);
 
 	/*
 	 *  RUN SOLVER
 	 */
 	double start_time = gettime();
-	PCA_solver::distributed_solver::distributed_sparse_PCA_solver(optimization_data_inst, settings, stat);
+	PCA_solver::distributed_solver::distributed_sparse_PCA_solver(
+			optimization_data_inst, settings, stat);
 	double end_time = gettime();
-	if (iam == 0) {
-		printf("time spend in solver %f; stating points%d; it%d; val%f\n",
-				end_time - start_time, settings->starting_points,
-				settings->max_it, stat->fval);
-		input_ouput_helper::save_statistics(stat, settings);
-	}
-
+	stat->true_computation_time = end_time - start_time;
 	/*
 	 * STORE RESULT INTO FILE
 	 */
+	PCA_solver::distributed_solver::gather_and_store_best_result_to_file(
+			optimization_data_inst, settings, stat);
+	if (iam == 0) {
+		stat->total_elapsed_time = gettime() - start_all;
+		input_ouput_helper::save_statistics(stat, settings);
+	}
 
-	PCA_solver::distributed_solver::gather_and_store_best_result_to_file(optimization_data_inst, settings,
-			stat);
 	blacs_gridexit_(&optimization_data_inst.params.ictxt);
 }
+
 
 int main(int argc, char *argv[]) {
 	solver_structures::optimization_settings* settings =
@@ -66,7 +67,7 @@ int main(int argc, char *argv[]) {
 	if (settings->double_precission) {
 		run_solver<double>(settings);
 	} else {
-//		run_solver<float>(settings);
+		run_solver<float>(settings);
 	}
 	MPI_Finalize();
 	return 0;

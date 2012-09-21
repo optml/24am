@@ -78,6 +78,7 @@ char* result_file;
 	int max_it;
 	int starting_points;
 	int batch_size;
+	unsigned int number_of_batches;
 
 	bool on_the_fly_generation;
 
@@ -126,6 +127,20 @@ char* result_file;
 		} else {
 			return true;
 		}
+
+	}
+
+	void chceckInputAndModifyIt(unsigned int n){
+		if (this->constrain > n){
+			this->constrain=n;
+		}
+		if (this->batch_size == 0) {
+			this->batch_size = this->starting_points;
+		}
+		this->number_of_batches = this->starting_points / this->batch_size;
+		if (this->number_of_batches * this->batch_size < this->starting_points)
+			this->number_of_batches++;
+		this->starting_points = this->number_of_batches * this->batch_size;
 
 	}
 

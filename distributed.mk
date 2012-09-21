@@ -23,6 +23,8 @@ distributed_generator:
 # DISTRIBUTED TEST
 distributed_test: distributed_generator distributed_console
 	 mpirun -np 6 build/distributed_console -d datasets/distributed.dat.  -r results/distributed.txt -v true -p double -s 1000 -b 64 -u 1 -a 5 -n 2 -x 2
+	 mpirun -np 6 build/distributed_console -d datasets/distributed.dat.  -r results/distributed.txt.2 -v true  -s 1000 -b 64 -u 1 -a 5 -n 2 -x 2
+	 mpirun -np 6 build/distributed_console -d datasets/distributed.dat.  -r results/distributed.txt.3 -v true  -s 1000 -b 64 -u 1 -a 1 -n 2 -x 2
 
 
  

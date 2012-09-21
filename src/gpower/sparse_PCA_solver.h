@@ -22,7 +22,6 @@
  */
 
 namespace PCA_solver {
-
 template<typename F>
 F dense_PCA_solver(const F * B, const int ldB, F * x, const unsigned int m,
 		const unsigned int n, optimization_settings* settings,
@@ -30,21 +29,9 @@ F dense_PCA_solver(const F * B, const int ldB, F * x, const unsigned int m,
 	if (settings->verbose){
 		cout << "Solver started "<<endl;
 	}
-	if (settings->constrain > n){
-		settings->constrain=n;
-	}
-
-
+	settings->chceckInputAndModifyIt(n);
 	stat->it = settings->max_it;
 	F FLOATING_ZERO = 0;
-	if (settings->batch_size == 0) {
-		settings->batch_size = settings->starting_points;
-	}
-	unsigned int number_of_batches = settings->starting_points / settings->batch_size;
-	if (number_of_batches * settings->batch_size < settings->starting_points)
-		number_of_batches++;
-	settings->starting_points = number_of_batches * settings->batch_size;
-
 	// Allocate vector for stat to return which point needs how much iterations
 	if (settings->get_it_for_all_points) {
 		stat->iters.resize(settings->starting_points, -1);
@@ -147,7 +134,7 @@ F dense_PCA_solver(const F * B, const int ldB, F * x, const unsigned int m,
 		}
 	} else {
 		//====================== MAIN LOOP THROUGHT BATCHES
-		for (unsigned int batch = 0; batch < number_of_batches; batch++) {
+		for (unsigned int batch = 0; batch < settings->number_of_batches; batch++) {
 			unsigned int statistical_shift = batch * settings->batch_size;
 			cblas_vector_scale(n * number_of_experiments_per_batch, V,
 					FLOATING_ZERO);

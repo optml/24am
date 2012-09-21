@@ -44,7 +44,7 @@
 #include <mkl_blacs.h>
 #include <mkl_pblas.h>
 
-
+#include "pblas_wrapper.h"
 
 
 #ifdef _WIN_
@@ -123,7 +123,7 @@ extern "C" {
 
 /* Parameters */
 /* Parameters */
-double zero = 0.0e+0, one = 1.0e+0, two = 2.0e+0, negone = -1.0e+0;
+
 MKL_INT i_zero = 0, i_one = 1, i_four = 4, i_negone = -1;
 MKL_INT i_tmp1, i_tmp2, i_tmp3;
 char trans = 'T';
