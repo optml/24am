@@ -1,5 +1,15 @@
 /*
- //HEADER INFO
+  *
+ * This is a parallel sparse PCA solver
+ *
+ * The solver is based on a simple alternating maximization (AM) subroutine 
+ * and is based on the paper
+ *    P. Richtarik, M. Takac and S. Damla Ahipasaoglu 
+ *    "Alternating Maximization: Unified Framework and 24 Parallel Codes for L1 and L2 based Sparse PCA"
+ *
+ * The code is available at https://code.google.com/p/24am/
+ * under GNU GPL v3 License
+ * 
  */
 
 #include <iostream>
