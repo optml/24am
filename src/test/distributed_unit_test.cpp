@@ -57,7 +57,6 @@ void test_solver(solver_structures::optimization_settings * settings,
 	algorithms[5] = solver_structures::L0_constrained_L2_PCA;
 	algorithms[6] = solver_structures::L1_constrained_L1_PCA;
 	algorithms[7] = solver_structures::L1_constrained_L2_PCA;
-	algorithms[7] = solver_structures::L1_constrained_L1_PCA;
 	char* resultDistributed = settings->result_file;
 	for (int al = 0; al < 8; al++) {
 		settings->algorithm = algorithms[al];
@@ -101,8 +100,8 @@ int main(int argc, char *argv[]) {
 	settings->batch_size = 64;
 	settings->starting_points = 64;
 	settings->constrain = 20;
-	settings->toll = 0;
-	settings->max_it = 20;
+	settings->toll = 0.01;
+	settings->max_it = 100;
 	if (settings->proccess_node == 0)
 		cout << "Double test" << endl;
 	test_solver<double>(settings, multicoreDataset, multicoreResult);

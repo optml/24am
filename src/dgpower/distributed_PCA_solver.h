@@ -1,5 +1,5 @@
 /*
-  *
+ *
  * This is a parallel sparse PCA solver
  *
  * The solver is based on a simple alternating maximization (AM) subroutine 
@@ -125,7 +125,7 @@ public:
 	void free_extra_data() {
 		if (this->is_init_data_for_constrained) {
 			free(this->V_constr_treshold);
-			this->is_init_data_for_constrained=false;
+			this->is_init_data_for_constrained = false;
 		}
 
 	}
@@ -270,7 +270,8 @@ void threshold_V_for_constrained(
 										* j],
 								optimization_data_inst.params.DIM_N,
 								settings->constrain,
-								optimization_data_inst.V_constr_sort_buffer[j],settings); // x = S_w(x)
+								optimization_data_inst.V_constr_sort_buffer[j],
+								settings); // x = S_w(x)
 			} else {
 				settings->hard_tresholding_using_sort = true;
 				norm_of_x =
@@ -283,9 +284,11 @@ void threshold_V_for_constrained(
 								settings); // x = T_k(x)
 			}
 
-			if (settings->algorithm == solver_structures::L0_constrained_L2_PCA
-					|| settings->algorithm
-							== solver_structures::L1_constrained_L2_PCA) {
+//			if (settings->algorithm == solver_structures::L0_constrained_L2_PCA
+//					|| settings->algorithm
+//							== solver_structures::L1_constrained_L2_PCA)
+
+			{
 				cblas_vector_scale(optimization_data_inst.params.DIM_N,
 						&optimization_data_inst.V_constr_treshold[optimization_data_inst.params.DIM_N
 								* j], 1 / norm_of_x);
@@ -317,12 +320,6 @@ void perform_one_distributed_iteration_for_constrained_pca(
 			optimization_data_inst.Z, &i_one, &i_one,
 			optimization_data_inst.descZ);
 	//set Z=sgn(Z)
-	if (settings->algorithm == solver_structures::L0_constrained_L1_PCA
-			|| settings->algorithm
-					== solver_structures::L1_constrained_L1_PCA) {
-		vector_sgn(optimization_data_inst.Z, optimization_data_inst.nnz_z);	//y=sgn(y)
-	}
-
 	for (int i = 0; i < optimization_data_inst.z_nq; i++) {
 		F tmp = 0;
 		for (int j = 0; j < optimization_data_inst.z_mp; j++) {
@@ -346,7 +343,11 @@ void perform_one_distributed_iteration_for_constrained_pca(
 				optimization_data_inst.params.npcol,
 				optimization_data_inst.params.x_vector_blocking)] = tmp;
 	}
-
+	if (settings->algorithm == solver_structures::L0_constrained_L1_PCA
+			|| settings->algorithm
+					== solver_structures::L1_constrained_L1_PCA) {
+		vector_sgn(optimization_data_inst.Z, optimization_data_inst.nnz_z);	//y=sgn(y)
+	}
 	// Multiply V = B'*z
 	//		sub(C) := alpha*op(sub(A))*op(sub(B)) + beta*sub(C),
 	pXgemm(&trans, &transNo, &optimization_data_inst.params.DIM_N,
@@ -465,7 +466,12 @@ void distributed_sparse_PCA_solver(
 		for (i = 0; i < settings->starting_points; i++) {
 			if (settings->algorithm == solver_structures::L0_penalized_L1_PCA
 					|| settings->algorithm
-							== solver_structures::L0_penalized_L2_PCA) {
+							== solver_structures::L0_penalized_L2_PCA
+					|| settings->algorithm
+							== solver_structures::L0_constrained_L1_PCA
+					|| settings->algorithm
+							== solver_structures::L1_constrained_L1_PCA
+							) {
 				values[i].val = optimization_data_inst.norms[i];
 			} else {
 				values[i].val = sqrt(optimization_data_inst.norms[i]);
