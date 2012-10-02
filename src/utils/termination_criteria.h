@@ -38,7 +38,6 @@ F computeTheError(const F fval, const F fval_prev,const solver_structures::optim
 template<typename F>
 bool termination_criteria(const F error, int it,
 		const solver_structures::optimization_settings* settings) {
-	//FIXME CHECK
 	if (it > 0 && error < settings->toll)
 		return true;
 	return false;
@@ -47,7 +46,6 @@ bool termination_criteria(const F error, int it,
 template<typename F>
 bool termination_criteria(const F fval, const F fval_prev, int it,
 		const solver_structures::optimization_settings* settings) {
-	//FIXME CHECK
 	if (it > 0 && computeTheError(fval, fval_prev) < settings->toll)
 		return true;
 	return false;
