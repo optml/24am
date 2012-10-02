@@ -32,14 +32,6 @@ void printDescriptions(F* x, int length, const char* description) {
 			}
 
 		}
-		//		for (j = 0; j < DIM_M; j++) {
-		//			for (i = 0; i < DIM_N; i++) {
-		//				float tmp = -1;
-		//				fscanf(fin, "%f;", &tmp);
-		//				gsl_matrix_set(B, j, i, tmp);
-		//				gsl_matrix_set(BT, i, j, tmp);
-		//			}
-		//		}
 		fclose(fin);
 	}
 }
@@ -87,13 +79,6 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 		}
 
 	} else {
-		//		const gsl_rng_type * T;
-		//		gsl_rng * r;
-		//		gsl_rng_env_setup();
-		//		T = gsl_rng_default;
-		//		r = gsl_rng_alloc(T);
-
-
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
@@ -102,12 +87,9 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 			F tmp_norm = 0;
 			for (unsigned int i = 0; i < m; i++) {
 				F tmp = (F) rand_r(&myseed) / RAND_MAX;
-				//				F tmp = gsl_ran_ugaussian (r);
 				tmp = -1 + 2 * tmp;
 				Z[j * m + i] = tmp;
-				//				tmp_norm += tmp * tmp;
 			}
-			//			cblas_vector_scale(m, &Z[j * m], 1 / sqrt(tmp_norm));
 		}
 	}
 
@@ -138,21 +120,6 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 		}
 		if (settings->isConstrainedProblem()) {
 
-			//			printf("V:");
-			//			for (int i = 0; i < n; i++){
-			//				printf("%f ", V[i]);
-			//			}
-			//			printf("\n");
-
-			//			printf("B:");
-			//			for (int col = 0; col < n ; col++)
-			//				{
-			//				for (int row=B_CSC_Col_Ptr[col];row<B_CSC_Col_Ptr[col+1];row++)
-			//					printf("[%d %d %f] ", B_CSC_Row_Id[row],col, B_CSC_Vals[row]);
-			//				}
-			//			printf("\n");
-
-
 			if (doMean) {
 				my_mm_multiply(false, m, n, number_of_experiments, B_CSC_Vals,
 						B_CSC_Row_Id, B_CSC_Col_Ptr, means, V, Z);
@@ -164,14 +131,6 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 						ONE_MKL_INT);
 			}
 
-			//			printf("Z:");
-			//			for (int i = 0; i < m; i++)
-			//				printf("%f ", Z[i]);
-			//			printf("\n");
-
-			//			cblas_matrix_matrix_multiply(CblasColMajor, CblasNoTrans,
-			//					CblasNoTrans, m, number_of_experiments, n, 1, B, ldB, V, n,
-			//					0, Z, m); // Multiply z = B*V
 			//set Z=sgn(Z)
 			if (settings->algorithm == L0_constrained_L1_PCA
 					|| settings->algorithm == L1_constrained_L1_PCA) {
@@ -184,11 +143,6 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 				}
 			}
 
-			//			printf("Z:");
-			//			for (int i = 0; i < m; i++)
-			//				printf("%f ", Z[i]);
-			//			printf("\n");
-
 			if (doMean) {
 				my_mm_multiply(true, m, n, number_of_experiments, B_CSC_Vals,
 						B_CSC_Row_Id, B_CSC_Col_Ptr, means, Z, V);
@@ -200,16 +154,6 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 						&B_CSC_Col_Ptr[1], Z, ONE_MKL_INT, &floating_zero, V,
 						ONE_MKL_INT);
 			}
-			//			printf("V:");
-			//						for (int i = 0; i < n; i++){
-			//							printf("%f ", V[i]);
-			//						}
-			//						printf("\n");
-
-			//			cblas_matrix_matrix_multiply(CblasColMajor, CblasTrans,
-			//					CblasNoTrans, n, number_of_experiments, m, 1, B, ldB, Z, m,
-			//					0, V, n);// Multiply V = B'*z
-
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
@@ -267,10 +211,6 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 					cblas_vector_scale(m, &Z[j * m], 1 / tmp_norm);
 				}
 			}
-			//			cblas_matrix_matrix_multiply(CblasColMajor, CblasTrans,
-			//					CblasNoTrans, n, number_of_experiments, m, 1, B, ldB, Z, m,
-			//					0, V, n);// Multiply v = B'*z
-
 			sparse_matrix_matrix_multiply(MY_SPARSE_WRAPPER_TRANS, m,
 					number_of_experiments, n, &floating_one, matdescra,
 					B_CSC_Vals, B_CSC_Row_Id, B_CSC_Col_Ptr, &B_CSC_Col_Ptr[1],
@@ -288,11 +228,6 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 					number_of_experiments, n, &floating_one, matdescra,
 					B_CSC_Vals, B_CSC_Row_Id, B_CSC_Col_Ptr, &B_CSC_Col_Ptr[1],
 					V, ONE_MKL_INT, &floating_zero, Z, ONE_MKL_INT);
-
-			//			cblas_matrix_matrix_multiply(CblasColMajor, CblasNoTrans,
-			//					CblasNoTrans, m, number_of_experiments, n, 1, B, ldB, V, n,
-			//					0, Z, m); // Multiply z = B*w
-
 		}
 		error
 				= max_errors[cblas_vector_max_index(TOTAL_THREADS, max_errors,
@@ -302,9 +237,6 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 			break;
 		}
 
-//		printf("MAX FVAL = %f\n", vals[0].val);
-
-		//		printDescriptions(V,n, description);
 	}
 	double end_time_of_iterations = gettime();
 	//compute corresponding x

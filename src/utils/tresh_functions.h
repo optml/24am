@@ -115,7 +115,7 @@ F find_hard_treshHolding_parameter_without_sorting(F * x,
 
 template<typename F>
 F k_hard_tresholding(F * x, const unsigned int length, const unsigned int k,
-		std::vector<F>& myvector, optimization_settings* settings) {
+		std::vector<F>& myvector,solver_structures:: optimization_settings* settings) {
 	F treshHold;
 	if (settings->hard_tresholding_using_sort) {
 		treshHold = find_hard_treshHolding_parameter_with_sorting(x, length, k,
@@ -132,7 +132,8 @@ F k_hard_tresholding(F * x, const unsigned int length, const unsigned int k,
 		F val = x[i];
 		if (abs(val) < treshHold) {
 			x[i] = 0;
-		} else {
+		}
+		else {
 			norm += val * val;
 		}
 	}
@@ -142,7 +143,8 @@ F k_hard_tresholding(F * x, const unsigned int length, const unsigned int k,
 // Soft treshholding  x_i = (|x_i| - w)_+ sgn(x_i)
 template<typename F>
 F soft_tresholding(F * x, const unsigned int length,
-		const unsigned int constrain, std::vector<F>& myvector) {
+		const unsigned int constrain, std::vector<F>& myvector,
+		solver_structures::optimization_settings* settings) {
 	F w = sqrt(constrain);
 	mySort(x, length, myvector);
 	F lambda_Low = 0;
@@ -176,6 +178,7 @@ F soft_tresholding(F * x, const unsigned int length,
 	w = (-b - sqrt(b * b - 4 * a * c)) / (2 * a);
 #ifdef DEBUG
 	if (w < lambda_Low || w > lambda_High) {
+		if (settings->verbose)
 		printf("Problem detected!\n");
 	}
 #endif

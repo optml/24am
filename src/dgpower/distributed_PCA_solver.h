@@ -12,6 +12,7 @@
 #include "../class/optimization_settings.h"
 #include "../class/optimization_statistics.h"
 #include "../utils/termination_criteria.h"
+#include "../utils/tresh_functions.h"
 
 template<typename F>
 void clear_local_vector(F * v, const int n) {
@@ -38,11 +39,18 @@ public:
 	MKL_INT DIM_M;
 	MKL_INT DIM_N;
 	int mycol;
+	int myrow;
 	int npcol;
+	int nprow;
+
 	distributed_parameters() {
 		row_blocking = 64;
 		col_blocking = 64;
 		x_vector_blocking = 64;
+		mycol = 0;
+		npcol = 0;
+		myrow = 0;
+		nprow = 0;
 	}
 };
 
@@ -53,6 +61,13 @@ public:
 	std::vector<F> B;
 	F* V;
 	F* Z;
+	F* V_constr_treshold;
+	std::vector<std::vector<F> > V_constr_sort_buffer;
+	int V_tr_nq;
+	int V_tr_mp;
+	bool is_init_data_for_constrained;
+	int nnz_v_tr;
+
 	int nnz_z;
 	int nnz_v;
 
@@ -61,13 +76,50 @@ public:
 
 	int V_nq;
 	int V_mp;
-
+	MDESC descV_treshold;
 	MDESC descV;
 	MDESC descZ;
 	MDESC descB;
 	MDESC descx;
 	F* norms;
 	distributed_parameters params;
+
+	optimization_data() {
+		is_init_data_for_constrained = false;
+	}
+
+	void init_data_for_constrained(
+			solver_structures::optimization_settings* settings) {
+		if (!this->is_init_data_for_constrained) {
+
+			this->V_tr_mp = numroc_(&this->params.DIM_N, &this->params.DIM_N,
+					&this->params.myrow, &i_zero, &this->params.nprow);
+			this->V_tr_nq = numroc_(&settings->batch_size, &i_one,
+					&this->params.mycol, &i_zero, &this->params.npcol);
+
+			MKL_INT i_tmp1 = MAX(1, this->V_tr_mp);
+			MKL_INT info;
+			descinit_(this->descV_treshold, &this->params.DIM_N,
+					&settings->batch_size, &this->params.DIM_N, &i_one, &i_zero,
+					&i_zero, &this->params.ictxt, &i_tmp1, &info);
+			this->nnz_v_tr = this->V_tr_mp * this->V_tr_nq;
+			this->V_constr_treshold = (F*) calloc(this->nnz_v_tr, sizeof(F));
+			if (this->nnz_v_tr > 0) {
+				std::vector<F> tmp(this->params.DIM_N);
+				V_constr_sort_buffer.resize(this->V_tr_nq, tmp);
+			}
+			this->is_init_data_for_constrained = true;
+		}
+	}
+
+	void free_extra_data() {
+		if (this->is_init_data_for_constrained) {
+			free(this->V_constr_treshold);
+			this->is_init_data_for_constrained=false;
+		}
+
+	}
+
 };
 
 template<typename F>
@@ -183,125 +235,120 @@ void perform_one_distributed_iteration_for_penalized_pca(
 		}
 	}
 }
+template<typename F>
+void threshold_V_for_constrained(
+		PCA_solver::distributed_solver::optimization_data<F>& optimization_data_inst,
+		solver_structures::optimization_settings* settings,
+		solver_structures::optimization_statistics* stat) {
+	F zero = 0.0e+0, one = 1.0e+0, two = 2.0e+0, negone = -1.0e+0;
+	//================== Treshhold matrix V
+	optimization_data_inst.init_data_for_constrained(settings);
+	// obtain V from all cluster into V_constr_treshold for sorting and tresholding
+	pXgeadd(&transNo, &optimization_data_inst.params.DIM_N,
+			&settings->batch_size, &one, optimization_data_inst.V, &i_one,
+			&i_one, optimization_data_inst.descV, &zero,
+			optimization_data_inst.V_constr_treshold, &i_one, &i_one,
+			optimization_data_inst.descV_treshold);
+	//compute tresholding
+	if (optimization_data_inst.V_tr_mp == optimization_data_inst.params.DIM_N) {
+		for (unsigned int j = 0; j < optimization_data_inst.V_tr_nq; j++) {
+			F norm_of_x;
+			if (settings->isL1ConstrainedProblem()) {
+				norm_of_x =
+						soft_tresholding(
+								&optimization_data_inst.V_constr_treshold[optimization_data_inst.params.DIM_N
+										* j],
+								optimization_data_inst.params.DIM_N,
+								settings->constrain,
+								optimization_data_inst.V_constr_sort_buffer[j],settings); // x = S_w(x)
+			} else {
+				settings->hard_tresholding_using_sort = true;
+				norm_of_x =
+						k_hard_tresholding(
+								&optimization_data_inst.V_constr_treshold[optimization_data_inst.params.DIM_N
+										* j],
+								optimization_data_inst.params.DIM_N,
+								settings->constrain,
+								optimization_data_inst.V_constr_sort_buffer[j],
+								settings); // x = T_k(x)
+			}
 
+			if (settings->algorithm == solver_structures::L0_constrained_L2_PCA
+					|| settings->algorithm
+							== solver_structures::L1_constrained_L2_PCA) {
+				cblas_vector_scale(optimization_data_inst.params.DIM_N,
+						&optimization_data_inst.V_constr_treshold[optimization_data_inst.params.DIM_N
+								* j], 1 / norm_of_x);
+			}
+		}
+	}
+	//return thresholded values
+	pXgeadd(&transNo, &optimization_data_inst.params.DIM_N,
+			&settings->batch_size, &one,
+			optimization_data_inst.V_constr_treshold, &i_one, &i_one,
+			optimization_data_inst.descV_treshold, &zero,
+			optimization_data_inst.V, &i_one, &i_one,
+			optimization_data_inst.descV);
+}
 
+template<typename F>
+void perform_one_distributed_iteration_for_constrained_pca(
+		PCA_solver::distributed_solver::optimization_data<F>& optimization_data_inst,
+		solver_structures::optimization_settings* settings,
+		solver_structures::optimization_statistics* stat) {
+	F zero = 0.0e+0, one = 1.0e+0, two = 2.0e+0, negone = -1.0e+0;
+	clear_local_vector(optimization_data_inst.norms, settings->batch_size); // we use NORMS to store objective values
+	// z= B*V
+	pXgemm(&transNo, &transNo, &optimization_data_inst.params.DIM_M,
+			&settings->batch_size, &optimization_data_inst.params.DIM_N, &one,
+			&optimization_data_inst.B[0], &i_one, &i_one,
+			optimization_data_inst.descB, optimization_data_inst.V, &i_one,
+			&i_one, optimization_data_inst.descV, &zero,
+			optimization_data_inst.Z, &i_one, &i_one,
+			optimization_data_inst.descZ);
+	//set Z=sgn(Z)
+	if (settings->algorithm == solver_structures::L0_constrained_L1_PCA
+			|| settings->algorithm
+					== solver_structures::L1_constrained_L1_PCA) {
+		vector_sgn(optimization_data_inst.Z, optimization_data_inst.nnz_z);	//y=sgn(y)
+	}
 
-//FIXME TODO Have to finish
- template<typename F>
- void perform_one_distributed_iteration_for_constrained_pca(
- 		PCA_solver::distributed_solver::optimization_data<F>& optimization_data_inst,
- 		solver_structures::optimization_settings* settings,
- 		solver_structures::optimization_statistics* stat) {
- 	F zero = 0.0e+0, one = 1.0e+0, two = 2.0e+0, negone = -1.0e+0;
+	for (int i = 0; i < optimization_data_inst.z_nq; i++) {
+		F tmp = 0;
+		for (int j = 0; j < optimization_data_inst.z_mp; j++) {
 
- 	// z= B*V
- 	pXgemm(&transNo, &transNo, &optimization_data_inst.params.DIM_M,
- 			&settings->batch_size, &optimization_data_inst.params.DIM_N, &one,
- 			&optimization_data_inst.B[0], &i_one, &i_one,
- 			optimization_data_inst.descB, optimization_data_inst.V, &i_one,
- 			&i_one, optimization_data_inst.descV, &zero,
- 			optimization_data_inst.Z, &i_one, &i_one,
- 			optimization_data_inst.descZ);
- 	//================== normalize matrix Z
- 	//scale Z
- 	if (settings->algorithm == solver_structures::L0_penalized_L1_PCA
- 			|| settings->algorithm == solver_structures::L1_penalized_L1_PCA) {
- 		for (int j = 0; j < optimization_data_inst.nnz_z; j++) {
- 			optimization_data_inst.Z[j] = sgn(optimization_data_inst.Z[j]);
- 		}
- 	} else {
- 		clear_local_vector(optimization_data_inst.norms, settings->batch_size);
- 		//data are stored in column order
- 		for (int i = 0; i < optimization_data_inst.z_nq; i++) {
- 			F tmp = 0;
- 			for (int j = 0; j < optimization_data_inst.z_mp; j++) {
- 				tmp += optimization_data_inst.Z[j
- 						+ i * optimization_data_inst.z_mp]
- 						* optimization_data_inst.Z[j
- 								+ i * optimization_data_inst.z_mp];
- 			}
- 			optimization_data_inst.norms[get_column_coordinate(i,
- 					optimization_data_inst.params.mycol,
- 					optimization_data_inst.params.npcol,
- 					optimization_data_inst.params.x_vector_blocking)] = tmp;
- 		}
- //		sum up + distribute norms of "Z"
- 		Xgsum2d(&optimization_data_inst.params.ictxt, &C_CHAR_SCOPE_ALL,
- 				&C_CHAR_GENERAL_TREE_CATHER, &settings->batch_size, &i_one,
- 				optimization_data_inst.norms, &settings->batch_size, &i_negone,
- 				&i_negone);
- 		//normalize local "z"
- 		for (int i = 0; i < optimization_data_inst.z_nq; i++) {
- 			F scaleNorm =
- 					1
- 							/ sqrt(
- 									optimization_data_inst.norms[get_column_coordinate(
- 											i,
- 											optimization_data_inst.params.mycol,
- 											optimization_data_inst.params.npcol,
- 											optimization_data_inst.params.x_vector_blocking)]);
- 			for (int j = 0; j < optimization_data_inst.z_mp; j++) {
- 				optimization_data_inst.Z[j + i * optimization_data_inst.z_mp] =
- 						optimization_data_inst.Z[j
- 								+ i * optimization_data_inst.z_mp] * scaleNorm;
- 			}
- 		}
- 	}
- 	//======================
- 	// Multiply V = B'*z
- 	//		sub(C) := alpha*op(sub(A))*op(sub(B)) + beta*sub(C),
- 	pXgemm(&trans, &transNo, &optimization_data_inst.params.DIM_N,
- 			&settings->batch_size, &optimization_data_inst.params.DIM_M, &one,
- 			&optimization_data_inst.B[0], &i_one, &i_one,
- 			optimization_data_inst.descB, optimization_data_inst.Z, &i_one,
- 			&i_one, optimization_data_inst.descZ, &zero,
- 			optimization_data_inst.V, &i_one, &i_one,
- 			optimization_data_inst.descV);
- 	// perform thresh-holding operations and compute objective values
- 	clear_local_vector(optimization_data_inst.norms, settings->starting_points); // we use NORMS to store objective values
- 	if (settings->algorithm == solver_structures::L0_penalized_L1_PCA
- 			|| settings->algorithm == solver_structures::L0_penalized_L2_PCA) {
- 		for (int i = 0; i < optimization_data_inst.V_nq; i++) {
- 			for (int j = 0; j < optimization_data_inst.V_mp; j++) {
- 				const F tmp = optimization_data_inst.V[j
- 						+ i * optimization_data_inst.V_mp];
- 				F tmp2 = (tmp * tmp - settings->penalty);
- 				if (tmp2 > 0) {
- 					optimization_data_inst.norms[get_column_coordinate(i,
- 							optimization_data_inst.params.mycol,
- 							optimization_data_inst.params.npcol,
- 							optimization_data_inst.params.x_vector_blocking)] +=
- 							tmp2;
- 				} else {
- 					optimization_data_inst.V[j + i * optimization_data_inst.V_mp] =
- 							0;
- 				}
- 			}
- 		}
- 	} else {
- 		for (int i = 0; i < optimization_data_inst.V_nq; i++) {
- 			for (int j = 0; j < optimization_data_inst.V_mp; j++) {
- 				const F tmp = optimization_data_inst.V[j
- 						+ i * optimization_data_inst.V_mp];
- 				F tmp2 = myabs(tmp) - settings->penalty;
- 				if (tmp2 > 0) {
- 					optimization_data_inst.norms[get_column_coordinate(i,
- 							optimization_data_inst.params.mycol,
- 							optimization_data_inst.params.npcol,
- 							optimization_data_inst.params.x_vector_blocking)] +=
- 							tmp2 * tmp2;
- 					optimization_data_inst.V[j + i * optimization_data_inst.V_mp] =
- 							tmp2 * sgn(tmp);
- 				} else {
- 					optimization_data_inst.V[j + i * optimization_data_inst.V_mp] =
- 							0;
- 				}
- 			}
- 		}
- 	}
- }
+			if (settings->algorithm == solver_structures::L0_constrained_L1_PCA
+					|| settings->algorithm
+							== solver_structures::L1_constrained_L1_PCA) {
+				tmp += abs(
+						optimization_data_inst.Z[j
+								+ i * optimization_data_inst.z_mp]);
+			} else {
+				tmp += optimization_data_inst.Z[j
+						+ i * optimization_data_inst.z_mp]
+						* optimization_data_inst.Z[j
+								+ i * optimization_data_inst.z_mp];
+			}
 
+		}
+		optimization_data_inst.norms[get_column_coordinate(i,
+				optimization_data_inst.params.mycol,
+				optimization_data_inst.params.npcol,
+				optimization_data_inst.params.x_vector_blocking)] = tmp;
+	}
 
+	// Multiply V = B'*z
+	//		sub(C) := alpha*op(sub(A))*op(sub(B)) + beta*sub(C),
+	pXgemm(&trans, &transNo, &optimization_data_inst.params.DIM_N,
+			&settings->batch_size, &optimization_data_inst.params.DIM_M, &one,
+			&optimization_data_inst.B[0], &i_one, &i_one,
+			optimization_data_inst.descB, optimization_data_inst.Z, &i_one,
+			&i_one, optimization_data_inst.descZ, &zero,
+			optimization_data_inst.V, &i_one, &i_one,
+			optimization_data_inst.descV);
+	// perform 	threshold operation and compute objective values
+	threshold_V_for_constrained(optimization_data_inst, settings, stat);
+}
 
 template<typename F>
 void distributed_sparse_PCA_solver(
@@ -368,6 +415,11 @@ void distributed_sparse_PCA_solver(
 	for (i = 0; i < optimization_data_inst.nnz_v; i++) {
 		optimization_data_inst.V[i] = -1 + 2 * (F) rand_r(&seed) / RAND_MAX;
 	}
+	// initial tresholding of matrix "V".....
+	if (settings->isConstrainedProblem()) {
+		threshold_V_for_constrained(optimization_data_inst, settings, stat);
+	}
+
 	//=============== Create description for "x"
 	MKL_INT x_mp = numroc_(&N, &X_VECTOR_BLOCKING, &myrow, &i_zero, &nprow);
 	MKL_INT x_nq = numroc_(&i_one, &X_VECTOR_BLOCKING, &mycol, &i_zero, &npcol);
@@ -386,16 +438,14 @@ void distributed_sparse_PCA_solver(
 	double fval_prev = 0;
 	unsigned int it;
 	for (it = 0; it < settings->max_it; it++) {
-
 		stat->it++;
-
 		if (settings->isConstrainedProblem()) {
-			perform_one_distributed_iteration_for_constrained_pca(optimization_data_inst, settings, stat);
+			perform_one_distributed_iteration_for_constrained_pca(
+					optimization_data_inst, settings, stat);
 		} else {
 			perform_one_distributed_iteration_for_penalized_pca(
 					optimization_data_inst, settings, stat);
 		}
-
 		//Agregate FVAL
 		Xgsum2d(&ictxt, &C_CHAR_SCOPE_ALL, &C_CHAR_GENERAL_TREE_CATHER,
 				&settings->starting_points, &i_one,
@@ -445,6 +495,7 @@ void distributed_sparse_PCA_solver(
 	for (i = 0; i < optimization_data_inst.x.size(); i++) {
 		x[i] = x[i] * norm_of_x;
 	}
+	optimization_data_inst.free_extra_data();
 	free(optimization_data_inst.Z);
 	free(optimization_data_inst.V);
 	free(optimization_data_inst.norms);
@@ -478,6 +529,9 @@ int load_data_from_2d_files_and_distribution(
 	blacs_gridinfo_(&ictxt, &nprow, &npcol, &myrow, &mycol);
 	optimization_data_inst.params.mycol = mycol;
 	optimization_data_inst.params.npcol = npcol;
+	optimization_data_inst.params.myrow = myrow;
+	optimization_data_inst.params.nprow = nprow;
+
 	optimization_data_inst.params.ictxt = ictxt;
 
 	/* ===========================================================================================
@@ -649,7 +703,7 @@ int gather_and_store_best_result_to_file(
 
 	double end_time = gettime();
 	if (iam == 0) {
-		printf("stooring result %f\n", end_time - start_time);
+		printf("storing result %f\n", end_time - start_time);
 	}
 
 	free(x_local);

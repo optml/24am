@@ -89,7 +89,7 @@ void perform_one_iteration_for_constrained_pca(F* V, F* Z,
 		F norm_of_x;
 		if (settings->isL1ConstrainedProblem()) {
 			norm_of_x = soft_tresholding(&V[n * j], n, settings->constrain,
-					buffer[j]); // x = S_w(x)
+					buffer[j],settings); // x = S_w(x)
 		} else {
 			norm_of_x = k_hard_tresholding(&V[n * j], n, settings->constrain,
 					buffer[j], settings); // x = T_k(x)
