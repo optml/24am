@@ -16,9 +16,7 @@
  */
 
 /*
- [1 2
- 3 4]
- is stored as  1 3 2 4!!!
+ Data-matrix is stored column-wise
  */
 
 /* Header files*/
