@@ -332,7 +332,7 @@ struct init_sequence_with_LDN {
 };
 
 template<typename F>
-F compute_soft_tresholding_parameter(F * myvector, const unsigned int length,
+F compute_soft_thresholding_parameter(F * myvector, const unsigned int length,
 		const unsigned int constrain) {
 	F w = sqrt(constrain);
 	F lambda_Low = 0;
@@ -410,14 +410,14 @@ struct generate_random_number {
 };
 
 template<typename F>
-void perform_hard_and_soft_tresholdingNEW(thrust::device_vector<F> &d_V,
+void perform_hard_and_soft_thresholdingNEW(thrust::device_vector<F> &d_V,
 		optimization_settings* settings, const unsigned int n,
 		thrust::host_vector<F>& h_x, const unsigned int LDN,
 		thrust::device_vector<int> &d_IDX, thrust::device_vector<F> &dataToSort) {
 }
 
 template<>
-void perform_hard_and_soft_tresholdingNEW(thrust::device_vector<float> &d_V,
+void perform_hard_and_soft_thresholdingNEW(thrust::device_vector<float> &d_V,
 		optimization_settings* settings, const unsigned int n,
 		thrust::host_vector<float>& h_x, const unsigned int LDN,
 		thrust::device_vector<int> &d_IDX,
@@ -446,7 +446,7 @@ void perform_hard_and_soft_tresholdingNEW(thrust::device_vector<float> &d_V,
 					dataToSort.begin();
 			thrust::advance(it_sorted, LDN * i);
 			thrust::copy(it_sorted, it_sorted + n, h_x.begin());
-			float tresh_hold = compute_soft_tresholding_parameter(&h_x[0], n,
+			float tresh_hold = compute_soft_thresholding_parameter(&h_x[0], n,
 					settings->constrain);
 			thrust::transform(it_begin, it_end, it_begin,
 					gpu_soft_treshholding<float> (tresh_hold));
@@ -460,7 +460,7 @@ void perform_hard_and_soft_tresholdingNEW(thrust::device_vector<float> &d_V,
 }
 
 template<>
-void perform_hard_and_soft_tresholdingNEW(thrust::device_vector<double> &d_V,
+void perform_hard_and_soft_thresholdingNEW(thrust::device_vector<double> &d_V,
 		optimization_settings* settings, const unsigned int n,
 		thrust::host_vector<double>& h_x, const unsigned int LDN,
 		thrust::device_vector<int> &d_IDX,
@@ -489,7 +489,7 @@ void perform_hard_and_soft_tresholdingNEW(thrust::device_vector<double> &d_V,
 					dataToSort.begin();
 			thrust::advance(it_sorted, LDN * i);
 			thrust::copy(it_sorted, it_sorted + n, h_x.begin());
-			double tresh_hold = compute_soft_tresholding_parameter(&h_x[0], n,
+			double tresh_hold = compute_soft_thresholding_parameter(&h_x[0], n,
 					settings->constrain);
 			thrust::transform(it_begin, it_end, it_begin,
 					gpu_soft_treshholding<double> (tresh_hold));
@@ -503,24 +503,24 @@ void perform_hard_and_soft_tresholdingNEW(thrust::device_vector<double> &d_V,
 }
 
 template<typename F>
-void perform_hard_and_soft_tresholding(thrust::device_vector<F> &d_V,
+void perform_hard_and_soft_thresholding(thrust::device_vector<F> &d_V,
 		optimization_settings* settings, const unsigned int n,
 		thrust::device_vector<F>& d_x_for_sort, thrust::host_vector<F>& h_x,
 		const unsigned int LDN) {
 
 	if (settings->isL1ConstrainedProblem()
 			|| !settings->gpu_use_k_selection_algorithm) {
-		perform_hard_and_soft_tresholding_with_sorting(d_V, settings, n,
+		perform_hard_and_soft_thresholding_with_sorting(d_V, settings, n,
 				d_x_for_sort, h_x, LDN);
 	} else {
-		perform_hard_tresholding_with_k_selection(d_V, settings, n,
+		perform_hard_thresholding_with_k_selection(d_V, settings, n,
 				d_x_for_sort, h_x, LDN);
 	}
 
 }
 //===========================================================================
 template<typename F>
-void perform_hard_tresholding_with_k_selection(thrust::device_vector<F> &d_V,
+void perform_hard_thresholding_with_k_selection(thrust::device_vector<F> &d_V,
 		optimization_settings* settings, const unsigned int n,
 		thrust::device_vector<F>& d_x_for_sort, thrust::host_vector<F>& h_x,
 		const unsigned int LDN) {
@@ -528,7 +528,7 @@ void perform_hard_tresholding_with_k_selection(thrust::device_vector<F> &d_V,
 }
 
 template<>
-void perform_hard_tresholding_with_k_selection(
+void perform_hard_thresholding_with_k_selection(
 		thrust::device_vector<float> &d_V, optimization_settings* settings,
 		const unsigned int n, thrust::device_vector<float>& d_x_for_sort,
 		thrust::host_vector<float>& h_x, const unsigned int LDN) {
@@ -546,7 +546,7 @@ void perform_hard_tresholding_with_k_selection(
 }
 
 template<>
-void perform_hard_tresholding_with_k_selection(
+void perform_hard_thresholding_with_k_selection(
 		thrust::device_vector<double> &d_V, optimization_settings* settings,
 		const unsigned int n, thrust::device_vector<double>& d_x_for_sort,
 		thrust::host_vector<double>& h_x, const unsigned int LDN) {
@@ -567,14 +567,14 @@ void perform_hard_tresholding_with_k_selection(
 
 //===========================================================================
 template<typename F>
-void perform_hard_and_soft_tresholding_with_sorting(
+void perform_hard_and_soft_thresholding_with_sorting(
 		thrust::device_vector<F> &d_V, optimization_settings* settings,
 		const unsigned int n, thrust::device_vector<F>& d_x_for_sort,
 		thrust::host_vector<F>& h_x, const unsigned int LDN) {
 }
 
 template<>
-void perform_hard_and_soft_tresholding_with_sorting(
+void perform_hard_and_soft_thresholding_with_sorting(
 		thrust::device_vector<float> &d_V, optimization_settings* settings,
 		const unsigned int n, thrust::device_vector<float>& d_x_for_sort,
 		thrust::host_vector<float>& h_x, const unsigned int LDN) {
@@ -590,7 +590,7 @@ void perform_hard_and_soft_tresholding_with_sorting(
 				comparator_abs_val<float> ());// maybe use stable_sort ???
 		if (settings->isL1ConstrainedProblem()) {
 			thrust::copy(d_x_for_sort.begin(), d_x_for_sort.end(), h_x.begin());
-			float tresh_hold = compute_soft_tresholding_parameter(&h_x[0], n,
+			float tresh_hold = compute_soft_thresholding_parameter(&h_x[0], n,
 					settings->constrain);
 			thrust::transform(it_begin, it_end, it_begin,
 					gpu_soft_treshholding<float> (tresh_hold));
@@ -603,7 +603,7 @@ void perform_hard_and_soft_tresholding_with_sorting(
 }
 
 template<>
-void perform_hard_and_soft_tresholding_with_sorting(
+void perform_hard_and_soft_thresholding_with_sorting(
 		thrust::device_vector<double> &d_V, optimization_settings* settings,
 		const unsigned int n, thrust::device_vector<double>& d_x_for_sort,
 		thrust::host_vector<double>& h_x, const unsigned int LDN) {
@@ -619,7 +619,7 @@ void perform_hard_and_soft_tresholding_with_sorting(
 				comparator_abs_val<double> ());// maybe use stable_sort ???
 		if (settings->isL1ConstrainedProblem()) {
 			thrust::copy(d_x_for_sort.begin(), d_x_for_sort.end(), h_x.begin());
-			double tresh_hold = compute_soft_tresholding_parameter(&h_x[0], n,
+			double tresh_hold = compute_soft_thresholding_parameter(&h_x[0], n,
 					settings->constrain);
 			thrust::transform(it_begin, it_end, it_begin,
 					gpu_soft_treshholding<double> (tresh_hold));
@@ -632,14 +632,14 @@ void perform_hard_and_soft_tresholding_with_sorting(
 }
 
 template<typename F>
-void perform_hard_and_soft_tresholding_for_penalized(
+void perform_hard_and_soft_thresholding_for_penalized(
 		thrust::device_vector<F> &d_V, solver_structures::optimization_settings* settings,
 		const unsigned int n, value_coordinate_holder<F>* vals,
 		const unsigned int LDN) {
 }
 
 template<>
-void perform_hard_and_soft_tresholding_for_penalized(
+void perform_hard_and_soft_thresholding_for_penalized(
 		thrust::device_vector<double> &d_V, solver_structures::optimization_settings* settings,
 		const unsigned int n, value_coordinate_holder<double>* vals,
 		const unsigned int LDN) {
@@ -674,7 +674,7 @@ void perform_hard_and_soft_tresholding_for_penalized(
 }
 
 template<>
-void perform_hard_and_soft_tresholding_for_penalized(
+void perform_hard_and_soft_thresholding_for_penalized(
 		thrust::device_vector<float> &d_V, optimization_settings* settings,
 		const unsigned int n, value_coordinate_holder<float>* vals,
 		const unsigned int LDN) {

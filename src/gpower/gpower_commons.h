@@ -98,10 +98,10 @@ void perform_one_iteration_for_constrained_pca(F* V, F* Z,
 		}
 		F norm_of_x;
 		if (settings->isL1ConstrainedProblem()) {
-			norm_of_x = soft_tresholding(&V[n * j], n, settings->constrain,
+			norm_of_x = soft_thresholding(&V[n * j], n, settings->constrain,
 					buffer[j],settings); // x = S_w(x)
 		} else {
-			norm_of_x = k_hard_tresholding(&V[n * j], n, settings->constrain,
+			norm_of_x = k_hard_thresholding(&V[n * j], n, settings->constrain,
 					buffer[j], settings); // x = T_k(x)
 		}
 
@@ -160,10 +160,10 @@ void perform_one_iteration_for_penalized_pca(F* V, F* Z,
 	cblas_matrix_matrix_multiply(CblasColMajor, CblasTrans, CblasNoTrans, n,
 			number_of_experiments_per_batch, m, 1, B, ldB, Z, m, 0, V, n);// Multiply v = B'*z
 	if (settings->isL1PenalizedProblem()) {
-		L1_penalized_tresholding(number_of_experiments_per_batch, n, V,
+		L1_penalized_thresholding(number_of_experiments_per_batch, n, V,
 				settings, max_errors, vals, stat, it);
 	} else {
-		L0_penalized_tresholding(number_of_experiments_per_batch, n, V,
+		L0_penalized_thresholding(number_of_experiments_per_batch, n, V,
 				settings, max_errors, vals, stat, it);
 	}
 

@@ -19,7 +19,7 @@
 #include "../utils/various.h"
 #include "../utils/tresh_functions.h"
 #include "../utils/timer.h"
-#include "sparse_PCA_tresholding.h"
+#include "sparse_PCA_thresholding.h"
 
 #include "../utils/gsl_helper.h"
 

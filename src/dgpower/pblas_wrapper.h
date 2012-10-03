@@ -1,9 +1,25 @@
 /*
- * pblas.h
+ *
+ * This is a parallel sparse PCA solver
+ *
+ * The solver is based on a simple alternating maximization (AM) subroutine
+ * and is based on the paper
+ *    P. Richtarik, M. Takac and S. Damla Ahipasaoglu
+ *    "Alternating Maximization: Unified Framework and 24 Parallel Codes for L1 and L2 based Sparse PCA"
+ *
+ * The code is available at https://code.google.com/p/24am/
+ * under GNU GPL v3 License
  *
  *  Created on: Sep 21, 2012
  *      Author: taki
+ *
+ *
+ *
+ *  This file contains a wrappers for Parallel BLAS. This allows us to have one code
+ *  for double and also for floats.
+ *
  */
+
 
 #ifndef PBLAS_WAPPER_H_
 #define PBLAS_WAPPER_H_

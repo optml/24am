@@ -124,10 +124,10 @@ F find_hard_treshHolding_parameter_without_sorting(F * x,
 }
 
 template<typename F>
-F k_hard_tresholding(F * x, const unsigned int length, const unsigned int k,
+F k_hard_thresholding(F * x, const unsigned int length, const unsigned int k,
 		std::vector<F>& myvector,solver_structures:: optimization_settings* settings) {
 	F treshHold;
-	if (settings->hard_tresholding_using_sort) {
+	if (settings->hard_thresholding_using_sort) {
 		treshHold = find_hard_treshHolding_parameter_with_sorting(x, length, k,
 				myvector);
 	} else {
@@ -152,7 +152,7 @@ F k_hard_tresholding(F * x, const unsigned int length, const unsigned int k,
 
 // Soft treshholding  x_i = (|x_i| - w)_+ sgn(x_i)
 template<typename F>
-F soft_tresholding(F * x, const unsigned int length,
+F soft_thresholding(F * x, const unsigned int length,
 		const unsigned int constrain, std::vector<F>& myvector,
 		solver_structures::optimization_settings* settings) {
 	F w = sqrt(constrain);

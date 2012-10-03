@@ -135,10 +135,10 @@ int gpu_sparse_PCA_solver(cublasHandle_t &handle, const unsigned int m,
 			//					cudaEventRecord(start2, 0);
 			// choose betweem those two implementation
 			if (low_memory) {
-				perform_hard_and_soft_tresholding(d_V, settings, n,
+				perform_hard_and_soft_thresholding(d_V, settings, n,
 						d_x_for_sort, h_x, LD_N);
 			} else {
-				perform_hard_and_soft_tresholdingNEW(d_V, settings, n, h_x,
+				perform_hard_and_soft_thresholdingNEW(d_V, settings, n, h_x,
 						LD_N, d_IDX, dataToSort);
 			}
 			//			cudaEventRecord(stop2, 0);
@@ -164,7 +164,7 @@ int gpu_sparse_PCA_solver(cublasHandle_t &handle, const unsigned int m,
 			// Multiply x = B'*z
 			gpu_matrix_matrix_multiply(handle, CUBLAS_OP_T, ONE, m, n, B, z, V,
 					settings->starting_points, LD_M, LD_N);
-			perform_hard_and_soft_tresholding_for_penalized(d_V, settings, n,
+			perform_hard_and_soft_thresholding_for_penalized(d_V, settings, n,
 					vals, LD_N);
 			// Multiply z = B*x
 			gpu_matrix_matrix_multiply(handle, CUBLAS_OP_N, ONE, m, n, B, V, z,

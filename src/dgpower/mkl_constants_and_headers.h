@@ -121,8 +121,7 @@ extern "C" {
 }
 
 
-/* Parameters */
-/* Parameters */
+/* Constants used in the code */
 
 MKL_INT i_zero = 0, i_one = 1, i_four = 4, i_negone = -1;
 MKL_INT i_tmp1, i_tmp2, i_tmp3;

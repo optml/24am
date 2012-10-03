@@ -21,7 +21,7 @@
 #include "my_sparse_cblas_wrapper.h"
 #include "helpers.h"
 #include "tresh_functions.h"
-#include "sparse_PCA_tresholding.h"
+#include "sparse_PCA_thresholding.h"
 
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
@@ -175,10 +175,10 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 				}
 				F norm_of_x;
 				if (settings->isL1ConstrainedProblem()) {
-					norm_of_x = soft_tresholding(&V[n * j], n,
+					norm_of_x = soft_thresholding(&V[n * j], n,
 							settings->constrain, buffer[j]); // x = S_w(x)
 				} else {
-					norm_of_x = k_hard_tresholding(&V[n * j], n,
+					norm_of_x = k_hard_thresholding(&V[n * j], n,
 							settings->constrain, buffer[j], settings); // x = T_k(x)
 				}
 
@@ -227,10 +227,10 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 					Z, ONE_MKL_INT, &floating_zero, V, ONE_MKL_INT);
 
 			if (settings->isL1PenalizedProblem()) {
-				L1_penalized_tresholding(number_of_experiments, n, V, settings,
+				L1_penalized_thresholding(number_of_experiments, n, V, settings,
 						max_errors, vals, stat, it);
 			} else {
-				L0_penalized_tresholding(number_of_experiments, n, V, settings,
+				L0_penalized_thresholding(number_of_experiments, n, V, settings,
 						max_errors, vals, stat, it);
 			}
 

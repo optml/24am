@@ -63,8 +63,21 @@ unsigned int vector_get_nnz(const F * x,unsigned int size) {
 	return nnz;
 }
 
+template<typename F>
+void clear_local_vector(F * v, const int n) {
+	int i;
+	for (i = 0; i < n; i++)
+		v[i] = 0;
+}
 
-
-
+/*
+ * this function is used only for distributed solver and returns an position of
+ * starting point for given node in the grid
+ */
+int get_column_coordinate(const int col, const int myCol, const int numCol,
+		const int blocking) {
+	const int fillup = col / blocking;
+	return (fillup * (numCol - 1) + myCol) * blocking + col;
+}
 
 #endif /* VARIOUS_H_ */

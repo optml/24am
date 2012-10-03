@@ -10,6 +10,10 @@
  * The code is available at https://code.google.com/p/24am/
  * under GNU GPL v3 License
  * 
+ *
+ *  This file contains a distributed solver. The solver works only for dense matrices
+ *  and doesn't have implemented on the fly strategy and batching with more than one batch.
+ *
  */
 
 #ifndef DISTRIBUTED_PCA_SOLVER_H_
@@ -23,36 +27,30 @@
 #include "../class/optimization_statistics.h"
 #include "../utils/termination_criteria.h"
 #include "../utils/tresh_functions.h"
-
-template<typename F>
-void clear_local_vector(F * v, const int n) {
-	int i;
-	for (i = 0; i < n; i++)
-		v[i] = 0;
-}
-
-int get_column_coordinate(const int col, const int myCol, const int numCol,
-		const int blocking) {
-	const int fillup = col / blocking;
-	return (fillup * (numCol - 1) + myCol) * blocking + col;
-}
+#include "../utils/various.h"
 
 namespace PCA_solver {
 namespace distributed_solver {
 
+/*
+ * this class is used to hold all parameters for distributed computing
+ * and the context for pblas.
+ */
 class distributed_parameters {
 public:
-	MKL_INT ictxt;
-	MKL_INT row_blocking;
-	MKL_INT col_blocking;
-	MKL_INT x_vector_blocking;
-	MKL_INT DIM_M;
-	MKL_INT DIM_N;
-	int mycol;
-	int myrow;
-	int npcol;
-	int nprow;
+	MKL_INT ictxt; // parallel context
+	MKL_INT row_blocking; // determines partition in rows (see PBLAS manual)
+	MKL_INT col_blocking; // determines partition in columns (see PBLAS manual)
+	MKL_INT x_vector_blocking; // determines partition for vectors (this can have some meaning for
+							   // constrained versions. If is set to be "N" one would ged rid of some overhead
+	MKL_INT DIM_M; // Total dimension - number of rows of matrix B
+	MKL_INT DIM_N; // Total dimension - number of columns of matrix B
+	int mycol; // my column position inside of computation grid
+	int myrow; // my row position inside of computation grid
+	int npcol; // total number of columns in grid
+	int nprow; // total number of rows in grid
 
+	// set default parameters. Number 64 is recommended by PBLAS
 	distributed_parameters() {
 		row_blocking = 64;
 		col_blocking = 64;
@@ -64,19 +62,23 @@ public:
 	}
 };
 
+/*
+ * This class holds all optimization data needed by the algorithm
+ */
 template<typename F>
 class optimization_data {
 public:
-	std::vector<F> x;
-	std::vector<F> B;
-	F* V;
-	F* Z;
-	F* V_constr_treshold;
-	std::vector<std::vector<F> > V_constr_sort_buffer;
-	int V_tr_nq;
-	int V_tr_mp;
-	bool is_init_data_for_constrained;
-	int nnz_v_tr;
+	std::vector<F> x; // final solution will be stored here
+	std::vector<F> B; // data for matrix
+	F* V; // matrix used to store more starting points (of x-es)
+	F* Z; // matrix used to store corresponding vectors "z"
+	F* V_constr_threshold; // matrix used to store data to do thresholding (for constrained versions only)
+	                      // note that only few starting points will be processed on each node
+	std::vector<std::vector<F> > V_constr_sort_buffer; // buffer for sorting
+	int V_tr_nq; // number of starting points which will be processed on given node (constrained version  only)
+	int V_tr_mp; // number of rows == N
+	int nnz_v_tr; // total nonzero elements in V_constr_threshold
+	bool is_init_data_for_constrained; // local variable to hold info if the data were initialized
 
 	int nnz_z;
 	int nnz_v;
@@ -86,7 +88,7 @@ public:
 
 	int V_nq;
 	int V_mp;
-	MDESC descV_treshold;
+	MDESC descV_threshold;
 	MDESC descV;
 	MDESC descZ;
 	MDESC descB;
@@ -109,11 +111,11 @@ public:
 
 			MKL_INT i_tmp1 = MAX(1, this->V_tr_mp);
 			MKL_INT info;
-			descinit_(this->descV_treshold, &this->params.DIM_N,
+			descinit_(this->descV_threshold, &this->params.DIM_N,
 					&settings->batch_size, &this->params.DIM_N, &i_one, &i_zero,
 					&i_zero, &this->params.ictxt, &i_tmp1, &info);
 			this->nnz_v_tr = this->V_tr_mp * this->V_tr_nq;
-			this->V_constr_treshold = (F*) calloc(this->nnz_v_tr, sizeof(F));
+			this->V_constr_threshold = (F*) calloc(this->nnz_v_tr, sizeof(F));
 			if (this->nnz_v_tr > 0) {
 				std::vector<F> tmp(this->params.DIM_N);
 				V_constr_sort_buffer.resize(this->V_tr_nq, tmp);
@@ -124,7 +126,7 @@ public:
 
 	void free_extra_data() {
 		if (this->is_init_data_for_constrained) {
-			free(this->V_constr_treshold);
+			free(this->V_constr_threshold);
 			this->is_init_data_for_constrained = false;
 		}
 
@@ -253,30 +255,30 @@ void threshold_V_for_constrained(
 	F zero = 0.0e+0, one = 1.0e+0, two = 2.0e+0, negone = -1.0e+0;
 	//================== Treshhold matrix V
 	optimization_data_inst.init_data_for_constrained(settings);
-	// obtain V from all cluster into V_constr_treshold for sorting and tresholding
+	// obtain V from all cluster into V_constr_threshold for sorting and thresholding
 	pXgeadd(&transNo, &optimization_data_inst.params.DIM_N,
 			&settings->batch_size, &one, optimization_data_inst.V, &i_one,
 			&i_one, optimization_data_inst.descV, &zero,
-			optimization_data_inst.V_constr_treshold, &i_one, &i_one,
-			optimization_data_inst.descV_treshold);
-	//compute tresholding
+			optimization_data_inst.V_constr_threshold, &i_one, &i_one,
+			optimization_data_inst.descV_threshold);
+	//compute thresholding
 	if (optimization_data_inst.V_tr_mp == optimization_data_inst.params.DIM_N) {
 		for (unsigned int j = 0; j < optimization_data_inst.V_tr_nq; j++) {
 			F norm_of_x;
 			if (settings->isL1ConstrainedProblem()) {
 				norm_of_x =
-						soft_tresholding(
-								&optimization_data_inst.V_constr_treshold[optimization_data_inst.params.DIM_N
+						soft_thresholding(
+								&optimization_data_inst.V_constr_threshold[optimization_data_inst.params.DIM_N
 										* j],
 								optimization_data_inst.params.DIM_N,
 								settings->constrain,
 								optimization_data_inst.V_constr_sort_buffer[j],
 								settings); // x = S_w(x)
 			} else {
-				settings->hard_tresholding_using_sort = true;
+				settings->hard_thresholding_using_sort = true;
 				norm_of_x =
-						k_hard_tresholding(
-								&optimization_data_inst.V_constr_treshold[optimization_data_inst.params.DIM_N
+						k_hard_thresholding(
+								&optimization_data_inst.V_constr_threshold[optimization_data_inst.params.DIM_N
 										* j],
 								optimization_data_inst.params.DIM_N,
 								settings->constrain,
@@ -290,7 +292,7 @@ void threshold_V_for_constrained(
 
 			{
 				cblas_vector_scale(optimization_data_inst.params.DIM_N,
-						&optimization_data_inst.V_constr_treshold[optimization_data_inst.params.DIM_N
+						&optimization_data_inst.V_constr_threshold[optimization_data_inst.params.DIM_N
 								* j], 1 / norm_of_x);
 			}
 		}
@@ -298,8 +300,8 @@ void threshold_V_for_constrained(
 	//return thresholded values
 	pXgeadd(&transNo, &optimization_data_inst.params.DIM_N,
 			&settings->batch_size, &one,
-			optimization_data_inst.V_constr_treshold, &i_one, &i_one,
-			optimization_data_inst.descV_treshold, &zero,
+			optimization_data_inst.V_constr_threshold, &i_one, &i_one,
+			optimization_data_inst.descV_threshold, &zero,
 			optimization_data_inst.V, &i_one, &i_one,
 			optimization_data_inst.descV);
 }
@@ -426,7 +428,7 @@ void distributed_sparse_PCA_solver(
 	for (i = 0; i < optimization_data_inst.nnz_v; i++) {
 		optimization_data_inst.V[i] = -1 + 2 * (F) rand_r(&seed) / RAND_MAX;
 	}
-	// initial tresholding of matrix "V".....
+	// initial thresholding of matrix "V".....
 	if (settings->isConstrainedProblem()) {
 		threshold_V_for_constrained(optimization_data_inst, settings, stat);
 	}
@@ -470,8 +472,7 @@ void distributed_sparse_PCA_solver(
 					|| settings->algorithm
 							== solver_structures::L0_constrained_L1_PCA
 					|| settings->algorithm
-							== solver_structures::L1_constrained_L1_PCA
-							) {
+							== solver_structures::L1_constrained_L1_PCA) {
 				values[i].val = optimization_data_inst.norms[i];
 			} else {
 				values[i].val = sqrt(optimization_data_inst.norms[i]);

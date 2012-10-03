@@ -74,7 +74,7 @@ public:
 	int distributed_row_grid_file; // size of row-grid. used only for distributed solver. See documentation
 	double toll; // final tollerance for solver
 	bool verbose;
-	bool hard_tresholding_using_sort; // determines if hardtresholding should be done by sorting (better for large constrain value)
+	bool hard_thresholding_using_sort; // determines if hardthresholding should be done by sorting (better for large constrain value)
 									  // or by using an sorted map (better for small constrain parameter)
 	bool gpu_use_k_selection_algorithm; // use approximate k-selection algorithm (Russel Steinbach, Jeffrey Blanchard, Bradley Gordon, and Toluwaloju Alabi)
 	bool double_precission; // determines if one should use "double" or "float"
@@ -101,7 +101,7 @@ public:
 		penalty = 0;
 		verbose = false;
 		starting_points = 64;
-		hard_tresholding_using_sort = false;
+		hard_thresholding_using_sort = false;
 		on_the_fly_generation = false;
 		max_it = 100;
 		get_values_for_all_points = true;

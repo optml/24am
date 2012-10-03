@@ -13,8 +13,8 @@
  */
 
 
-#ifndef SPARSE_PCA_TRESHOLDING_H_
-#define SPARSE_PCA_TRESHOLDING_H_
+#ifndef SPARSE_PCA_thresholdING_H_
+#define SPARSE_PCA_thresholdING_H_
 
 #include "../utils/openmp_helper.h"
 #include "../class/optimization_statistics.h"
@@ -23,7 +23,7 @@
 
 
 template<typename F>
-void L1_penalized_tresholding(const unsigned int number_of_experiments,
+void L1_penalized_thresholding(const unsigned int number_of_experiments,
 		const unsigned int n, F* V, const optimization_settings* settings,
 		F* max_errors, value_coordinate_holder<F>* vals,
 		optimization_statistics* stat, const unsigned int it,unsigned int statistical_shift=0) {
@@ -63,7 +63,7 @@ void L1_penalized_tresholding(const unsigned int number_of_experiments,
 }
 
 template<typename F>
-void L0_penalized_tresholding(const unsigned int number_of_experiments,
+void L0_penalized_thresholding(const unsigned int number_of_experiments,
 		const unsigned int n, F* V, const optimization_settings* settings,
 		F* max_errors, value_coordinate_holder<F>* vals,
 		optimization_statistics* stat, const unsigned int it,unsigned int statistical_shift=0) {
@@ -100,4 +100,4 @@ void L0_penalized_tresholding(const unsigned int number_of_experiments,
 }
 
 
-#endif /* SPARSE_PCA_TRESHOLDING_H_ */
+#endif /* SPARSE_PCA_thresholdING_H_ */
