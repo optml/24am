@@ -10,15 +10,10 @@
  * The code is available at https://code.google.com/p/24am/
  * under GNU GPL v3 License
  * 
+ *    GPU SOLVER FOR SPARSE PCA - frontend console interface
+ *
  */
 
-//============================================================================
-// Name        :
-// Author      : Martin Takac
-// Version     :
-// Copyright   : GNU
-// Description : GPower Method
-//============================================================================
 
 #include "../class/optimization_settings.h"
 #include "../class/optimization_statistics.h"

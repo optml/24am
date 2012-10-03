@@ -5,24 +5,18 @@ BLAS_LIB= $(GSL_LIB)
 
 
 
-UTILS =  gsl_helper.o  my_cblas_wrapper.o  
-OBJS = multicore_console.o  $(UTILS)
+OBJS = multicore_console.o  
 
 
-my_cblas_wrapper.o :
-	$(CC) $(CFLAGS) $(INCLUDE)  $(UTILSFOLDER)my_cblas_wrapper.cpp -o $(OBJFOL)my_cblas_wrapper.o
-gsl_helper.o :
-	$(CC) $(CFLAGS) $(INCLUDE) $(UTILSFOLDER)gsl_helper.cpp -o $(OBJFOL)gsl_helper.o
 multicore_console.o :  $(UTILS) 
 	$(CC) $(CFLAGS) $(INCLUDE)  $(FRONTENDFOLDER)multicore_console.cpp  -o $(OBJFOL)multicore_console.o
 test_cpu.o :  $(UTILS) 
 	$(CC) $(CFLAGS) $(INCLUDE) $(TESTFOLDER)test_cpu.cpp  -o $(OBJFOL)test_cpu.o
-PC_OBJECTS =          $(OBJFOL)my_cblas_wrapper.o  $(OBJFOL)gsl_helper.o    
 multicore_console: $(OBJS)
-	$(CC) $(LFLAGS) $(OBJFOL)multicore_console.o $(PC_OBJECTS)  $(LIBS) -o $(BUILD_FOLDER)multicore_console
+	$(CC) $(LFLAGS) $(OBJFOL)multicore_console.o  $(LIBS) -o $(BUILD_FOLDER)multicore_console
 
 test_cpu: test_cpu.o
-	$(CC) $(LFLAGS) $(OBJFOL)test_cpu.o $(PC_OBJECTS)  $(LIBS) -o $(BUILD_FOLDER)test_cpu
+	$(CC) $(LFLAGS) $(OBJFOL)test_cpu.o   $(LIBS) -o $(BUILD_FOLDER)test_cpu
 
 
 test_pc:

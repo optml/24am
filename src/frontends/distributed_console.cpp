@@ -10,7 +10,7 @@
  * The code is available at https://code.google.com/p/24am/
  * under GNU GPL v3 License
  * 
- *    DISTRIBUTIVE SOLVER FOR SPARSE PCA
+ *    DISTRIBUTIVE SOLVER FOR SPARSE PCA - frontend console interface
  *
  * 
  */

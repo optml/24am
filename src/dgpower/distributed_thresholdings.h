@@ -32,6 +32,7 @@
 namespace PCA_solver {
 namespace distributed_thresholdings {
 
+// this function execute one iteration for penalized PCA
 template<typename F>
 void perform_one_distributed_iteration_for_penalized_pca(
 		PCA_solver::distributed_classes::optimization_data<F>& optimization_data_inst,
@@ -70,7 +71,7 @@ void perform_one_distributed_iteration_for_penalized_pca(
 					optimization_data_inst.params.npcol,
 					optimization_data_inst.params.x_vector_blocking)] = tmp;
 		}
-//		sum up + distribute norms of "Z"
+        //	sum up + distribute norms of "Z"
 		Xgsum2d(&optimization_data_inst.params.ictxt, &C_CHAR_SCOPE_ALL,
 				&C_CHAR_GENERAL_TREE_CATHER, &settings->batch_size, &i_one,
 				optimization_data_inst.norms, &settings->batch_size, &i_negone,
@@ -145,6 +146,8 @@ void perform_one_distributed_iteration_for_penalized_pca(
 		}
 	}
 }
+
+// this function executes thresholding operations for constrained PCA
 template<typename F>
 void threshold_V_for_constrained(
 		PCA_solver::distributed_classes::optimization_data<F>& optimization_data_inst,
@@ -183,16 +186,9 @@ void threshold_V_for_constrained(
 								optimization_data_inst.V_constr_sort_buffer[j],
 								settings); // x = T_k(x)
 			}
-
-//			if (settings->algorithm == solver_structures::L0_constrained_L2_PCA
-//					|| settings->algorithm
-//							== solver_structures::L1_constrained_L2_PCA)
-
-			{
-				cblas_vector_scale(optimization_data_inst.params.DIM_N,
-						&optimization_data_inst.V_constr_threshold[optimization_data_inst.params.DIM_N
-								* j], 1 / norm_of_x);
-			}
+			cblas_vector_scale(optimization_data_inst.params.DIM_N,
+					&optimization_data_inst.V_constr_threshold[optimization_data_inst.params.DIM_N
+							* j], 1 / norm_of_x);
 		}
 	}
 	//return thresholded values
@@ -204,11 +200,13 @@ void threshold_V_for_constrained(
 			optimization_data_inst.descV);
 }
 
+// this function perform one iteration of contrained PCA
 template<typename F>
 void perform_one_distributed_iteration_for_constrained_pca(
 		PCA_solver::distributed_classes::optimization_data<F>& optimization_data_inst,
 		solver_structures::optimization_settings* settings,
 		solver_structures::optimization_statistics* stat) {
+	// standard constants used in MKL library
 	F zero = 0.0e+0, one = 1.0e+0, two = 2.0e+0, negone = -1.0e+0;
 	clear_local_vector(optimization_data_inst.norms, settings->batch_size); // we use NORMS to store objective values
 	// z= B*V
@@ -219,7 +217,7 @@ void perform_one_distributed_iteration_for_constrained_pca(
 			&i_one, optimization_data_inst.descV, &zero,
 			optimization_data_inst.Z, &i_one, &i_one,
 			optimization_data_inst.descZ);
-	//set Z=sgn(Z)
+// compute distributed objective values (each computer has only part of the objective value)
 	for (int i = 0; i < optimization_data_inst.z_nq; i++) {
 		F tmp = 0;
 		for (int j = 0; j < optimization_data_inst.z_mp; j++) {
@@ -243,6 +241,7 @@ void perform_one_distributed_iteration_for_constrained_pca(
 				optimization_data_inst.params.npcol,
 				optimization_data_inst.params.x_vector_blocking)] = tmp;
 	}
+	//set Z=sgn(Z)
 	if (settings->algorithm == solver_structures::L0_constrained_L1_PCA
 			|| settings->algorithm
 					== solver_structures::L1_constrained_L1_PCA) {
