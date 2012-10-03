@@ -36,7 +36,7 @@ void run_solver(solver_structures::optimization_settings * settings) {
 	MKL_INT iam, nprocs;
 	blacs_pinfo_(&iam, &nprocs);
 	double start_all = gettime();
-	PCA_solver::distributed_solver::optimization_data<F> optimization_data_inst;
+	PCA_solver::distributed_classes::optimization_data<F> optimization_data_inst;
 	PCA_solver::distributed_solver::load_data_from_2d_files_and_distribution<F>(
 			optimization_data_inst, settings, stat);
 
