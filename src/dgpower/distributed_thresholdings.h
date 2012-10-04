@@ -25,7 +25,7 @@
 #include "../class/optimization_settings.h"
 #include "../class/optimization_statistics.h"
 #include "../utils/termination_criteria.h"
-#include "../utils/tresh_functions.h"
+#include "../utils/thresh_functions.h"
 #include "../utils/various.h"
 #include "distributed_classes.h"
 

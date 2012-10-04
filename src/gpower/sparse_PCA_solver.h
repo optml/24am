@@ -17,7 +17,7 @@
 #include "../class/optimization_settings.h"
 #include "../class/optimization_statistics.h"
 #include "../utils/various.h"
-#include "../utils/tresh_functions.h"
+#include "../utils/thresh_functions.h"
 #include "../utils/timer.h"
 #include "sparse_PCA_thresholding.h"
 
