@@ -15,6 +15,7 @@ results/
 benchmark_suite/
 c/GPower/src/output/
 syncsrc.sh
+synchector.sh
 *.zip
 *.d
 *.tmp
@@ -35,18 +36,4 @@ octave-core
 cpu_test
 ..hg/
 tbb40_233oss
-ac-dc/
-latex/papers/2012_ICML/icml_parallel_ucdm.ps
-latex/papers/2012_CompuationPaper_PCDM/2012_gOMS_parallelCDM.ps
-ac-dc/DATA/MC/EX12/
-ac-dc/DATA/MC/EX4/
-projects/
-ac-dc/DATA/MC/EX5/
-ac-dc/..hg
-ac-dc.wiki/..hg
-c/.metadata
 *.pdf
-c/GPower/.cproject
-academics_papers/Books/Borwein.J.M.,Lewis.A.S.Convex.analysis.and.nonlinear.optimization.ps
-richtarik_takac_nrcdm.ps
-c/hogwild_sw/

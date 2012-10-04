@@ -18,11 +18,12 @@
 
 #include "../utils/various.h"
 
+
+// this function generate initial points
 template<typename F>
 void getSignleStartingPoint(F* V, F* Z, optimization_settings* settings,
 		const unsigned int n, const unsigned int m, int batchshift,
 		unsigned int j) {
-
 	if (settings->isConstrainedProblem()) {
 		myseed = j + batchshift;
 		F tmp_norm = 0;
@@ -30,8 +31,6 @@ void getSignleStartingPoint(F* V, F* Z, optimization_settings* settings,
 			unsigned int idx = (int) (n * (F) rand_r(&myseed) / (RAND_MAX));
 			if (idx == n)
 				idx--;
-			//							for (unsigned int i = 0; i < n; i++) {
-			//								unsigned int idx = i;
 			F tmp = (F) rand_r(&myseed) / RAND_MAX;
 			V[idx] = tmp;
 			tmp_norm += tmp * tmp;
@@ -48,6 +47,7 @@ void getSignleStartingPoint(F* V, F* Z, optimization_settings* settings,
 
 }
 
+//initialize starting points
 template<typename F>
 void initialize_starting_points(F* V, F* Z, optimization_settings* settings,
 		optimization_statistics* stat,
@@ -63,6 +63,7 @@ void initialize_starting_points(F* V, F* Z, optimization_settings* settings,
 	}
 }
 
+// do one iteration for constrained PCA
 template<typename F>
 void perform_one_iteration_for_constrained_pca(F* V, F* Z,
 		optimization_settings* settings, optimization_statistics* stat,
@@ -130,6 +131,7 @@ void perform_one_iteration_for_constrained_pca(F* V, F* Z,
 	}
 }
 
+// do one iteration for penalize PCA
 template<typename F>
 void perform_one_iteration_for_penalized_pca(F* V, F* Z,
 		optimization_settings* settings, optimization_statistics* stat,

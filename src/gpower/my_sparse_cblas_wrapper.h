@@ -10,6 +10,8 @@
  * The code is available at https://code.google.com/p/24am/
  * under GNU GPL v3 License
  * 
+ *  this file contains wrapper for sprace blas. This enables us to use float and double precission
+ *
  */
 
 #ifndef MY_SPARSE_WRAPPER_H_
@@ -20,6 +22,7 @@
 char* MY_SPARSE_WRAPPER_TRANS = "T";
 char* MY_SPARSE_WRAPPER_NOTRANS = "N";
 
+// matrix matrix multiply
 template<typename F>
 void my_mm_multiply(bool trans, const int m, const int n,
 		const int experiments, const F* vals, const int* row_id,
@@ -85,7 +88,6 @@ void my_mm_multiply(bool trans, const int m, const int n,
 	}
 }
 
-//template<>
 void sparse_matrix_matrix_multiply(char *transa, int mI, int nI, int kI,
 		double *alpha, char *matdescra, double *val, MKL_INT *indx,
 		MKL_INT *pntrb, MKL_INT *pntre, double *b, int ldbI, double *beta,
@@ -97,34 +99,9 @@ void sparse_matrix_matrix_multiply(char *transa, int mI, int nI, int kI,
 	MKL_INT ldc = ldcI;
 	MKL_INT ldb = ldbI;
 
-	//	for (int i = 0; i < 5; i++) {
-	//		printf("%d PTR %d  %d==%d \n",i, pntrb[i],pntrb[i+1],pntre[i]);
-	//		for (int row = pntrb[i]; row < pntrb[i+1]; row++) {
-	//			printf("%d  %d   %f\n", indx[row], i, val[row]);
-	//		}
-	//	}
-
 	mkl_dcscmm(transa, &m, &n, &k, alpha, matdescra, val, indx, pntrb, pntre,
 			b, &ldb, beta, c, &ldc);
 }
-
-//void sparse_matrix_matrix_multiply(char *transa, MKL_INT *m, MKL_INT *n,
-//		float *alpha, char *matdescra, float *val, MKL_INT *indx,
-//		MKL_INT *pntrb, MKL_INT *pntre, float *b, MKL_INT *ldb, float *c,
-//		MKL_INT *ldc) {
-//	mkl_scscmm(transa, m, n, k, alpha, matdescra, val, indx, pntrb, pntre, b,
-//			ldb, beta, c, ldc);
-//}
-
-//template<>
-//void sparse_matrix_matrix_multiply(const CBLAS_ORDER Order,
-//		const CBLAS_TRANSPOSE TransA, const CBLAS_TRANSPOSE TransB,
-//		const int M, const int N, const int K, const float alpha,
-//		const float *A, const int lda, const float *B, const int ldb,
-//		const float beta, float *C, const int ldc) {
-//	cblas_sgemm(Order, TransA, TransB, M, N, K, alpha, A, lda, B, ldb, beta, C,
-//			ldc);
-//}
 
 
 #endif /* MY_CBLAS_WRAPPER_H_ */
