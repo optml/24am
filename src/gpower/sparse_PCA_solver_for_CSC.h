@@ -15,12 +15,11 @@
 
 #ifndef SPARSE_PCA_SOLVER_CSC_H_
 #define SPARSE_PCA_SOLVER_CSC_H_
-#include "optimization_settings.h"
-#include "optimization_statistics.h"
-#include "my_cblas_wrapper.h"
+#include "../class/optimization_settings.h"
+#include "../class/optimization_statistics.h"
+#include "../utils/my_cblas_wrapper.h"
 #include "my_sparse_cblas_wrapper.h"
-#include "helpers.h"
-#include "tresh_functions.h"
+#include "../utils/thresh_functions.h"
 #include "sparse_PCA_thresholding.h"
 
 #include <gsl/gsl_rng.h>
@@ -45,6 +44,9 @@ void printDescriptions(F* x, int length, const char* description) {
 		fclose(fin);
 	}
 }
+
+
+namespace PCA_solver {
 
 /*
  * Matrix B is stored in column order (Fortran Based)
@@ -271,5 +273,9 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 	free(vals);
 	return best_value;
 }
+
+
+}
+
 
 #endif /* SPARSE_PCA_SOLVER_H__ */
