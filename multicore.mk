@@ -1,8 +1,16 @@
 GSL_INCLUDE = -I/exports/applications/apps/gsl/1.9/include
 GSL_LIB= -L/exports/applications/apps/gsl/1.9/lib
-CC = g++
-BLAS_LIB= $(GSL_LIB)
+CC = icc
+#MKL_MULTICORE_LIB =   -Wl,--start-group  $(MKLROOT)/lib/intel64/libmkl_intel_lp64.a $(MKLROOT)/lib/intel64/libmkl_gnu_thread.a $(MKLROOT)/lib/intel64/libmkl_core.a -Wl,--end-group -ldl -lpthread -lm -mkl=parallel 
+MKL_MULTICORE_LIB =    -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lgsl -lm  
 
+#BLAS_LIB= $(GSL_LIB)
+BLAS_LIB= $(MKL_MULTICORE_LIB)
+LIBS_GSL = -lgslcblas
+LIBS_MKL =  
+
+
+LIBS = -L./ $(BLAS_LIB) -L../objects $(OPENMP_FLAG)  -lgsl $(LIBS_MKL)
 
 
 OBJS = multicore_console.o  
@@ -29,4 +37,32 @@ test_multicore:
 
 multicore: multicore_console test_multicore
 
+
+multicore_paper_experiments_batching: KMP
+	$(CC) $(CFLAGS) $(INCLUDE)  $(EXPERIMENTS_FOLDER)experiment_batching.cpp  -o $(OBJFOL)experiment_batching.o 
+	$(CC) $(LFLAGS) $(OBJFOL)experiment_batching.o  $(LIBS) -o $(BUILD_FOLDER)experiment_batching
+	./$(BUILD_FOLDER)experiment_batching
+	
+multicore_paper_experiments_otf: KMP
+	$(CC) $(CFLAGS) $(INCLUDE)  $(EXPERIMENTS_FOLDER)experiment_otf.cpp  -o $(OBJFOL)experiment_otf.o 
+	$(CC) $(LFLAGS) $(OBJFOL)experiment_otf.o  $(LIBS) -o $(BUILD_FOLDER)experiment_otf
+	./$(BUILD_FOLDER)experiment_otf
+	
+	
+multicore_paper_experiments_speedup: KMP	
+	$(CC) $(CFLAGS) $(INCLUDE)  $(EXPERIMENTS_FOLDER)experiment_multicore_speedup.cpp  -o $(OBJFOL)experiment_multicore_speedup.o 
+	$(CC) $(LFLAGS) $(OBJFOL)experiment_multicore_speedup.o  $(LIBS) -o $(BUILD_FOLDER)experiment_multicore_speedup
+	./$(BUILD_FOLDER)experiment_multicore_speedup	
+	
+multicore_paper_experiments: KMP multicore_paper_experiments_speedup multicore_paper_experiments_otf multicore_paper_experiments_batching	 
+
+
+KMP:
+	export KMP_AFFINITY=verbose,granularity=fine,scatter	
+
+test:
+	icc -openmp -Wall -O3 -I/exports/applications/apps/SL5/intel/MKL/10.2.3.029/include -I/exports/applications/apps/gsl/1.9/include  -c $(EXPERIMENTS_FOLDER)experiment_multicore_speedup.cpp -o $(OBJFOL)experiment_multicore_speedup.o 
+	icc -O3 $(OBJFOL)experiment_multicore_speedup.o	 -o $(BUILD_FOLDER)experiment_multicore_speedup -L/exports/applications/apps/gsl/1.9/lib -L/exports/applications/apps/SL5/intel/MKL/10.2.3.029/lib/em64t  -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lgsl -lm  
+	./$(BUILD_FOLDER)experiment_multicore_speedup	 	
+	
 	

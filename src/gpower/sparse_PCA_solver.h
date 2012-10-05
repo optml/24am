@@ -36,8 +36,15 @@ template<typename F>
 F dense_PCA_solver(const F * B, const int ldB, F * x, const unsigned int m,
 		const unsigned int n, optimization_settings* settings,
 		optimization_statistics* stat) {
-	if (settings->verbose){
-		cout << "Solver started "<<endl;
+#ifdef _OPENMP
+#pragma omp parallel
+	{
+	stat->total_threads_used = omp_get_num_threads();
+	}
+#endif
+
+	if (settings->verbose) {
+		cout << "Solver started " << endl;
 	}
 	settings->chceckInputAndModifyIt(n);
 	stat->it = settings->max_it;
@@ -85,6 +92,7 @@ F dense_PCA_solver(const F * B, const int ldB, F * x, const unsigned int m,
 		for (unsigned int i = 0; i < number_of_experiments_per_batch; i++) {
 			current_order[i] = i;
 		}
+		double start_time_of_iterations = gettime();
 		while (do_iterate) {
 			total_iterations++;
 			for (unsigned int tmp = 0; tmp < TOTAL_THREADS; tmp++) {
@@ -142,9 +150,13 @@ F dense_PCA_solver(const F * B, const int ldB, F * x, const unsigned int m,
 			}
 
 		}
+		double end_time_of_iterations = gettime();
+					stat->true_computation_time += (end_time_of_iterations
+							- start_time_of_iterations);
 	} else {
 		//====================== MAIN LOOP THROUGHT BATCHES
-		for (unsigned int batch = 0; batch < settings->number_of_batches; batch++) {
+		for (unsigned int batch = 0; batch < settings->number_of_batches;
+				batch++) {
 			unsigned int statistical_shift = batch * settings->batch_size;
 			cblas_vector_scale(n * number_of_experiments_per_batch, V,
 					FLOATING_ZERO);
@@ -204,7 +216,7 @@ F dense_PCA_solver(const F * B, const int ldB, F * x, const unsigned int m,
 	free(Z);
 	free(V);
 	free(vals);
-	stat->fval=the_best_solution_value;
+	stat->fval = the_best_solution_value;
 	return the_best_solution_value;
 }
 

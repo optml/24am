@@ -38,8 +38,10 @@ public:
 	std::vector<int> iters; // the same as before, but holds the number of iterations for given starting point
 	std::vector<int> cardinalities; // cardinalities for given starting point. For L0 constrained method doesn't make sense as
 	                                // it's value has to be constrain parameter from settings
+	int total_threads_used;
 	optimization_statistics() {
 		it = 0;
+		total_threads_used=1;
 	}
 };
 }

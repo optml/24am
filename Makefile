@@ -1,5 +1,6 @@
-
-
+#MKLROOT = /home/taki/Programs/intel/mkl
+MKLROOT = /exports/applications/apps/SL5/intel/MKL/10.2.3.029
+OPENMP_FLAG=-openmp
 
 
 UTILSFOLDER=$(SRC)/utils/
@@ -8,12 +9,13 @@ GPOWERFOLDER=$(SRC)/gpower/
 FRONTENDFOLDER=$(SRC)/frontends/
 BUILD_FOLDER=build/
 DISTR_FOLDER=$(SRC)/dgpower/
+EXPERIMENTS_FOLDER=$(SRC)/paper_experiments/
+
 
 DEBUG = -g -DDEBUG
-CFLAGS = -Wall -w -O3 -c $(DEBUG) -fopenmp 
-LFLAGS = -Wall -w -O3 $(DEBUG) 
+CFLAGS = -Wall -w -O3 -c $(DEBUG) $(OPENMP_FLAG) 
+LFLAGS = -Wall -w -O3 $(DEBUG)  $(OPENMP_FLAG)
 INCLUDE= -I. -I./frontends  -I/usr/local/include $(GSL_INCLUDE)
-LIBS = -L./ $(BLAS_LIB) -L../objects -fopenmp -lgsl -lgslcblas
 OBJFOL=objects/
 SRC = src
 
