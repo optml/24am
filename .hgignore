@@ -34,6 +34,6 @@ synchector.sh
 hg/
 octave-core
 cpu_test
-..hg/
+.hg/
 tbb40_233oss
 *.pdf

@@ -53,7 +53,7 @@ void run_experiments(optimization_settings* settings) {
 	std::vector<F> x;
 	std::vector<F> y;
 	int multSC = 1;
-	for (int mult = multSC; mult <= 32; mult = mult * 2) {
+	for (int mult = multSC; mult <= 128; mult = mult * 2) {
 		int m = 100*mult;
 		int n = 1000 * mult;
 		h_B.resize(m * n);

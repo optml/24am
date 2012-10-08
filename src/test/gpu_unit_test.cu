@@ -15,17 +15,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../utils/file_reader.h"
-#include "../utils/option_console_parser.h"
 
-using namespace solver_structures;
 #include "../gpower/sparse_PCA_solver.h"
 #include "../utils/file_reader.h"
 #include "../utils/option_console_parser.h"
 #include "../gpugpower/gpu_sparse_PCA_solver.h"
+using namespace solver_structures;
+#include "../utils/file_reader.h"
+#include "../utils/option_console_parser.h"
+
 
 template<typename F>
-void test_solver(solver_structures::optimization_settings * settings,
+int test_solver(solver_structures::optimization_settings * settings,
 		char* multicoreDataset, char* multicoreResult) {
 	solver_structures::optimization_statistics* stat =
 			new optimization_statistics();
@@ -45,10 +46,6 @@ void test_solver(solver_structures::optimization_settings * settings,
 	settings->gpu_sm_count = dp.multiProcessorCount;
 	settings->gpu_max_threads = dp.maxThreadsPerBlock;
 
-	unsigned int ldB;
-	unsigned int m;
-	unsigned int n;
-	std::vector < F > B_mat;
 	input_ouput_helper::read_csv_file(B_mat, ldB, m, n, settings->data_file);
 	stat->n = n;
 
@@ -92,15 +89,17 @@ void test_solver(solver_structures::optimization_settings * settings,
 	algorithms[5] = solver_structures::L0_constrained_L2_PCA;
 	algorithms[6] = solver_structures::L1_constrained_L1_PCA;
 	algorithms[7] = solver_structures::L1_constrained_L2_PCA;
-	char* resultDistributed = settings->result_file;
+	char* resultGPU = settings->result_file;
 	for (int al = 0; al < 8; al++) {
 		settings->algorithm = algorithms[al];
 		PCA_solver::gpu_sparse_PCA_solver(handle, m, n, d_B, h_x, settings,
 				stat, LD_M, LD_N);
+		settings->result_file=resultGPU;
+		input_ouput_helper::save_results(stat, settings, &h_x[0], n);
 		if (settings->proccess_node == 0) {
 			PCA_solver::dense_PCA_solver(B, ldB, x, m, n, settings, stat2);
 			settings->result_file = multicoreResult;
-			input_ouput_helper::save_results(stat, settings, x, n);
+			input_ouput_helper::save_results(stat2, settings, x, n);
 			cout << "Test " << al << " " << settings->algorithm << " "
 					<< stat->fval << "  " << stat2->fval << endl;
 		}
@@ -110,20 +109,23 @@ void test_solver(solver_structures::optimization_settings * settings,
 		fprintf(stderr, "!cublas shutdown error\n");
 		return EXIT_FAILURE;
 	}
+	return 0;
 }
 
 int main(int argc, char *argv[]) {
 	solver_structures::optimization_settings* settings =
 			new optimization_settings();
-	settings->data_file = "datasets/distributed.dat.";
 	settings->result_file = "results/gpu_unittest.txt";
 	char* multicoreDataset = "datasets/distributed.dat.all";
+	settings->data_file = multicoreDataset;
 	char* multicoreResult = "results/gpu_unittest_multicore.txt";
 	settings->verbose = false;
-	settings->batch_size = 64;
-	settings->starting_points = 64;
+	settings->starting_points = 1024;
+	settings->batch_size = settings->starting_points;
+	settings->on_the_fly_generation=false;
+	settings->gpu_use_k_selection_algorithm=false;
 	settings->constrain = 20;
-	settings->toll = 0.001;
+	settings->toll = 0.0001;
 	settings->max_it = 100;
 	cout << "Double test" << endl;
 	test_solver<double>(settings, multicoreDataset, multicoreResult);

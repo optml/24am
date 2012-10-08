@@ -12,16 +12,15 @@
  * 
  */
 
-
 #ifndef GPOWER_COMMONS_H_
 #define GPOWER_COMMONS_H_
 
 #include "../utils/various.h"
 
-
 // this function generate initial points
 template<typename F>
-void getSignleStartingPoint(F* V, F* Z, optimization_settings* settings,
+void getSignleStartingPoint(F* V, F* Z,
+		solver_structures::optimization_settings* settings,
 		const unsigned int n, const unsigned int m, int batchshift,
 		unsigned int j) {
 	if (settings->isConstrainedProblem()) {
@@ -49,8 +48,9 @@ void getSignleStartingPoint(F* V, F* Z, optimization_settings* settings,
 
 //initialize starting points
 template<typename F>
-void initialize_starting_points(F* V, F* Z, optimization_settings* settings,
-		optimization_statistics* stat,
+void initialize_starting_points(F* V, F* Z,
+		solver_structures::optimization_settings* settings,
+		solver_structures::optimization_statistics* stat,
 		const unsigned int number_of_experiments_per_batch,
 		const unsigned int n, const unsigned int m, const int ldB, const F* B,
 		int batchshift = 0) {
@@ -58,31 +58,32 @@ void initialize_starting_points(F* V, F* Z, optimization_settings* settings,
 #pragma omp parallel for
 #endif
 	for (unsigned int j = 0; j < number_of_experiments_per_batch; j++) {
-		getSignleStartingPoint(&V[j * n], &Z[j * m], settings, n, m,
-				batchshift, j);
+		getSignleStartingPoint(&V[j * n], &Z[j * m], settings, n, m, batchshift,
+				j);
 	}
 }
 
 // do one iteration for constrained PCA
 template<typename F>
 void perform_one_iteration_for_constrained_pca(F* V, F* Z,
-		optimization_settings* settings, optimization_statistics* stat,
+		solver_structures::optimization_settings* settings,
+		solver_structures::optimization_statistics* stat,
 		const unsigned int number_of_experiments_per_batch,
 		const unsigned int n, const unsigned int m, const int ldB, const F* B,
-		F* max_errors, value_coordinate_holder<F>* vals,
-		std::vector<F>* buffer, unsigned int it, unsigned int statistical_shift) {
-
+		F* max_errors, value_coordinate_holder<F>* vals, std::vector<F>* buffer,
+		unsigned int it, unsigned int statistical_shift) {
 	cblas_matrix_matrix_multiply(CblasColMajor, CblasNoTrans, CblasNoTrans, m,
 			number_of_experiments_per_batch, n, 1, B, ldB, V, n, 0, Z, m); // Multiply z = B*V
 	//set Z=sgn(Z)
-	if (settings->algorithm == L0_constrained_L1_PCA || settings->algorithm
-			== L1_constrained_L1_PCA) {
+	if (settings->algorithm == solver_structures::L0_constrained_L1_PCA
+			|| settings->algorithm
+					== solver_structures::L1_constrained_L1_PCA) {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
 		for (unsigned int j = 0; j < number_of_experiments_per_batch; j++) {
 			vals[j].tmp = cblas_l1_norm(m, &Z[m * j], 1);
-			vector_sgn(&Z[m * j], m);//y=sgn(y)
+			vector_sgn(&Z[m * j], m);	//y=sgn(y)
 		}
 	}
 	cblas_matrix_matrix_multiply(CblasColMajor, CblasTrans, CblasNoTrans, n,
@@ -93,35 +94,38 @@ void perform_one_iteration_for_constrained_pca(F* V, F* Z,
 #endif
 	for (unsigned int j = 0; j < number_of_experiments_per_batch; j++) {
 		F fval_current = 0;
-		if (settings->algorithm == L0_constrained_L2_PCA || settings->algorithm
-				== L1_constrained_L2_PCA) {
+		if (settings->algorithm == solver_structures::L0_constrained_L2_PCA
+				|| settings->algorithm
+						== solver_structures::L1_constrained_L2_PCA) {
 			fval_current = cblas_l2_norm(m, &Z[m * j], 1);
 		}
 		F norm_of_x;
 		if (settings->isL1ConstrainedProblem()) {
 			norm_of_x = soft_thresholding(&V[n * j], n, settings->constrain,
-					buffer[j],settings); // x = S_w(x)
+					buffer[j], settings); // x = S_w(x)
 		} else {
 			norm_of_x = k_hard_thresholding(&V[n * j], n, settings->constrain,
 					buffer[j], settings); // x = T_k(x)
 		}
 
 		cblas_vector_scale(n, &V[j * n], 1 / norm_of_x);
-		if (settings->algorithm == L0_constrained_L1_PCA || settings->algorithm
-				== L1_constrained_L1_PCA) {
+		if (settings->algorithm == solver_structures::L0_constrained_L1_PCA
+				|| settings->algorithm
+						== solver_structures::L1_constrained_L1_PCA) {
 			fval_current = vals[j].tmp;
 		}
 		F tmp_error = computeTheError(fval_current, vals[j].val, settings);
 		vals[j].current_error = tmp_error;
 		//Log end of iteration for given point
-		if (settings->get_it_for_all_points && termination_criteria(tmp_error,
-				it, settings) && stat->iters[statistical_shift + j] == -1) {
+		if (settings->get_it_for_all_points
+				&& termination_criteria(tmp_error, it, settings)
+				&& stat->iters[statistical_shift + j] == -1) {
 			stat->iters[statistical_shift + j] = it;
 			stat->cardinalities[statistical_shift + j] = vector_get_nnz(
 					&V[j * n], n);
-		} else if (settings->get_it_for_all_points && !termination_criteria(
-				tmp_error, it, settings) && stat->iters[statistical_shift + j]
-				!= -1) {
+		} else if (settings->get_it_for_all_points
+				&& !termination_criteria(tmp_error, it, settings)
+				&& stat->iters[statistical_shift + j] != -1) {
 			stat->iters[j + statistical_shift] = -1;
 		}
 		//---------------
@@ -134,7 +138,8 @@ void perform_one_iteration_for_constrained_pca(F* V, F* Z,
 // do one iteration for penalize PCA
 template<typename F>
 void perform_one_iteration_for_penalized_pca(F* V, F* Z,
-		optimization_settings* settings, optimization_statistics* stat,
+		solver_structures::optimization_settings* settings,
+		solver_structures::optimization_statistics* stat,
 		const unsigned int number_of_experiments_per_batch,
 		const unsigned int n, const unsigned int m, const int ldB, const F* B,
 		F* max_errors, value_coordinate_holder<F>* vals, unsigned int it,
@@ -142,8 +147,8 @@ void perform_one_iteration_for_penalized_pca(F* V, F* Z,
 	//scale Z
 	cblas_matrix_matrix_multiply(CblasColMajor, CblasNoTrans, CblasNoTrans, m,
 			number_of_experiments_per_batch, n, 1, B, ldB, V, n, 0, Z, m); // Multiply z = B*w
-	if (settings->algorithm == L0_penalized_L1_PCA || settings->algorithm
-			== L1_penalized_L1_PCA) {
+	if (settings->algorithm == solver_structures::L0_penalized_L1_PCA
+			|| settings->algorithm == solver_structures::L1_penalized_L1_PCA) {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
@@ -160,7 +165,7 @@ void perform_one_iteration_for_penalized_pca(F* V, F* Z,
 		}
 	}
 	cblas_matrix_matrix_multiply(CblasColMajor, CblasTrans, CblasNoTrans, n,
-			number_of_experiments_per_batch, m, 1, B, ldB, Z, m, 0, V, n);// Multiply v = B'*z
+			number_of_experiments_per_batch, m, 1, B, ldB, Z, m, 0, V, n); // Multiply v = B'*z
 	if (settings->isL1PenalizedProblem()) {
 		L1_penalized_thresholding(number_of_experiments_per_batch, n, V,
 				settings, max_errors, vals, stat, it);

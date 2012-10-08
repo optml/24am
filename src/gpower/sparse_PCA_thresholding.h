@@ -24,9 +24,9 @@
 
 template<typename F>
 void L1_penalized_thresholding(const unsigned int number_of_experiments,
-		const unsigned int n, F* V, const optimization_settings* settings,
+		const unsigned int n, F* V, const solver_structures::optimization_settings* settings,
 		F* max_errors, value_coordinate_holder<F>* vals,
-		optimization_statistics* stat, const unsigned int it,unsigned int statistical_shift=0) {
+		solver_structures::optimization_statistics* stat, const unsigned int it,unsigned int statistical_shift=0) {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
@@ -64,9 +64,9 @@ void L1_penalized_thresholding(const unsigned int number_of_experiments,
 
 template<typename F>
 void L0_penalized_thresholding(const unsigned int number_of_experiments,
-		const unsigned int n, F* V, const optimization_settings* settings,
+		const unsigned int n, F* V, const solver_structures::optimization_settings* settings,
 		F* max_errors, value_coordinate_holder<F>* vals,
-		optimization_statistics* stat, const unsigned int it,unsigned int statistical_shift=0) {
+		solver_structures::optimization_statistics* stat, const unsigned int it,unsigned int statistical_shift=0) {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif

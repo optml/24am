@@ -12,7 +12,6 @@
  * 
  */
 
-
 #ifndef GPU_SPARSE_PCA_SOLVER_H_
 #define GPU_SPARSE_PCA_SOLVER_H_
 
@@ -30,17 +29,19 @@ namespace PCA_solver {
 template<typename F>
 int gpu_sparse_PCA_solver(cublasHandle_t &handle, const unsigned int m,
 		const unsigned int n, thrust::device_vector<F> &d_B,
-		thrust::host_vector<F>& h_x, solver_structures::optimization_settings* settings,
-		solver_structures::optimization_statistics* stat, const unsigned int LD_M,
-		const unsigned int LD_N) {
-
+		thrust::host_vector<F>& h_x,
+		solver_structures::optimization_settings* settings,
+		solver_structures::optimization_statistics* stat,
+		const unsigned int LD_M, const unsigned int LD_N) {
 	bool low_memory = false;
 	double total_memory = LD_N * LD_M + LD_N * settings->starting_points * 2
 			+ LD_M * settings->starting_points;
 	total_memory = total_memory * sizeof(F)
 			+ LD_N * settings->starting_points * 4;
 	total_memory = total_memory / (1024 * 1024 * 1024);
-	printf("Total Memory needed = %f GB\n", total_memory);
+	if (settings->verbose) {
+		printf("Total Memory needed = %f GB\n", total_memory);
+	}
 	if (total_memory > 1) {
 		low_memory = true;
 	}
@@ -104,10 +105,12 @@ int gpu_sparse_PCA_solver(cublasHandle_t &handle, const unsigned int m,
 			for (unsigned int i = 0; i < settings->starting_points; i++) {
 				gpu_computeNorm(handle, &V[i * LD_N], n, norm_of_x);
 				gpu_vector_scale(handle, &V[i * LD_N], n, 1 / norm_of_x);
+								gpu_computeNorm(handle, &V[i * LD_N], n, norm_of_x);
 			}
 			// Multiply z = B*x
 			gpu_matrix_matrix_multiply(handle, CUBLAS_OP_N, ONE, m, n, B, V, z,
 					settings->starting_points, LD_M, LD_N);
+
 			//set Z=sgn(Z)
 			if (settings->algorithm == L0_constrained_L1_PCA
 					|| settings->algorithm == L1_constrained_L1_PCA) {

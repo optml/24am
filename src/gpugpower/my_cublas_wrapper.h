@@ -135,6 +135,7 @@ void gpu_matrix_matrix_multiply(cublasHandle_t &handle,
 template<typename F>
 void gpu_vector_scale(cublasHandle_t &handle, F* d_z, const unsigned int n,
 		const F alpha) {
+	cout << "ERROR in vector scale!"<<endl;
 }
 
 template<>
@@ -414,6 +415,7 @@ void perform_hard_and_soft_thresholdingNEW(thrust::device_vector<F> &d_V,
 		optimization_settings* settings, const unsigned int n,
 		thrust::host_vector<F>& h_x, const unsigned int LDN,
 		thrust::device_vector<int> &d_IDX, thrust::device_vector<F> &dataToSort) {
+	cout << "ERROR IN TEMPLATES"<<endl;
 }
 
 template<>

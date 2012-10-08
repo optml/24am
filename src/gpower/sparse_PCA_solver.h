@@ -34,8 +34,8 @@
 namespace PCA_solver {
 template<typename F>
 F dense_PCA_solver(const F * B, const int ldB, F * x, const unsigned int m,
-		const unsigned int n, optimization_settings* settings,
-		optimization_statistics* stat) {
+		const unsigned int n, solver_structures::optimization_settings* settings,
+		solver_structures::optimization_statistics* stat) {
 #ifdef _OPENMP
 #pragma omp parallel
 	{
