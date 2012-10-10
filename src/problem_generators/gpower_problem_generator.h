@@ -22,7 +22,7 @@
 
 
 template<typename F>
-int generateProblem(const int n, const int m,F* h_B) {
+int generateProblem(const int n, const int m,F* h_B,bool uniformScale=false) {
 
 	printf("%d x %d \n", m, n);
 
@@ -37,6 +37,9 @@ int generateProblem(const int n, const int m,F* h_B) {
 			total+=tmp*tmp;
 		}
 		total=sqrt(total);
+		if (uniformScale){
+			total=total*((F) rand_r(&seed) / (RAND_MAX+0.0));
+		}
 		for (int j = 0; j < m; j++) {
 			h_B[j+i*m]=h_B[j+i*m]/total;
 		}
@@ -46,7 +49,7 @@ int generateProblem(const int n, const int m,F* h_B) {
 
 
 template<typename F>
-int generateProblem(const int n, const int m,F* h_B,const unsigned int LD_M,const unsigned int LD_N) {
+int generateProblem(const int n, const int m,F* h_B,const unsigned int LD_M,const unsigned int LD_N,bool uniformScale=false) {
 
 	printf("%d x %d \n", m, n);
 
@@ -61,8 +64,12 @@ int generateProblem(const int n, const int m,F* h_B,const unsigned int LD_M,cons
 			total+=tmp*tmp;
 		}
 		total=sqrt(total);
+		if (uniformScale){
+			total=1/total*(+((F) rand_r(&seed) / (RAND_MAX+0.0)));
+		}
+
 		for (int j = 0; j < m; j++) {
-			h_B[j+i*LD_M]=h_B[j+i*LD_M]/total;
+			h_B[j+i*LD_M]=h_B[j+i*LD_M]*total;
 		}
 	}
 	return 0;

@@ -10,5 +10,12 @@ wget archive.ics.uci.edu/ml/machine-learning-databases/bag-of-words/docword.pubm
 wget http://archive.ics.uci.edu/ml/machine-learning-databases/bag-of-words/vocab.nytimes.txt
 wget http://archive.ics.uci.edu/ml/machine-learning-databases/bag-of-words/vocab.pubmed.txt
 
-tar -xzvf docword.nytimes.txt.gz
-tar -xzvf docword.pubmed.txt.gz
+gunzip docword.nytimes.txt.gz
+gunzip docword.pubmed.txt.gz
+
+
+one small dataset is NIPS papers:
+
+wget http://archive.ics.uci.edu/ml/machine-learning-databases/bag-of-words/vocab.nips.txt
+wget archive.ics.uci.edu/ml/machine-learning-databases/bag-of-words/docword.nips.txt.gz
+gunzip docword.nips.txt.gz

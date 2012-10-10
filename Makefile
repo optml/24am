@@ -1,12 +1,12 @@
-MKLROOT = /home/taki/Programs/intel/mkl
-#MKLROOT = /exports/applications/apps/SL5/intel/MKL/10.2.3.029
+#MKLROOT = /home/taki/Programs/intel/mkl
+MKLROOT = /exports/applications/apps/SL5/intel/MKL/10.2.3.029
 
 # for INTEL COMPILER
-#CC = icc
-#OPENMP_FLAG=-openmp
+CC = icc
+OPENMP_FLAG=-openmp
 # for GCC COMPILER
-CC = g++
-OPENMP_FLAG=-fopenmp
+#CC = g++
+#OPENMP_FLAG=-fopenmp
 
 
 UTILSFOLDER=$(SRC)/utils/
@@ -28,17 +28,15 @@ SRC = src
 GSL_INCLUDE = -I/exports/applications/apps/gsl/1.9/include
 GSL_LIB= -L/exports/applications/apps/gsl/1.9/lib
 
-MKL_MULTICORE_LIB =   -Wl,--start-group  $(MKLROOT)/lib/intel64/libmkl_intel_lp64.a $(MKLROOT)/lib/intel64/libmkl_gnu_thread.a $(MKLROOT)/lib/intel64/libmkl_core.a -Wl,--end-group -ldl -lpthread -lm -mkl=parallel 
-#MKL_MULTICORE_LIB =    -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lgsl -lm  
+#MKL_MULTICORE_LIB =   -Wl,--start-group  $(MKLROOT)/lib/intel64/libmkl_intel_lp64.a $(MKLROOT)/lib/intel64/libmkl_gnu_thread.a $(MKLROOT)/lib/intel64/libmkl_core.a -Wl,--end-group -ldl -lpthread -lm -mkl=parallel 
+MKL_MULTICORE_LIB =    -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lgsl -lm  
 
 
 BLAS_LIB= $(MKL_MULTICORE_LIB)
 LIBS_GSL = -lgsl  -lgslcblas
 LIBS_MKL =   -lgsl
-LIBS_BLAS= $(LIBS_GSL)
-#LIBS_BLAS= $(LIBS_MKL)
-
-
+#LIBS_BLAS= $(LIBS_GSL)
+LIBS_BLAS= $(LIBS_MKL)
 #BLAS_LIB= $(GSL_LIB) 
 
 LIBS = -L./ $(BLAS_LIB) -L../objects $(OPENMP_FLAG)   $(LIBS_GSL)

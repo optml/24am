@@ -16,7 +16,7 @@
 #ifndef DATA_GENERATION_H_
 #define DATA_GENERATION_H_
 
-#include "matrix_conversions.h"
+#include "../utils/matrix_conversions.h"
 
 template<typename F>
 int load_doc_data(const char* filename, int& n, int& m, std::vector<F>& B) {

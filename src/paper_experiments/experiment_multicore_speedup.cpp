@@ -20,24 +20,7 @@ using namespace solver_structures;
 #include "../utils/option_console_parser.h"
 #include "../utils/timer.h"
 #include "../problem_generators/gpower_problem_generator.h"
-
-template<typename F>
-void logTime(ofstream &stream, mytimer* mt, optimization_statistics* stat,
-		optimization_settings* settings, std::vector<F>& x, int m, int n) {
-	int nnz = vector_get_nnz(&x[0], n);
-	cout << settings->algorithm << "," << nnz << "," << m << "," << n << ","
-			<< mt->getElapsedWallClockTime() << ","
-			<< stat->true_computation_time << "," << settings->batch_size << ","
-			<< settings->on_the_fly_generation << ","
-			<< stat->total_threads_used << "," << settings->starting_points
-			<< "," << stat->it << endl;
-	stream << settings->algorithm << "," << nnz << "," << m << "," << n << ","
-			<< mt->getElapsedWallClockTime() << ","
-			<< stat->true_computation_time << "," << settings->batch_size << ","
-			<< settings->on_the_fly_generation << ","
-			<< stat->total_threads_used << "," << settings->starting_points
-			<< "," << stat->it << endl;
-}
+#include "experiment_utils.h"
 
 template<typename F>
 void run_experiments(optimization_settings* settings) {
@@ -49,7 +32,7 @@ void run_experiments(optimization_settings* settings) {
 	std::vector<F> x;
 	std::vector<F> y;
 	int multSC = 1;
-	for (int mult = multSC; mult <= 128; mult = mult * 2) {
+	for (int mult = multSC; mult <= 64; mult = mult * 2) {
 		int m = 100 * mult;
 		int n = 1000 * mult;
 		h_B.resize(m * n);
