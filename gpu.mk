@@ -30,5 +30,10 @@ gpu_unit_test: distributed_generator
 	$(CUDA_COMPILER) -O3 -w $(GSL_INCLUDE) $(CUDA_INCLUDES) $(SRC)/test/gpu_unit_test.cu       $(CUDA_LIB) $(BLAS_LIB) $(LIBS_GSL) -o $(BUILD_FOLDER)gpu_unittest
 	./$(BUILD_FOLDER)gpu_unittest
 
+gpu_paper_experiments_sppedup: 	
+	$(CUDA_COMPILER) -O3 -w $(GSL_INCLUDE) $(CUDA_INCLUDES) $(SRC)/paper_experiments/experiment_gpu_speedup.cu       $(CUDA_LIB) $(LIBS_GSL) -o $(BUILD_FOLDER)experiment_gpu_speedup
+	./$(BUILD_FOLDER)experiment_gpu_speedup
+
+
 
 gpu: gpu_test  gpu_unit_test

@@ -47,7 +47,7 @@ multicore_paper_experiments_boxplot: KMP
 
 
 multicore_paper_experiments_text_corpora: KMP	
-	$(CC) $(CFLAGS) $(INCLUDE)  $(EXPERIMENTS_FOLDER)experiment_text_corpora.cpp  -o $(OBJFOL)experiment_text_corpora.o 
+	$(CC) $(CFLAGS) $(INCLUDE) -I$(MKLROOT)/include $(EXPERIMENTS_FOLDER)experiment_text_corpora.cpp  -o $(OBJFOL)experiment_text_corpora.o 
 	$(CC) $(LFLAGS) $(OBJFOL)experiment_text_corpora.o  $(LIBS) -o $(BUILD_FOLDER)experiment_text_corpora
 	./$(BUILD_FOLDER)experiment_text_corpora	
 

@@ -82,10 +82,9 @@ int main(int argc, char *argv[]) {
 	char* logfilename = "results/nytimes.txt";
 	run_experiments<double>(settings, filename, description, logfilename);
 
-
-	char* filename = "datasets/docword.pubmed.txt";
-	char* description = "datasets/vocab.pubmed.txt";
-	char* logfilename = "results/pubmed.txt";
+	filename = "datasets/docword.pubmed.txt";
+	description = "datasets/vocab.pubmed.txt";
+	logfilename = "results/pubmed.txt";
 	run_experiments<double>(settings, filename, description, logfilename);
 
 	return 0;

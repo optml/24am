@@ -13,8 +13,8 @@
  */
 
 
-#ifndef GPOWER_PROBLEM_GENERATOR_H_
-#define GPOWER_PROBLEM_GENERATOR_H_
+#ifndef GPOWER_PROBLEM_GENERATOR2_H_
+#define GPOWER_PROBLEM_GENERATOR2_H_
 
 
 
@@ -79,4 +79,4 @@ int generateProblem(const int n, const int m,F* h_B,const unsigned int LD_M,cons
 
 
 
-#endif /* GPOWER_PROBLEM_GENERATOR_H_ */
+#endif /* GPOWER_PROBLEM_GENERATOR2_H_ */

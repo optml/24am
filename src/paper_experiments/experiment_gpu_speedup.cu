@@ -1,102 +1,39 @@
-//============================================================================
-// Name        : GPower.cpp
-// Author      : Martin Takac
-// Version     :
-// Copyright   : GNU
-// Description : GPower Method
-//============================================================================
+/*
+ *
+ * This is a parallel sparse PCA solver
+ *
+ * The solver is based on a simple alternating maximization (AM) subroutine
+ * and is based on the paper
+ *    P. Richtarik, M. Takac and S. Damla Ahipasaoglu
+ *    "Alternating Maximization: Unified Framework and 24 Parallel Codes for L1 and L2 based Sparse PCA"
+ *
+ * The code is available at https://code.google.com/p/24am/
+ * under GNU GPL v3 License
+ *
+ */
 
-#include <iostream>
-using namespace std;
 #include <stdio.h>
-#include "gpower/timer.h"
+#include <stdlib.h>
 
-#include <gsl/gsl_cblas.h>
-#include "gpower/sparse_PCA_solver.h"
-
-#include "gpower/optimization_settings.h"
-#include "gpower/optimization_statistics.h"
-
-#include <thrust/host_vector.h>
-#include <thrust/device_vector.h>
-#include <thrust/generate.h>
-#include <thrust/sort.h>
-#include <thrust/copy.h>
-
-#include <cuda.h>
-#include "cublas_v2.h"
-#include "gpower_cu/gpu_sparse_PCA_solver_single.h"
-#include "gpower_cu/gpu_sparse_PCA_solver.h"
-
-#include "gpower/gpower_problem_generator.h"
-
-
-#define IDX2C(i,j,ld) (((j)*(ld))+(i))
+#include "../gpower/sparse_PCA_solver.h"
+#include "../utils/file_reader.h"
+#include "../utils/option_console_parser.h"
+#include "../gpugpower/gpu_sparse_PCA_solver.h"
+using namespace solver_structures;
+#include "../utils/file_reader.h"
+#include "../utils/option_console_parser.h"
+#include "experiment_utils.h"
+#include "../problem_generators/gpower_problem_generator.h"
 
 template<typename F>
-unsigned int vector_get_nnz(const F * x,const int n) {
-	unsigned int nnz = 0;
-	for (unsigned int i = 0; i < n; i++) {
-		if (x[i] != 0)
-		nnz++;
-	}
-	return nnz;
-}
+int test_solver(solver_structures::optimization_settings * settings) {
+	solver_structures::optimization_statistics* stat =
+			new optimization_statistics();
 
-void getFileSize(const char* filename, int& DIM_M, int& DIM_N) {
-	FILE * fin = fopen(filename, "r");
-	if (fin == NULL) {
-	} else {
-		fscanf(fin, "%d;%d", &DIM_M, &DIM_N);
-		fclose(fin);
-	}
-}
-
-template<typename F>
-void readFromFile(const char* filename, int& DIM_M, int& DIM_N, thrust::host_vector<F> &B) {
-	int i, j;
-	FILE * fin = fopen(filename, "r");
-	if (fin == NULL) {
-	} else {
-		fscanf(fin, "%d;%d", &DIM_M, &DIM_N);
-		for (j = 0; j < DIM_M; j++) {
-			for (i = 0; i < DIM_N; i++) {
-				float tmp = -1;
-				fscanf(fin, "%f;", &tmp);
-				//				float asdf = (float) rand()/RAND_MAX;
-				//				if (asdf>0.5) asdf=-asdf;
-				B[IDX2C(j,i,DIM_M)]=tmp;
-			}
-		}
-		fclose(fin);
-	}
-}
-
-FILE * global_fin;
-
-void logTime(int GPU, int nnz, mytimer* mt, optimization_statistics* stat,
-		optimization_settings* settings, int n, int m, int sizeofvariable) {
-	printf("%d,%d,%1.5f,%d,%f,%f,%d,%d,%d,%d,%d\n", settings->algorithm, GPU,
-			stat->fval, nnz, mt->getElapsedCPUTime(),
-			mt->getElapsedWallClockTime(), stat->it, n, m,
-			settings->starting_points, sizeofvariable);
-	fprintf(global_fin, "%d,%d,%1.5f,%d,%f,%f,%d,%d,%d,%d,%d\n",
-			settings->algorithm, GPU, stat->fval, nnz, mt->getElapsedCPUTime(),
-			mt->getElapsedWallClockTime(), stat->it, n, m,
-			settings->starting_points, sizeofvariable);
-	fflush(global_fin);
-
-}
-
-
-template<typename F>
-int runTest() {
-
-	mytimer* mt = new mytimer();
-	optimization_statistics* stat = new optimization_statistics();
-	optimization_settings* settings = new optimization_settings();
-	settings->max_it = 50;
-	settings->toll = 0.000;
+	ofstream fileOut;
+	fileOut.open("results/paper_experiment_gpu_speedup.txt");
+	ofstream fileOutCPU;
+	fileOutCPU.open("results/paper_experiment_gpu_speedup_cpu.txt");
 
 	cublasStatus_t status;
 	cublasHandle_t handle;
@@ -108,155 +45,92 @@ int runTest() {
 		printf("CUBLAS initialized.\n");
 	}
 
-	thrust::host_vector<F> h_B;
-	thrust::host_vector<F> h_x;
+	cudaDeviceProp dp;
+	cudaGetDeviceProperties(&dp, 0);
+	settings->gpu_sm_count = dp.multiProcessorCount;
+	settings->gpu_max_threads = dp.maxThreadsPerBlock;
 
-	SparsePCA_Algorithm algorithms[8];
+	mytimer* mt = new mytimer();
+	std::vector<F> B_mat;
+	std::vector<F> y;
+	int multSC = 1;
+	for (int mult = multSC; mult <= 64; mult = mult * 2) {
+		int m = 100 * mult;
+		int n = 1000 * mult;
 
-	algorithms[0]=L0_penalized_L1_PCA;
-	algorithms[1]= L0_penalized_L2_PCA;
-	algorithms[2]=L1_penalized_L1_PCA;
-	algorithms[3]=L1_penalized_L2_PCA;
-	algorithms[4]=L0_constrained_L1_PCA;
-	algorithms[5]=L0_constrained_L2_PCA;
-	algorithms[6]=L1_constrained_L1_PCA;
-	algorithms[7]=L1_constrained_L2_PCA;
-	int nn=1024;
-	for (int i=0;i<9;i++) {
-
-		int n=nn;
-		int m=n/100;
-		n=n*2;
-		double size=(double)n*m*sizeof(F)/(1024*1024*1024);
-		printf("SIZE %f\n",size);
-		h_B.resize(m*n);
-		h_x.resize(n);
-
-		generateProblem( n, m, h_B);
+		const int MEMORY_BANK_FLOAT_SIZE = MEMORY_ALIGNMENT / sizeof(F);
+		const unsigned int LD_M = (
+				m % MEMORY_BANK_FLOAT_SIZE == 0 ?
+						m :
+						(m / MEMORY_BANK_FLOAT_SIZE + 1)
+								* MEMORY_BANK_FLOAT_SIZE);
+		const unsigned int LD_N = (
+				n % MEMORY_BANK_FLOAT_SIZE == 0 ?
+						n :
+						(n / MEMORY_BANK_FLOAT_SIZE + 1)
+								* MEMORY_BANK_FLOAT_SIZE);
+		thrust::host_vector<F> h_B(LD_M * n, 0);
+		generateProblem(n, m, &h_B[0], m, n, false);
+		settings->max_it = 100;
+		settings->toll = 0;
+		settings->penalty = 0.02;
+		settings->constrain = n / 100;
+		settings->algorithm = L1_penalized_L1_PCA;
+		settings->on_the_fly_generation = false;
+		settings->gpu_use_k_selection_algorithm = false;
+		stat->n = n;
+		// move data to DEVICE
 		thrust::device_vector<F> d_B = h_B;
+		// allocate vector for solution
+		thrust::host_vector<F> h_x(n, 0);
 
-		settings->constrain = 100;
-		settings->penalty = 0.1;
-
-		for (int sp=1;sp<=256;sp=sp*2) {
-			settings->starting_points = sp;
-			settings->batch_size=sp;
-			for (int alg=2;alg<8;alg=alg+4) {
-//			for (int alg=0;alg<8;alg++) {
-
-				settings->algorithm = algorithms[alg];
-				mt->start();gpu_sparse_PCA_solver(handle,m, n, d_B, h_x, settings, stat,m,n);mt->end();
-				logTime(1, vector_get_nnz(&h_x[0],n), mt,stat,settings,n,m,sizeof(F));
-
-//						mt->start();gpu_sparse_PCA_solver_single(handle,m, n, d_B, h_x, settings, stat);mt->end();
-//						logTime(1, vector_get_nnz(&h_x[0],n), mt,stat,settings,n,m);
+		for (settings->starting_points = 1; settings->starting_points <= 256;
+				settings->starting_points = settings->starting_points * 16) {
+		settings->batch_size = settings->starting_points;
+			mt->start();
+			PCA_solver::gpu_sparse_PCA_solver(handle, m, n, d_B, h_x, settings,
+					stat, LD_M, LD_N);
+			mt->end();
+			std::vector<F> x(n, 0);
+			for (int i = 0; i < n; i++)
+				x[i] = h_x[i];
+			logTime(fileOut, mt, stat, settings, x, m, n);
 
 
-//				if (sp<=256) {
-					mt->start();
-					stat->fval = sparse_PCA_solver(&h_B[0], m, &h_x[0],m, n,
-							settings, stat);
-					mt->end();
-					logTime(0, vector_get_nnz(&h_x[0],n), mt,stat,settings,n,m,sizeof(F));
-//				}
-				printf("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
-			}
+			// CPU
+			mt->start();
+			PCA_solver::dense_PCA_solver(&h_B[0], LD_M, &x[0], m, n, settings,
+								stat);
+			mt->end();
+			logTime(fileOutCPU, mt, stat, settings, x, m, n);
 
 		}
-		nn=nn*2;
 	}
-	//	//-----------------------
-	//	settings->algorithm = L1_penalized_L2_PCA;
-	//	mt->start();gpu_sparse_PCA_solver(handle,m, n, h_B, h_x, settings, stat);mt->end();
-	//	logTime(1, vector_get_nnz(&h_x[0],n), mt,stat,settings);
-	//	mt->start();
-	//	stat->fval = sparse_PCA_solver(&h_B[0], m, &h_x[0],m, n,
-	//			settings, stat);
-	//	mt->end();
-	//	logTime(0, vector_get_nnz(&h_x[0],n), mt,stat,settings);
-	//	printf("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
-	//
-	//	//-----------------------
-	//	settings->algorithm = L0_penalized_L1_PCA;
-	//	mt->start();gpu_sparse_PCA_solver(handle,m, n, h_B, h_x, settings, stat);mt->end();
-	//	logTime(1, vector_get_nnz(&h_x[0],n), mt,stat,settings);
-	//	mt->start();
-	//	stat->fval = sparse_PCA_solver(&h_B[0], m, &h_x[0],m, n,
-	//			settings, stat);
-	//	mt->end();
-	//	logTime(0, vector_get_nnz(&h_x[0],n), mt,stat,settings);
-	//	printf("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
-	//
-	//	//-----------------------
-	//	settings->algorithm = L1_penalized_L1_PCA;
-	//	mt->start();gpu_sparse_PCA_solver(handle,m, n, h_B, h_x, settings, stat);mt->end();
-	//	logTime(1, vector_get_nnz(&h_x[0],n), mt,stat,settings);
-	//	mt->start();
-	//	stat->fval = sparse_PCA_solver(&h_B[0], m, &h_x[0],m, n,
-	//			settings, stat);
-	//	mt->end();
-	//	logTime(0, vector_get_nnz(&h_x[0],n), mt,stat,settings);
-	//	printf("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
-	//
-	//	//==================  CONSTRAINED
-	//	settings->algorithm = L0_constrained_L1_PCA;
-	//	mt->start();gpu_sparse_PCA_solver(handle,m, n, h_B, h_x, settings, stat);mt->end();
-	//	logTime(1, vector_get_nnz(&h_x[0],n), mt,stat,settings);
-	//	mt->start();
-	//	stat->fval = sparse_PCA_solver(&h_B[0], m, &h_x[0],m, n,
-	//			settings, stat);
-	//	mt->end();
-	//	logTime(0, vector_get_nnz(&h_x[0],n), mt,stat,settings);
-	//	printf("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
-	//
-	//	settings->algorithm = L0_constrained_L2_PCA;
-	//	mt->start();gpu_sparse_PCA_solver(handle,m, n, h_B, h_x, settings, stat);mt->end();
-	//	logTime(1, vector_get_nnz(&h_x[0],n), mt,stat,settings);
-	//	mt->start();
-	//	stat->fval = sparse_PCA_solver(&h_B[0], m, &h_x[0],m, n,
-	//			settings, stat);
-	//	mt->end();
-	//	logTime(0, vector_get_nnz(&h_x[0],n), mt,stat,settings);
-	//	printf("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
-	//
-	//	settings->algorithm = L1_constrained_L1_PCA;
-	//	mt->start();gpu_sparse_PCA_solver(handle,m, n, h_B, h_x, settings, stat);mt->end();
-	//	logTime(1, vector_get_nnz(&h_x[0],n), mt,stat,settings);
-	//	mt->start();
-	//	stat->fval = sparse_PCA_solver(&h_B[0], m, &h_x[0],m, n,
-	//			settings, stat);
-	//	mt->end();
-	//	logTime(0, vector_get_nnz(&h_x[0],n), mt,stat,settings);
-	//	printf("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
-	//
-	//	settings->algorithm = L1_constrained_L2_PCA;
-	//	mt->start();gpu_sparse_PCA_solver(handle,m, n, h_B, h_x, settings, stat);mt->end();
-	//	logTime(1, vector_get_nnz(&h_x[0],n), mt,stat,settings);
-	//	mt->start();
-	//	stat->fval = sparse_PCA_solver(&h_B[0], m, &h_x[0],m, n,
-	//			settings, stat);
-	//	mt->end();
-	//	logTime(0, vector_get_nnz(&h_x[0],n), mt,stat,settings);
-	//	printf("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
+	fileOutCPU.close();
+	fileOut.close();
 
 	status = cublasDestroy(handle);
 	if (status != CUBLAS_STATUS_SUCCESS) {
 		fprintf(stderr, "!cublas shutdown error\n");
 		return EXIT_FAILURE;
 	}
-
-	return 0;
-
-}
-
-int main() {
-	global_fin = fopen("/exports/home/s1052689/gpu_test2.log", "w");
-	runTest<float>();
-
-	printf("DONE\n");
-//	runTest<double>();
-
-	fclose(global_fin);
-
 	return 0;
 }
+
+int main(int argc, char *argv[]) {
+	solver_structures::optimization_settings* settings =
+			new optimization_settings();
+	settings->result_file = "results/gpu_unittest.txt";
+	settings->verbose = false;
+	settings->starting_points = 1024;
+	settings->batch_size = settings->starting_points;
+	settings->on_the_fly_generation = false;
+	settings->gpu_use_k_selection_algorithm = false;
+	settings->constrain = 20;
+	settings->toll = 0.0001;
+	settings->max_it = 100;
+	cout << "Double test" << endl;
+	test_solver<double>(settings);
+	return 0;
+}
+
