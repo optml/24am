@@ -19,6 +19,8 @@
 #include "../utils/my_cblas_wrapper.h"
 #include "my_sparse_cblas_wrapper.h"
 #include "../utils/thresh_functions.h"
+#include "../utils/timer.h"
+
 #include "sparse_PCA_thresholding.h"
 
 #include <gsl/gsl_rng.h>
@@ -26,7 +28,7 @@
 
 template<typename F>
 void printDescriptions(F* x, int length, const char* description,
-		optimization_statistics* stat, ofstream& stream) {
+		solver_structures::optimization_statistics* stat, ofstream& stream) {
 	FILE * fin = fopen(description, "r");
 	char buffer[1000];
 	if (fin == NULL) {
@@ -55,13 +57,17 @@ namespace PCA_solver {
  */
 template<typename F>
 F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
-		F * x, int m, int n, optimization_settings* settings,
-		optimization_statistics* stat, bool doMean, F * means) {
+		F * x, int m, int n, solver_structures::optimization_settings* settings,
+		solver_structures::optimization_statistics* stat, bool doMean,
+		F * means) {
 	int number_of_experiments = settings->starting_points;
-	F * Z = (F*) calloc(m * number_of_experiments, sizeof(F));
 	value_coordinate_holder<F>* vals = (value_coordinate_holder<F>*) calloc(
 			number_of_experiments, sizeof(value_coordinate_holder<F> ));
+	F * Z = (F*) calloc(m * number_of_experiments, sizeof(F));
 	F * V = (F*) calloc(n * number_of_experiments, sizeof(F));
+	F * ZZ = (F*) calloc(m * number_of_experiments, sizeof(F));
+	F * VV = (F*) calloc(n * number_of_experiments, sizeof(F));
+
 	stat->it = settings->max_it;
 	// Allocate vector for stat to return which point needs how much iterations
 	if (settings->get_it_for_all_points) {
@@ -71,7 +77,7 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 	if (settings->isConstrainedProblem()) {
 		//				cblas_dscal(n * number_of_experiments, 0, V, 1);
 #ifdef _OPENMP
-#pragma omp parallel for
+//#pragma omp parallel for
 #endif
 		for (unsigned int j = 0; j < number_of_experiments; j++) {
 			myseed = rand();
@@ -79,8 +85,8 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 			//			for (unsigned int i = 0; i < n;i++){//settings->constrain; i++) {
 			//				unsigned int idx = i;
 
-			for (unsigned int i = 0; i < settings->constrain; i++) {
-				unsigned int idx = (int) (n * (F) rand_r(&myseed) / (RAND_MAX));
+			for (unsigned int i = 0; i < n; i++) {
+				unsigned int idx = i;//(int) (n * (F) rand_r(&myseed) / (RAND_MAX));
 				if (idx == n)
 					idx--;
 				//printf("%d\n",idx);
@@ -138,16 +144,26 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 				my_mm_multiply(false, m, n, number_of_experiments, B_CSC_Vals,
 						B_CSC_Row_Id, B_CSC_Col_Ptr, means, V, Z);
 			} else {
+				for (int ex = 0; ex < number_of_experiments; ex++) {
+					for (int i = 0; i < n; i++)
+						VV[i * number_of_experiments + ex] = V[i + ex * n];
+				}
 				sparse_matrix_matrix_multiply(MY_SPARSE_WRAPPER_NOTRANS, m,
 						number_of_experiments, n, &floating_one, matdescra,
 						B_CSC_Vals, B_CSC_Row_Id, B_CSC_Col_Ptr,
-						&B_CSC_Col_Ptr[1], V, ONE_MKL_INT, &floating_zero, Z,
-						ONE_MKL_INT);
-			}
+						&B_CSC_Col_Ptr[1], VV, number_of_experiments,
+						&floating_zero, ZZ, number_of_experiments);
+				for (int ex = 0; ex < number_of_experiments; ex++) {
+					for (int i = 0; i < m; i++)
+						Z[i + m * ex] = ZZ[number_of_experiments * i + ex];
+//						Z[i + ex * m] = ZZ[i * number_of_experiments + ex];
+				}
 
+			}
 			//set Z=sgn(Z)
-			if (settings->algorithm == L0_constrained_L1_PCA
-					|| settings->algorithm == L1_constrained_L1_PCA) {
+			if (settings->algorithm == solver_structures::L0_constrained_L1_PCA
+					|| settings->algorithm
+							== solver_structures::L1_constrained_L1_PCA) {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
@@ -161,20 +177,30 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 				my_mm_multiply(true, m, n, number_of_experiments, B_CSC_Vals,
 						B_CSC_Row_Id, B_CSC_Col_Ptr, means, Z, V);
 			} else {
-
+				for (int ex = 0; ex < number_of_experiments; ex++) {
+					for (int i = 0; i < m; i++)
+						ZZ[number_of_experiments * i + ex] = Z[i + m * ex];
+				}
 				sparse_matrix_matrix_multiply(MY_SPARSE_WRAPPER_TRANS, m,
 						number_of_experiments, n, &floating_one, matdescra,
 						B_CSC_Vals, B_CSC_Row_Id, B_CSC_Col_Ptr,
-						&B_CSC_Col_Ptr[1], Z, ONE_MKL_INT, &floating_zero, V,
-						ONE_MKL_INT);
+						&B_CSC_Col_Ptr[1], ZZ, number_of_experiments,
+						&floating_zero, VV, number_of_experiments);
+				for (int ex = 0; ex < number_of_experiments; ex++) {
+					for (int i = 0; i < n; i++)
+						V[i + ex * n] = VV[i * number_of_experiments + ex];
+				}
+
 			}
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
 			for (unsigned int j = 0; j < number_of_experiments; j++) {
 				F fval_current = 0;
-				if (settings->algorithm == L0_constrained_L2_PCA
-						|| settings->algorithm == L1_constrained_L2_PCA) {
+				if (settings->algorithm
+						== solver_structures::L0_constrained_L2_PCA
+						|| settings->algorithm
+								== solver_structures::L1_constrained_L2_PCA) {
 					fval_current = cblas_l2_norm(m, &Z[m * j], 1);
 				}
 				F norm_of_x;
@@ -187,8 +213,10 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 				}
 
 				cblas_vector_scale(n, &V[j * n], 1 / norm_of_x);
-				if (settings->algorithm == L0_constrained_L1_PCA
-						|| settings->algorithm == L1_constrained_L1_PCA) {
+				if (settings->algorithm
+						== solver_structures::L0_constrained_L1_PCA
+						|| settings->algorithm
+								== solver_structures::L1_constrained_L1_PCA) {
 					fval_current = vals[j].tmp;
 				}
 				F tmp_error = computeTheError(fval_current, vals[j].val,
@@ -210,8 +238,9 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 			}
 		} else {
 			//scale Z
-			if (settings->algorithm == L0_penalized_L1_PCA
-					|| settings->algorithm == L1_penalized_L1_PCA) {
+			if (settings->algorithm == solver_structures::L0_penalized_L1_PCA
+					|| settings->algorithm
+							== solver_structures::L1_penalized_L1_PCA) {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
@@ -273,6 +302,8 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 	cblas_vector_scale(n, x, 1 / norm_of_x); //Final x
 	free(Z);
 	free(V);
+	free(VV);
+	free(ZZ);
 	free(vals);
 	stat->fval = best_value;
 	return best_value;

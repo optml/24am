@@ -59,6 +59,8 @@ public:
 	}
 };
 
+
+
 template<typename F>
 bool abs_value_comparator(const F & i, const F &j) {
 	return (myabs(i) < myabs(j));

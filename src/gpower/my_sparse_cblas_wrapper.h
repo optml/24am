@@ -24,9 +24,9 @@ char* MY_SPARSE_WRAPPER_NOTRANS = "N";
 
 // matrix matrix multiply
 template<typename F>
-void my_mm_multiply(bool trans, const int m, const int n,
-		const int experiments, const F* vals, const int* row_id,
-		const int* colPtr, const F* means, F* x, F*y) {
+void my_mm_multiply(bool trans, const int m, const int n, const int experiments,
+		const F* vals, const int* row_id, const int* colPtr, const F* means,
+		F* x, F*y) {
 	for (int ex = 0; ex < experiments; ex++) {
 		if (trans) {
 			for (int row = 0; row < n; row++)
@@ -38,12 +38,14 @@ void my_mm_multiply(bool trans, const int m, const int n,
 					y[col + ex * n] += x[ex * m + row] * means[col];
 				}
 				int lastMR = 0;
-				for (int rowId = colPtr[col]; rowId < colPtr[col + 1]; rowId++) {
+				for (int rowId = colPtr[col]; rowId < colPtr[col + 1];
+						rowId++) {
 					int tmp_row = row_id[rowId];
 					y[col + ex * n] += x[ex * m + tmp_row] * means[col];
 					//					y[tmp_row + ex * m] += xval * vals[rowId];
 					if (rowId < colPtr[col + 1] - 1) {
-						for (int row = tmp_row; row < row_id[rowId + 1]; row++) {
+						for (int row = tmp_row; row < row_id[rowId + 1];
+								row++) {
 							//							y[row + ex * m] += xval * means[col];
 							y[col + ex * n] += x[ex * m + row] * means[col];
 						}
@@ -68,11 +70,13 @@ void my_mm_multiply(bool trans, const int m, const int n,
 						y[row + ex * m] += xval * means[col];
 					}
 					int lastMR = 0;
-					for (int rowId = colPtr[col]; rowId < colPtr[col + 1]; rowId++) {
+					for (int rowId = colPtr[col]; rowId < colPtr[col + 1];
+							rowId++) {
 						int tmp_row = row_id[rowId];
 						y[tmp_row + ex * m] += xval * vals[rowId];
 						if (rowId < colPtr[col + 1] - 1) {
-							for (int row = tmp_row; row < row_id[rowId + 1]; row++) {
+							for (int row = tmp_row; row < row_id[rowId + 1];
+									row++) {
 								y[row + ex * m] += xval * means[col];
 							}
 						}
@@ -99,9 +103,22 @@ void sparse_matrix_matrix_multiply(char *transa, int mI, int nI, int kI,
 	MKL_INT ldc = ldcI;
 	MKL_INT ldb = ldbI;
 
-	mkl_dcscmm(transa, &m, &n, &k, alpha, matdescra, val, indx, pntrb, pntre,
-			b, &ldb, beta, c, &ldc);
+	mkl_dcscmm(transa, &m, &n, &k, alpha, matdescra, val, indx, pntrb, pntre, b,
+			&ldb, beta, c, &ldc);
 }
 
+void sparse_matrix_matrix_multiply(char *transa, int mI, int nI, int kI,
+		float *alpha, char *matdescra, float *val, MKL_INT *indx,
+		MKL_INT *pntrb, MKL_INT *pntre, float *b, int ldbI, float *beta,
+		float *c, int ldcI) {
 
+	MKL_INT m = mI;
+	MKL_INT n = nI;
+	MKL_INT k = kI;
+	MKL_INT ldc = ldcI;
+	MKL_INT ldb = ldbI;
+
+	mkl_scscmm(transa, &m, &n, &k, alpha, matdescra, val, indx, pntrb, pntre, b,
+			&ldb, beta, c, &ldc);
+}
 #endif /* MY_CBLAS_WRAPPER_H_ */
