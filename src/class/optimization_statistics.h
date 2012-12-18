@@ -5,7 +5,7 @@
  * The solver is based on a simple alternating maximization (AM) subroutine
  * and is based on the paper
  *    P. Richtarik, M. Takac and S. Damla Ahipasaoglu
- *    "Alternating Maximization: Unified Framework and 24 Parallel Codes for L1 and L2 based Sparse PCA"
+ *    "Alternating Maximization: Unifying Framework for 8 Sparse PCA Formulations and Efficient Parallel Codes"
  *
  * The code is available at https://code.google.com/p/24am/
  * under GNU GPL v3 License
