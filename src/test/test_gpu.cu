@@ -36,7 +36,7 @@ void run_solver(OptimizationSettings* settings) {
 //
 //	std::vector<F> x_vec(n, 0);
 //	F * x = &x_vec[0];
-//	PCA_solver::dense_PCA_solver(B, ldB, x, m, n, settings, stat);
+//	PCA_solver::denseDataSolver(B, ldB, x, m, n, settings, stat);
 //	double end_wall_time = gettime();
 //	stat->total_elapsed_time=end_wall_time-start_wall_time;
 //	input_ouput_helper::save_statistics_and_results(stat, settings,x_vec);

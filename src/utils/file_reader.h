@@ -26,7 +26,7 @@
 #include <iomanip>
 using namespace std;
 
-namespace input_ouput_helper {
+namespace InputOuputHelper {
 
 void parse_data_size_from_CSV_file(unsigned int &m, unsigned int &n,
 		const char* input_csv_file) {
@@ -78,7 +78,7 @@ int parse_data_from_CSV_file(unsigned int m, unsigned int n,
 }
 
 template<typename F>
-void read_csv_file(std::vector<F> &Bmat, unsigned int &ldB, unsigned int &m,
+void readCSVFile(std::vector<F> &Bmat, unsigned int &ldB, unsigned int &m,
 		unsigned int & n, const char* input_csv_file) {
 	parse_data_size_from_CSV_file(m, n, input_csv_file);
 	parse_data_from_CSV_file(m, n, input_csv_file, Bmat);

@@ -32,14 +32,16 @@
  */
 
 namespace SPCASolver {
+namespace MulticoreSolver {
+
 template<typename F>
-F dense_PCA_solver(const F * B, const int ldB, F * x, const unsigned int m,
+F denseDataSolver(const F * B, const int ldB, F * x, const unsigned int m,
 		const unsigned int n, SolverStructures::OptimizationSettings* settings,
 		SolverStructures::OptimizationStatistics* stat) {
 #ifdef _OPENMP
 #pragma omp parallel
 	{
-	stat->total_threads_used = omp_get_num_threads();
+		stat->total_threads_used = omp_get_num_threads();
 	}
 #endif
 
@@ -151,8 +153,8 @@ F dense_PCA_solver(const F * B, const int ldB, F * x, const unsigned int m,
 
 		}
 		double end_time_of_iterations = gettime();
-					stat->true_computation_time += (end_time_of_iterations
-							- start_time_of_iterations);
+		stat->true_computation_time += (end_time_of_iterations
+				- start_time_of_iterations);
 	} else {
 		//====================== MAIN LOOP THROUGHT BATCHES
 		for (unsigned int batch = 0; batch < settings->number_of_batches;
@@ -219,7 +221,7 @@ F dense_PCA_solver(const F * B, const int ldB, F * x, const unsigned int m,
 	stat->fval = the_best_solution_value;
 	return the_best_solution_value;
 }
-
+}
 }
 
 #endif /* SPARSE_PCA_SOLVER_H__ */

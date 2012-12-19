@@ -34,7 +34,7 @@ int test_solver(SolverStructures::OptimizationSettings * settings,
 	unsigned int ldB;
 	unsigned int m;
 	unsigned int n;
-	input_ouput_helper::read_csv_file(B_mat, ldB, m, n, multicoreDataset);
+	InputOuputHelper::readCSVFile(B_mat, ldB, m, n, multicoreDataset);
 	OptimizationStatistics* stat2 = new OptimizationStatistics();
 	stat2->n = n;
 	const F * B = &B_mat[0];
@@ -46,7 +46,7 @@ int test_solver(SolverStructures::OptimizationSettings * settings,
 	settings->gpu_sm_count = dp.multiProcessorCount;
 	settings->gpu_max_threads = dp.maxThreadsPerBlock;
 
-	input_ouput_helper::read_csv_file(B_mat, ldB, m, n, settings->data_file);
+	InputOuputHelper::read_csv_file(B_mat, ldB, m, n, settings->data_file);
 	stat->n = n;
 
 	const int MEMORY_BANK_FLOAT_SIZE = MEMORY_ALIGNMENT / sizeof(F);
@@ -95,11 +95,11 @@ int test_solver(SolverStructures::OptimizationSettings * settings,
 		SPCASolver::gpu_sparse_PCA_solver(handle, m, n, d_B, h_x, settings,
 				stat, LD_M, LD_N);
 		settings->result_file=resultGPU;
-		input_ouput_helper::save_results(stat, settings, &h_x[0], n);
+		InputOuputHelper::save_results(stat, settings, &h_x[0], n);
 		if (settings->proccess_node == 0) {
-			SPCASolver::dense_PCA_solver(B, ldB, x, m, n, settings, stat2);
+			SPCASolver::MulticoreSolver::denseDataSolver(B, ldB, x, m, n, settings, stat2);
 			settings->result_file = multicoreResult;
-			input_ouput_helper::save_results(stat2, settings, x, n);
+			InputOuputHelper::save_results(stat2, settings, x, n);
 			cout << "Test " << al << " " << settings->algorithm << " "
 					<< stat->fval << "  " << stat2->fval << endl;
 		}

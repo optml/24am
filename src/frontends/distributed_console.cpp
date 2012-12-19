@@ -52,7 +52,7 @@ void runSolver(SolverStructures::OptimizationSettings * settings) {
 			optimization_data_inst, settings, stat);
 	if (iam == 0) {
 		stat->total_elapsed_time = gettime() - start_all;
-		input_ouput_helper::save_statistics(stat, settings);
+		InputOuputHelper::save_statistics(stat, settings);
 	}
 
 	blacs_gridexit_(&optimization_data_inst.params.ictxt);

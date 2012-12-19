@@ -51,7 +51,7 @@ void run_experiments(OptimizationSettings* settings) {
 			omp_set_num_threads(i);
 			init_random_seeds();
 			mt->start();
-			SPCASolver::dense_PCA_solver(&h_B[0], m, &x[0], m, n, settings,
+			SPCASolver::MulticoreSolver::denseDataSolver(&h_B[0], m, &x[0], m, n, settings,
 					stat);
 			mt->end();
 			logTime(fileOut, mt, stat, settings, x, m, n);

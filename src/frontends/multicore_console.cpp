@@ -27,19 +27,19 @@ void load_data_and_run_solver(OptimizationSettings* settings) {
 	std::vector<F> B_mat;
 	unsigned int ldB, m, n;
 	// load data from CSV file
-	input_ouput_helper::read_csv_file(B_mat, ldB, m, n, settings->data_file);
+	InputOuputHelper::readCSVFile(B_mat, ldB, m, n, settings->data_file);
 	OptimizationStatistics* stat = new OptimizationStatistics();
 	stat->n = n;
 	std::vector<F> x_vec(n, 0);
 	// run SOLVER
-	SPCASolver::dense_PCA_solver(&B_mat[0], ldB, &x_vec[0], m, n, settings,
+	SPCASolver::MulticoreSolver::denseDataSolver(&B_mat[0], ldB, &x_vec[0], m, n, settings,
 			stat);
 	double end_wall_time = gettime();
 	stat->total_elapsed_time = end_wall_time - start_wall_time;
     // store result into file
-	input_ouput_helper::save_results(stat, settings, &x_vec[0], n);
+	InputOuputHelper::save_results(stat, settings, &x_vec[0], n);
 	// store statistics into stat file
-	input_ouput_helper::save_statistics(stat, settings);
+	InputOuputHelper::save_statistics(stat, settings);
 }
 
 int main(int argc, char *argv[]) {

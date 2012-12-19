@@ -99,7 +99,7 @@ int test_solver(SolverStructures::OptimizationSettings * settings) {
 
 			// CPU
 			mt->start();
-			SPCASolver::dense_PCA_solver(&h_B[0], LD_M, &x[0], m, n, settings,
+			SPCASolver::MulticoreSolver::denseDataSolver(&h_B[0], LD_M, &x[0], m, n, settings,
 								stat);
 			mt->end();
 			logTime(fileOutCPU, mt, stat, settings, x, m, n);

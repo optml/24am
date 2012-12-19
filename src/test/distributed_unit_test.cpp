@@ -41,7 +41,7 @@ void test_solver(SolverStructures::OptimizationSettings * settings,
 	unsigned int ldB;
 	unsigned int m;
 	unsigned int n;
-	input_ouput_helper::read_csv_file(B_mat, ldB, m, n, multicoreDataset);
+	InputOuputHelper::readCSVFile(B_mat, ldB, m, n, multicoreDataset);
 	OptimizationStatistics* stat2 = new OptimizationStatistics();
 	stat2->n = n;
 	const F * B = &B_mat[0];
@@ -63,9 +63,9 @@ void test_solver(SolverStructures::OptimizationSettings * settings,
 		SPCASolver::DistributedSolver::denseDataSolver(
 				optimization_data_inst, settings, stat);
 		if (settings->proccess_node == 0) {
-			SPCASolver::dense_PCA_solver(B, ldB, x, m, n, settings, stat2);
+			SPCASolver::MulticoreSolver::denseDataSolver(B, ldB, x, m, n, settings, stat2);
 			settings->result_file=multicoreResult;
-			input_ouput_helper::save_results(stat, settings, x, n);
+			InputOuputHelper::save_results(stat, settings, x, n);
 			cout << "Test " << al << " " << settings->algorithm << " "
 					<< stat->fval << "  " << stat2->fval << endl;
 		}
@@ -79,7 +79,7 @@ void test_solver(SolverStructures::OptimizationSettings * settings,
 			optimization_data_inst, settings, stat);
 	if (iam == 0) {
 		stat->total_elapsed_time = gettime() - start_all;
-		input_ouput_helper::save_statistics(stat, settings);
+		InputOuputHelper::save_statistics(stat, settings);
 	}
 
 	blacs_gridexit_(&optimization_data_inst.params.ictxt);

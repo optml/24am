@@ -117,7 +117,7 @@ int test() {
 					<= 128 * 8*4; //
 			settings->starting_points = settings->starting_points * 2+1) {
 				mt->start();
-				stat->fval = SPCASolver::dense_PCA_solver(&h_B[0], m, &x[0], m, n,
+				stat->fval = SPCASolver::MulticoreSolver::denseDataSolver(&h_B[0], m, &x[0], m, n,
 						settings, stat);
 				mt->end();
 				printf(
