@@ -78,7 +78,7 @@ void test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 	SPCASolver::DistributedSolver::gatherAndStoreBestResultToOutputFile(
 			optimizationDataInstance, optimizationSettings, optimizationStatistics);
 	if (iam == 0) {
-		optimizationStatistics->total_elapsed_time = gettime() - start_all;
+		optimizationStatistics->totalElapsedTime = gettime() - start_all;
 		InputOuputHelper::save_optimizationStatisticsistics(optimizationStatistics, optimizationSettings);
 	}
 

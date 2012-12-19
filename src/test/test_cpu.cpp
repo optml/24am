@@ -124,8 +124,8 @@ int test() {
 						"%d,%d,%f,%f,%d,%d,%d,%d\n",
 						alg,
 						optimizationSettings->starting_points,
-						optimizationStatistics->true_computation_time,
-						optimizationStatistics->true_computation_time / (0.0
+						optimizationStatistics->totalTrueComputationTime,
+						optimizationStatistics->totalTrueComputationTime / (0.0
 								+ optimizationSettings->starting_points * optimizationSettings->maximumIterations),
 						m, n, TOTAL_THREADS, sizeof(F));
 				fprintf(
@@ -133,8 +133,8 @@ int test() {
 						"%d,%d,%f,%f,%d,%d,%d,%d\n",
 						alg,
 						optimizationSettings->starting_points,
-						optimizationStatistics->true_computation_time,
-						optimizationStatistics->true_computation_time / (0.0
+						optimizationStatistics->totalTrueComputationTime,
+						optimizationStatistics->totalTrueComputationTime / (0.0
 								+ optimizationSettings->starting_points * optimizationSettings->maximumIterations),
 						m, n, TOTAL_THREADS, sizeof(F));
 

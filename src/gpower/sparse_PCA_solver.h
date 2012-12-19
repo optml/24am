@@ -40,7 +40,7 @@ F denseDataSolver(const F * B, const int ldB, F * x, const unsigned int m,
 #ifdef _OPENMP
 #pragma omp parallel
 	{
-	optimizationStatistics->total_threads_used = omp_get_num_threads();
+	optimizationStatistics->totalThreadsUsed = omp_get_num_threads();
 	}
 #endif
 
@@ -63,7 +63,7 @@ F denseDataSolver(const F * B, const int ldB, F * x, const unsigned int m,
 			number_of_experiments_per_batch,
 			sizeof(ValueCoordinateHolder<F> ));
 	F * V = (F*) calloc(n * number_of_experiments_per_batch, sizeof(F));
-	optimizationStatistics->true_computation_time = 0;
+	optimizationStatistics->totalTrueComputationTime = 0;
 	F error = 0;
 	F max_errors[TOTAL_THREADS];
 	std::vector<F>* buffer = (std::vector<F>*) calloc(
@@ -152,7 +152,7 @@ F denseDataSolver(const F * B, const int ldB, F * x, const unsigned int m,
 
 		}
 		double end_time_of_iterations = gettime();
-					optimizationStatistics->true_computation_time += (end_time_of_iterations
+					optimizationStatistics->totalTrueComputationTime += (end_time_of_iterations
 							- start_time_of_iterations);
 	} else {
 		//====================== MAIN LOOP THROUGHT BATCHES
@@ -189,7 +189,7 @@ F denseDataSolver(const F * B, const int ldB, F * x, const unsigned int m,
 				}
 			}
 			double end_time_of_iterations = gettime();
-			optimizationStatistics->true_computation_time += (end_time_of_iterations
+			optimizationStatistics->totalTrueComputationTime += (end_time_of_iterations
 					- start_time_of_iterations);
 			//============= save the best solution==========
 			int selected_idx = 0;

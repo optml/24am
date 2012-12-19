@@ -190,7 +190,7 @@ int denseDataSolver(cublasHandle_t &handle, const unsigned int m,
 	cudaEventElapsedTime(&time, start, stop);
 	cudaEventDestroy(start);
 	cudaEventDestroy(stop);
-	optimizationStatistics->true_computation_time = time;
+	optimizationStatistics->totalTrueComputationTime = time;
 	int selected_idx = 0;
 	F best_value = vals[selected_idx].val;
 	for (unsigned int i = 1; i < optimizationSettings->starting_points; i++) {

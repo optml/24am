@@ -44,14 +44,14 @@ void runSolver(SolverStructures::OptimizationSettings * optimizationSettings) {
 	SPCASolver::DistributedSolver::denseDataSolver(
 			optimizationDataInstance, optimizationSettings, optimizationStatistics);
 	double end_time = gettime();
-	optimizationStatistics->true_computation_time = end_time - start_time;
+	optimizationStatistics->totalTrueComputationTime = end_time - start_time;
 	/*
 	 * STORE RESULT INTO FILE
 	 */
 	SPCASolver::DistributedSolver::gatherAndStoreBestResultToOutputFile(
 			optimizationDataInstance, optimizationSettings, optimizationStatistics);
 	if (iam == 0) {
-		optimizationStatistics->total_elapsed_time = gettime() - start_all;
+		optimizationStatistics->totalElapsedTime = gettime() - start_all;
 		InputOuputHelper::save_optimizationStatisticsistics(optimizationStatistics, optimizationSettings);
 	}
 

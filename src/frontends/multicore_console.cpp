@@ -35,7 +35,7 @@ void load_data_and_run_solver(OptimizationSettings* optimizationSettings) {
 	SPCASolver::MulticoreSolver::denseDataSolver(&B_mat[0], ldB, &x_vec[0], m, n, optimizationSettings,
 			optimizationStatistics);
 	double end_wall_time = gettime();
-	optimizationStatistics->total_elapsed_time = end_wall_time - start_wall_time;
+	optimizationStatistics->totalElapsedTime = end_wall_time - start_wall_time;
     // store result into file
 	InputOuputHelper::save_results(optimizationStatistics, optimizationSettings, &x_vec[0], n);
 	// store optimizationStatisticsistics into optimizationStatistics file

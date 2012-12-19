@@ -119,8 +119,8 @@ void save_optimizationStatisticsistics(SolverStructures::OptimizationStatisticsi
 	#endif
 
 		statFile << '\n'<< "Timing " << '\n';
-		statFile << "Total computational time: "<< setprecision(16) << optimizationStatistics->true_computation_time<< " sec"<< '\n';
-		statFile << "Total elapsed time: "<< setprecision(16) << optimizationStatistics->total_elapsed_time<< " sec"<<'\n';
+		statFile << "Total computational time: "<< setprecision(16) << optimizationStatistics->totalTrueComputationTime<< " sec"<< '\n';
+		statFile << "Total elapsed time: "<< setprecision(16) << optimizationStatistics->totalElapsedTime<< " sec"<<'\n';
 
 		statFile << '\n'<< "Result " << '\n';
 		statFile << "Objective value: " << setprecision(16)<< optimizationStatistics->fval<< '\n';

@@ -288,7 +288,7 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 	int selected_idx = 0;
 	F best_value = vals[selected_idx].val;
 	optimizationStatistics->values[0] = best_value;
-	optimizationStatistics->true_computation_time = (end_time_of_iterations
+	optimizationStatistics->totalTrueComputationTime = (end_time_of_iterations
 			- start_time_of_iterations);
 	for (unsigned int i = 1; i < number_of_experiments; i++) {
 		optimizationStatistics->values[i] = vals[i].val;

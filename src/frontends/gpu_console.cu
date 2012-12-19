@@ -76,7 +76,7 @@ int load_data_and_run_solver(SolverStructures::OptimizationSettings* optimizatio
 	SPCASolver::GPUSolver::gpu_sparse_PCA_solver(handle, m, n, d_B, h_x, optimizationSettings, optimizationStatistics,
 			LD_M, LD_N);
 	mt->end();
-	optimizationStatistics->total_elapsed_time = mt->getElapsedWallClockTime();
+	optimizationStatistics->totalElapsedTime = mt->getElapsedWallClockTime();
 	InputOuputHelper::save_results(optimizationStatistics, optimizationSettings, &h_x[0], n);
 	InputOuputHelper::save_optimizationStatisticsistics(optimizationStatistics, optimizationSettings);
 	optimizationStatisticsus = cublasDestroy(handle);

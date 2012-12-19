@@ -30,18 +30,18 @@ public:
 	unsigned int it; // total iterations solver did
 	double fval; // final objective value
 	double error; // final error
-	double true_computation_time; // elapsed time used in AM method
-	double total_elapsed_time; // total elapsed time including data loading and storing result
+	double totalTrueComputationTime; // elapsed time used in AM method
+	double totalElapsedTime; // total elapsed time including data loading and storing result
 	unsigned int n; // size of problem (length of vector "x")
 	std::vector<double> values; // final values for different starting point. This is used only for
 	                             // creating some figures in paper.
 	std::vector<int> iters; // the same as before, but holds the number of iterations for given starting point
 	std::vector<int> cardinalities; // cardinalities for given starting point. For L0 constrained method doesn't make sense as
 	                                // it's value has to be constrain parameter from optimizationSettings
-	int total_threads_used;
+	int totalThreadsUsed;
 	OptimizationStatisticsistics() {
 		it = 0;
-		total_threads_used=1;
+		totalThreadsUsed=1;
 	}
 };
 }
