@@ -19,7 +19,7 @@
 #include "../gpower/sparse_PCA_solver.h"
 #include "../utils/file_reader.h"
 #include "../utils/option_console_parser.h"
-#include "../gpugpower/denseDataSolver.h"
+#include "../gpugpower/gpu_sparse_PCA_solver.h"
 using namespace SolverStructures;
 #include "../utils/file_reader.h"
 #include "../utils/option_console_parser.h"
