@@ -70,7 +70,7 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 	// move data to DEVICE
 	thrust::device_vector<F> d_B = h_B;
 
-	cublasStatust optimizationStatisticsus;
+	cublasStatus_t optimizationStatisticsus;
 	cublasHandle_t handle;
 	optimizationStatisticsus = cublasCreate(&handle);
 	if (optimizationStatisticsus != CUBLAS_STATUS_SUCCESS) {

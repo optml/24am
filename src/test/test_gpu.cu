@@ -98,7 +98,7 @@ int runTest() {
 	int nnz=0;
 	thrust::device_vector<F> d_B=h_B;
 
-	cublasStatust optimizationStatisticsus;
+	cublasStatus_t optimizationStatisticsus;
 	cublasHandle_t handle;
 	optimizationStatisticsus = cublasCreate(&handle);
 	if (optimizationStatisticsus != CUBLAS_STATUS_SUCCESS) {

@@ -35,7 +35,7 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings) {
 	ofstream fileOutCPU;
 	fileOutCPU.open("results/paper_experiment_gpu_speedup_cpu.txt");
 
-	cublasStatust optimizationStatisticsus;
+	cublasStatus_t optimizationStatisticsus;
 	cublasHandle_t handle;
 	optimizationStatisticsus = cublasCreate(&handle);
 	if (optimizationStatisticsus != CUBLAS_STATUS_SUCCESS) {
