@@ -46,7 +46,6 @@ int parse_console_options(solver_structures::optimization_settings* settings,
 	char c;
 	/*
 	 * d - data file
-	 * f - input file type
 	 * r - result file
 	 * i - max number of iterations (*optional*)
 	 * t - tolerance (*optional*)
@@ -126,7 +125,7 @@ int parse_console_options(solver_structures::optimization_settings* settings,
 				algorithm=true;
 				break;
 			case 6:
-				settings->algorithm=L0_penalized_L1_PCA;
+				settings->algorithm=L0_penalized_L2_PCA;
 				algorithm=true;
 				break;
 			case 7:

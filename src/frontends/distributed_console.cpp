@@ -22,10 +22,7 @@
 /* Header files*/
 #include <stdio.h>
 #include <stdlib.h>
-unsigned int myseed = 0;
-
 #include "../dgpower/distributed_PCA_solver.h"
-
 #include "../utils/file_reader.h"
 #include "../utils/option_console_parser.h"
 
