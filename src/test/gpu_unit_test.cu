@@ -46,7 +46,7 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 	optimizationSettings->gpu_sm_count = dp.multiProcessorCount;
 	optimizationSettings->gpu_max_threads = dp.maxThreadsPerBlock;
 
-	InputOuputHelper::read_csv_file(B_mat, ldB, m, n, optimizationSettings->dataFilePath);
+	InputOuputHelper::readCSVFile(B_mat, ldB, m, n, optimizationSettings->dataFilePath);
 	optimizationStatistics->n = n;
 
 	const int MEMORY_BANK_FLOAT_SIZE = MEMORY_ALIGNMENT / sizeof(F);
