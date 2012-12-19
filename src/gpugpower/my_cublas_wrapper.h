@@ -396,14 +396,14 @@ struct gpu_soft_treshholding {
 
 template<typename F>
 struct generate_random_number {
-	int state;
-	generate_random_number(int _state) {
-		state = _state;
+	int optimizationStatisticse;
+	generate_random_number(int _optimizationStatisticse) {
+		optimizationStatisticse = _optimizationStatisticse;
 	}
 
 	__host__                          __device__
 	F operator()(F index) {
-		thrust::default_random_engine rng(state);
+		thrust::default_random_engine rng(optimizationStatisticse);
 		// skip past numbers used in previous threads
 		rng.discard((int) index);
 		return (F) (rng() / (thrust::default_random_engine::max + 0.0));
@@ -412,7 +412,7 @@ struct generate_random_number {
 
 template<typename F>
 void perform_hard_and_soft_thresholdingNEW(thrust::device_vector<F> &d_V,
-		OptimizationSettings* settings, const unsigned int n,
+		OptimizationSettings* optimizationSettings, const unsigned int n,
 		thrust::host_vector<F>& h_x, const unsigned int LDN,
 		thrust::device_vector<int> &d_IDX, thrust::device_vector<F> &dataToSort) {
 	cout << "ERROR IN TEMPLATES"<<endl;
@@ -420,7 +420,7 @@ void perform_hard_and_soft_thresholdingNEW(thrust::device_vector<F> &d_V,
 
 template<>
 void perform_hard_and_soft_thresholdingNEW(thrust::device_vector<float> &d_V,
-		OptimizationSettings* settings, const unsigned int n,
+		OptimizationSettings* optimizationSettings, const unsigned int n,
 		thrust::host_vector<float>& h_x, const unsigned int LDN,
 		thrust::device_vector<int> &d_IDX,
 		thrust::device_vector<float> &dataToSort) {
@@ -438,23 +438,23 @@ void perform_hard_and_soft_thresholdingNEW(thrust::device_vector<float> &d_V,
 	//			make_zip_iterator(make_tuple(dataToSort.begin(), indices_begin)),
 	//			make_zip_iterator(make_tuple(dataToSort.end(), indices_end)),
 	//			comparator_abs_val_for_tuple_with_sequence(LDN));// maybe use stable_sort ???
-	for (unsigned int i = 0; i < settings->starting_points; i++) {
+	for (unsigned int i = 0; i < optimizationSettings->starting_points; i++) {
 		// copy data to x_for_sort
 		if (i > 0)
 			thrust::advance(it_begin, LDN);
 		thrust::device_vector<float>::iterator it_end = it_begin + n;
-		if (settings->isL1ConstrainedProblem()) {
+		if (optimizationSettings->isL1ConstrainedProblem()) {
 			thrust::device_vector<float>::iterator it_sorted =
 					dataToSort.begin();
 			thrust::advance(it_sorted, LDN * i);
 			thrust::copy(it_sorted, it_sorted + n, h_x.begin());
 			float tresh_hold = compute_soft_thresholding_parameter(&h_x[0], n,
-					settings->constrain);
+					optimizationSettings->constrain);
 			thrust::transform(it_begin, it_end, it_begin,
 					gpu_soft_treshholding<float> (tresh_hold));
 		} else {
 			float tresh_hold = abs(
-					dataToSort[i * LDN + settings->constrain - 1]);
+					dataToSort[i * LDN + optimizationSettings->constrain - 1]);
 			thrust::transform(it_begin, it_end, it_begin,
 					gpu_hard_treshholding<float> (tresh_hold));
 		}
@@ -463,7 +463,7 @@ void perform_hard_and_soft_thresholdingNEW(thrust::device_vector<float> &d_V,
 
 template<>
 void perform_hard_and_soft_thresholdingNEW(thrust::device_vector<double> &d_V,
-		OptimizationSettings* settings, const unsigned int n,
+		OptimizationSettings* optimizationSettings, const unsigned int n,
 		thrust::host_vector<double>& h_x, const unsigned int LDN,
 		thrust::device_vector<int> &d_IDX,
 		thrust::device_vector<double> &dataToSort) {
@@ -481,23 +481,23 @@ void perform_hard_and_soft_thresholdingNEW(thrust::device_vector<double> &d_V,
 	//			make_zip_iterator(make_tuple(dataToSort.begin(), indices_begin)),
 	//			make_zip_iterator(make_tuple(dataToSort.end(), indices_end)),
 	//			comparator_abs_val_for_tuple_with_sequence(LDN));// maybe use stable_sort ???
-	for (unsigned int i = 0; i < settings->starting_points; i++) {
+	for (unsigned int i = 0; i < optimizationSettings->starting_points; i++) {
 		// copy data to x_for_sort
 		if (i > 0)
 			thrust::advance(it_begin, LDN);
 		thrust::device_vector<double>::iterator it_end = it_begin + n;
-		if (settings->isL1ConstrainedProblem()) {
+		if (optimizationSettings->isL1ConstrainedProblem()) {
 			thrust::device_vector<double>::iterator it_sorted =
 					dataToSort.begin();
 			thrust::advance(it_sorted, LDN * i);
 			thrust::copy(it_sorted, it_sorted + n, h_x.begin());
 			double tresh_hold = compute_soft_thresholding_parameter(&h_x[0], n,
-					settings->constrain);
+					optimizationSettings->constrain);
 			thrust::transform(it_begin, it_end, it_begin,
 					gpu_soft_treshholding<double> (tresh_hold));
 		} else {
 			double tresh_hold = abs(
-					dataToSort[i * LDN + settings->constrain - 1]);
+					dataToSort[i * LDN + optimizationSettings->constrain - 1]);
 			thrust::transform(it_begin, it_end, it_begin,
 					gpu_hard_treshholding<double> (tresh_hold));
 		}
@@ -506,16 +506,16 @@ void perform_hard_and_soft_thresholdingNEW(thrust::device_vector<double> &d_V,
 
 template<typename F>
 void perform_hard_and_soft_thresholding(thrust::device_vector<F> &d_V,
-		OptimizationSettings* settings, const unsigned int n,
+		OptimizationSettings* optimizationSettings, const unsigned int n,
 		thrust::device_vector<F>& d_x_for_sort, thrust::host_vector<F>& h_x,
 		const unsigned int LDN) {
 
-	if (settings->isL1ConstrainedProblem()
-			|| !settings->gpu_use_k_selection_algorithm) {
-		perform_hard_and_soft_thresholding_with_sorting(d_V, settings, n,
+	if (optimizationSettings->isL1ConstrainedProblem()
+			|| !optimizationSettings->gpu_use_k_selection_algorithm) {
+		perform_hard_and_soft_thresholding_with_sorting(d_V, optimizationSettings, n,
 				d_x_for_sort, h_x, LDN);
 	} else {
-		perform_hard_thresholding_with_k_selection(d_V, settings, n,
+		perform_hard_thresholding_with_k_selection(d_V, optimizationSettings, n,
 				d_x_for_sort, h_x, LDN);
 	}
 
@@ -523,7 +523,7 @@ void perform_hard_and_soft_thresholding(thrust::device_vector<F> &d_V,
 //===========================================================================
 template<typename F>
 void perform_hard_thresholding_with_k_selection(thrust::device_vector<F> &d_V,
-		OptimizationSettings* settings, const unsigned int n,
+		OptimizationSettings* optimizationSettings, const unsigned int n,
 		thrust::device_vector<F>& d_x_for_sort, thrust::host_vector<F>& h_x,
 		const unsigned int LDN) {
 
@@ -531,17 +531,17 @@ void perform_hard_thresholding_with_k_selection(thrust::device_vector<F> &d_V,
 
 template<>
 void perform_hard_thresholding_with_k_selection(
-		thrust::device_vector<float> &d_V, OptimizationSettings* settings,
+		thrust::device_vector<float> &d_V, OptimizationSettings* optimizationSettings,
 		const unsigned int n, thrust::device_vector<float>& d_x_for_sort,
 		thrust::host_vector<float>& h_x, const unsigned int LDN) {
 	thrust::device_vector<float>::iterator it_begin = d_V.begin();
 	float * V = thrust::raw_pointer_cast(&d_V[0]);
-	for (unsigned int i = 0; i < settings->starting_points; i++) {
+	for (unsigned int i = 0; i < optimizationSettings->starting_points; i++) {
 		if (i > 0)
 			thrust::advance(it_begin, LDN);
 		thrust::device_vector<float>::iterator it_end = it_begin + n;
-		float tresh_hold = BucketSelect::bucketSelectWrapper(&V[i*LDN], n, settings->constrain,
-				settings->gpu_sm_count, settings->gpu_max_threads);
+		float tresh_hold = BucketSelect::bucketSelectWrapper(&V[i*LDN], n, optimizationSettings->constrain,
+				optimizationSettings->gpu_sm_count, optimizationSettings->gpu_max_threads);
 		thrust::transform(it_begin, it_end, it_begin,
 				gpu_hard_treshholding<float> (tresh_hold));
 	}
@@ -549,17 +549,17 @@ void perform_hard_thresholding_with_k_selection(
 
 template<>
 void perform_hard_thresholding_with_k_selection(
-		thrust::device_vector<double> &d_V, OptimizationSettings* settings,
+		thrust::device_vector<double> &d_V, OptimizationSettings* optimizationSettings,
 		const unsigned int n, thrust::device_vector<double>& d_x_for_sort,
 		thrust::host_vector<double>& h_x, const unsigned int LDN) {
 	thrust::device_vector<double>::iterator it_begin = d_V.begin();
 	double * V = thrust::raw_pointer_cast(&d_V[0]);
-	for (unsigned int i = 0; i < settings->starting_points; i++) {
+	for (unsigned int i = 0; i < optimizationSettings->starting_points; i++) {
 		if (i > 0)
 			thrust::advance(it_begin, LDN);
 		thrust::device_vector<double>::iterator it_end = it_begin + n;
-		double tresh_hold = BucketSelect::bucketSelectWrapper(&V[i*LDN], n, settings->constrain,
-				settings->gpu_sm_count, settings->gpu_max_threads);
+		double tresh_hold = BucketSelect::bucketSelectWrapper(&V[i*LDN], n, optimizationSettings->constrain,
+				optimizationSettings->gpu_sm_count, optimizationSettings->gpu_max_threads);
 		thrust::transform(it_begin, it_end, it_begin,
 				gpu_hard_treshholding<double> (tresh_hold));
 	}
@@ -570,18 +570,18 @@ void perform_hard_thresholding_with_k_selection(
 //===========================================================================
 template<typename F>
 void perform_hard_and_soft_thresholding_with_sorting(
-		thrust::device_vector<F> &d_V, OptimizationSettings* settings,
+		thrust::device_vector<F> &d_V, OptimizationSettings* optimizationSettings,
 		const unsigned int n, thrust::device_vector<F>& d_x_for_sort,
 		thrust::host_vector<F>& h_x, const unsigned int LDN) {
 }
 
 template<>
 void perform_hard_and_soft_thresholding_with_sorting(
-		thrust::device_vector<float> &d_V, OptimizationSettings* settings,
+		thrust::device_vector<float> &d_V, OptimizationSettings* optimizationSettings,
 		const unsigned int n, thrust::device_vector<float>& d_x_for_sort,
 		thrust::host_vector<float>& h_x, const unsigned int LDN) {
 	thrust::device_vector<float>::iterator it_begin = d_V.begin();
-	for (unsigned int i = 0; i < settings->starting_points; i++) {
+	for (unsigned int i = 0; i < optimizationSettings->starting_points; i++) {
 		// copy data to x_for_sort
 		if (i > 0)
 			thrust::advance(it_begin, LDN);
@@ -590,14 +590,14 @@ void perform_hard_and_soft_thresholding_with_sorting(
 		// sort data on the device
 		thrust::sort(d_x_for_sort.begin(), d_x_for_sort.end(),
 				comparator_abs_val<float> ());// maybe use stable_sort ???
-		if (settings->isL1ConstrainedProblem()) {
+		if (optimizationSettings->isL1ConstrainedProblem()) {
 			thrust::copy(d_x_for_sort.begin(), d_x_for_sort.end(), h_x.begin());
 			float tresh_hold = compute_soft_thresholding_parameter(&h_x[0], n,
-					settings->constrain);
+					optimizationSettings->constrain);
 			thrust::transform(it_begin, it_end, it_begin,
 					gpu_soft_treshholding<float> (tresh_hold));
 		} else {
-			float tresh_hold = abs(d_x_for_sort[settings->constrain - 1]);
+			float tresh_hold = abs(d_x_for_sort[optimizationSettings->constrain - 1]);
 			thrust::transform(it_begin, it_end, it_begin,
 					gpu_hard_treshholding<float> (tresh_hold));
 		}
@@ -606,11 +606,11 @@ void perform_hard_and_soft_thresholding_with_sorting(
 
 template<>
 void perform_hard_and_soft_thresholding_with_sorting(
-		thrust::device_vector<double> &d_V, OptimizationSettings* settings,
+		thrust::device_vector<double> &d_V, OptimizationSettings* optimizationSettings,
 		const unsigned int n, thrust::device_vector<double>& d_x_for_sort,
 		thrust::host_vector<double>& h_x, const unsigned int LDN) {
 	thrust::device_vector<double>::iterator it_begin = d_V.begin();
-	for (unsigned int i = 0; i < settings->starting_points; i++) {
+	for (unsigned int i = 0; i < optimizationSettings->starting_points; i++) {
 		// copy data to x_for_sort
 		if (i > 0)
 			thrust::advance(it_begin, LDN);
@@ -619,14 +619,14 @@ void perform_hard_and_soft_thresholding_with_sorting(
 		// sort data on the device
 		thrust::sort(d_x_for_sort.begin(), d_x_for_sort.end(),
 				comparator_abs_val<double> ());// maybe use stable_sort ???
-		if (settings->isL1ConstrainedProblem()) {
+		if (optimizationSettings->isL1ConstrainedProblem()) {
 			thrust::copy(d_x_for_sort.begin(), d_x_for_sort.end(), h_x.begin());
 			double tresh_hold = compute_soft_thresholding_parameter(&h_x[0], n,
-					settings->constrain);
+					optimizationSettings->constrain);
 			thrust::transform(it_begin, it_end, it_begin,
 					gpu_soft_treshholding<double> (tresh_hold));
 		} else {
-			double tresh_hold = abs(d_x_for_sort[settings->constrain - 1]);
+			double tresh_hold = abs(d_x_for_sort[optimizationSettings->constrain - 1]);
 			thrust::transform(it_begin, it_end, it_begin,
 					gpu_hard_treshholding<double> (tresh_hold));
 		}
@@ -635,77 +635,77 @@ void perform_hard_and_soft_thresholding_with_sorting(
 
 template<typename F>
 void perform_hard_and_soft_thresholding_for_penalized(
-		thrust::device_vector<F> &d_V, SolverStructures::OptimizationSettings* settings,
-		const unsigned int n, value_coordinate_holder<F>* vals,
+		thrust::device_vector<F> &d_V, SolverStructures::OptimizationSettings* optimizationSettings,
+		const unsigned int n, ValueCoordinateHolder<F>* vals,
 		const unsigned int LDN) {
 }
 
 template<>
 void perform_hard_and_soft_thresholding_for_penalized(
-		thrust::device_vector<double> &d_V, SolverStructures::OptimizationSettings* settings,
-		const unsigned int n, value_coordinate_holder<double>* vals,
+		thrust::device_vector<double> &d_V, SolverStructures::OptimizationSettings* optimizationSettings,
+		const unsigned int n, ValueCoordinateHolder<double>* vals,
 		const unsigned int LDN) {
 	thrust::device_vector<double>::iterator it_begin = d_V.begin();
-	if (settings->isL1PenalizedProblem()) {
+	if (optimizationSettings->isL1PenalizedProblem()) {
 		//------------L1 PENALIZED
-		for (unsigned int i = 0; i < settings->starting_points; i++) {
+		for (unsigned int i = 0; i < optimizationSettings->starting_points; i++) {
 			if (i > 0)
 				thrust::advance(it_begin, LDN);
 
 			thrust::device_vector<double>::iterator it_end = it_begin + n;
 			vals[i].val = thrust::transform_reduce(it_begin, it_end,
-					gpu_l1_penalized_objval<double> (settings->penalty), 0.0f,
+					gpu_l1_penalized_objval<double> (optimizationSettings->penalty), 0.0f,
 					thrust::plus<double>());
 			vals[i].val = std::sqrt(vals[i].val);
 		}
 		thrust::transform(d_V.begin(), d_V.end(), d_V.begin(),
-				gpu_l1_penalized_tresholing<double> (settings->penalty));
+				gpu_l1_penalized_tresholing<double> (optimizationSettings->penalty));
 	} else {
 		//------------L0 PENALIZED
-		for (unsigned int i = 0; i < settings->starting_points; i++) {
+		for (unsigned int i = 0; i < optimizationSettings->starting_points; i++) {
 			if (i > 0)
 				thrust::advance(it_begin, LDN);
 			thrust::device_vector<double>::iterator it_end = it_begin + n;
 			vals[i].val = thrust::transform_reduce(it_begin, it_end,
-					gpu_l0_penalized_objval<double> (settings->penalty), 0.0f,
+					gpu_l0_penalized_objval<double> (optimizationSettings->penalty), 0.0f,
 					thrust::plus<double>());
 		}
 		thrust::transform(d_V.begin(), d_V.end(), d_V.begin(),
-				gpu_l0_penalized_tresholing<double> (settings->penalty));
+				gpu_l0_penalized_tresholing<double> (optimizationSettings->penalty));
 	}
 }
 
 template<>
 void perform_hard_and_soft_thresholding_for_penalized(
-		thrust::device_vector<float> &d_V, OptimizationSettings* settings,
-		const unsigned int n, value_coordinate_holder<float>* vals,
+		thrust::device_vector<float> &d_V, OptimizationSettings* optimizationSettings,
+		const unsigned int n, ValueCoordinateHolder<float>* vals,
 		const unsigned int LDN) {
 	thrust::device_vector<float>::iterator it_begin = d_V.begin();
-	if (settings->isL1PenalizedProblem()) {
+	if (optimizationSettings->isL1PenalizedProblem()) {
 		//------------L1 PENALIZED
-		for (unsigned int i = 0; i < settings->starting_points; i++) {
+		for (unsigned int i = 0; i < optimizationSettings->starting_points; i++) {
 			if (i > 0)
 				thrust::advance(it_begin, LDN);
 			thrust::device_vector<float>::iterator it_end = it_begin + n;
 			vals[i].val = thrust::transform_reduce(it_begin, it_end,
-					gpu_l1_penalized_objval<float> (settings->penalty), 0.0f,
+					gpu_l1_penalized_objval<float> (optimizationSettings->penalty), 0.0f,
 					thrust::plus<float>());
 			vals[i].val = std::sqrt(vals[i].val);
 		}
 		thrust::transform(d_V.begin(), d_V.end(), d_V.begin(),
-				gpu_l1_penalized_tresholing<float> (settings->penalty));
+				gpu_l1_penalized_tresholing<float> (optimizationSettings->penalty));
 	} else {
 		//------------L0 PENALIZED
-		for (unsigned int i = 0; i < settings->starting_points; i++) {
+		for (unsigned int i = 0; i < optimizationSettings->starting_points; i++) {
 			if (i > 0)
 				thrust::advance(it_begin, LDN);
 			thrust::device_vector<float>::iterator it_end = it_begin + n;
 			vals[i].val = thrust::transform_reduce(it_begin, it_end,
-					gpu_l0_penalized_objval<float> (settings->penalty), 0.0f,
+					gpu_l0_penalized_objval<float> (optimizationSettings->penalty), 0.0f,
 					thrust::plus<float>());
 		}
 		thrust::transform(d_V.begin(), d_V.end(), d_V.begin(),
-				gpu_l0_penalized_tresholing<float> (settings->penalty));
+				gpu_l0_penalized_tresholing<float> (optimizationSettings->penalty));
 	}
 }
 

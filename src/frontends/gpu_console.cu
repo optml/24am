@@ -23,22 +23,22 @@
 
 
 template<typename F>
-int load_data_and_run_solver(SolverStructures::OptimizationSettings* settings) {
+int load_data_and_run_solver(SolverStructures::OptimizationSettings* optimizationSettings) {
 	mytimer* mt = new mytimer();
 	mt->start();
-	SolverStructures::OptimizationStatistics* stat =
-			new OptimizationStatistics();
+	SolverStructures::OptimizationStatisticsistics* optimizationStatistics =
+			new OptimizationStatisticsistics();
 	cudaDeviceProp dp;
 	cudaGetDeviceProperties(&dp, 0);
-	settings->gpu_sm_count = dp.multiProcessorCount;
-	settings->gpu_max_threads = dp.maxThreadsPerBlock;
+	optimizationSettings->gpu_sm_count = dp.multiProcessorCount;
+	optimizationSettings->gpu_max_threads = dp.maxThreadsPerBlock;
 
 	unsigned int ldB;
 	unsigned int m;
 	unsigned int n;
 	std::vector<F> B_mat;
-	InputOuputHelper::readCSVFile(B_mat, ldB, m, n, settings->data_file);
-	stat->n = n;
+	InputOuputHelper::readCSVFile(B_mat, ldB, m, n, optimizationSettings->data_file);
+	optimizationStatistics->n = n;
 
 	const int MEMORY_BANK_FLOAT_SIZE = MEMORY_ALIGNMENT / sizeof(F);
 	const unsigned int LD_M = (
@@ -61,26 +61,26 @@ int load_data_and_run_solver(SolverStructures::OptimizationSettings* settings) {
 	// move data to DEVICE
 	thrust::device_vector<F> d_B = h_B;
 
-	cublasStatus_t status;
+	cublasoptimizationStatisticsus_t optimizationStatisticsus;
 	cublasHandle_t handle;
-	status = cublasCreate(&handle);
-	if (status != CUBLAS_STATUS_SUCCESS) {
+	optimizationStatisticsus = cublasCreate(&handle);
+	if (optimizationStatisticsus != CUBLAS_optimizationStatisticsUS_SUCCESS) {
 		fprintf(stderr, "! CUBLAS initialization error\n");
 		return EXIT_FAILURE;
 	} else {
 		printf("CUBLAS initialized.\n");
 	}
 //FIXME
-	settings->gpu_use_k_selection_algorithm = true;
-	settings->gpu_use_k_selection_algorithm = false;
-	SPCASolver::gpu_sparse_PCA_solver(handle, m, n, d_B, h_x, settings, stat,
+	optimizationSettings->gpu_use_k_selection_algorithm = true;
+	optimizationSettings->gpu_use_k_selection_algorithm = false;
+	SPCASolver::GPUSolver::gpu_sparse_PCA_solver(handle, m, n, d_B, h_x, optimizationSettings, optimizationStatistics,
 			LD_M, LD_N);
 	mt->end();
-	stat->total_elapsed_time = mt->getElapsedWallClockTime();
-	InputOuputHelper::save_results(stat, settings, &h_x[0], n);
-	InputOuputHelper::save_statistics(stat, settings);
-	status = cublasDestroy(handle);
-	if (status != CUBLAS_STATUS_SUCCESS) {
+	optimizationStatistics->total_elapsed_time = mt->getElapsedWallClockTime();
+	InputOuputHelper::save_results(optimizationStatistics, optimizationSettings, &h_x[0], n);
+	InputOuputHelper::save_optimizationStatisticsistics(optimizationStatistics, optimizationSettings);
+	optimizationStatisticsus = cublasDestroy(handle);
+	if (optimizationStatisticsus != CUBLAS_optimizationStatisticsUS_SUCCESS) {
 		fprintf(stderr, "!cublas shutdown error\n");
 		return EXIT_FAILURE;
 	}
@@ -88,15 +88,15 @@ int load_data_and_run_solver(SolverStructures::OptimizationSettings* settings) {
 }
 
 int main(int argc, char *argv[]) {
-	SolverStructures::OptimizationSettings* settings =
+	SolverStructures::OptimizationSettings* optimizationSettings =
 			new OptimizationSettings();
-	int status = parseConsoleOptions(settings, argc, argv);
-	if (status > 0)
-		return status;
-	if (settings->double_precission) {
-		load_data_and_run_solver<double>(settings);
+	int optimizationStatisticsus = parseConsoleOptions(optimizationSettings, argc, argv);
+	if (optimizationStatisticsus > 0)
+		return optimizationStatisticsus;
+	if (optimizationSettings->double_precission) {
+		load_data_and_run_solver<double>(optimizationSettings);
 	} else {
-		load_data_and_run_solver<float>(settings);
+		load_data_and_run_solver<float>(optimizationSettings);
 	}
 	return 0;
 }

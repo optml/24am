@@ -26,28 +26,28 @@ using namespace SolverStructures;
 
 
 template<typename F>
-int test_solver(SolverStructures::OptimizationSettings * settings,
+int test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 		char* multicoreDataset, char* multicoreResult) {
-	SolverStructures::OptimizationStatistics* stat =
-			new OptimizationStatistics();
+	SolverStructures::OptimizationStatisticsistics* optimizationStatistics =
+			new OptimizationStatisticsistics();
 	std::vector<F> B_mat;
 	unsigned int ldB;
 	unsigned int m;
 	unsigned int n;
 	InputOuputHelper::readCSVFile(B_mat, ldB, m, n, multicoreDataset);
-	OptimizationStatistics* stat2 = new OptimizationStatistics();
-	stat2->n = n;
+	OptimizationStatisticsistics* optimizationStatistics2 = new OptimizationStatisticsistics();
+	optimizationStatistics2->n = n;
 	const F * B = &B_mat[0];
 	std::vector<F> x_vec(n, 0);
 	F * x = &x_vec[0];
 
 	cudaDeviceProp dp;
 	cudaGetDeviceProperties(&dp, 0);
-	settings->gpu_sm_count = dp.multiProcessorCount;
-	settings->gpu_max_threads = dp.maxThreadsPerBlock;
+	optimizationSettings->gpu_sm_count = dp.multiProcessorCount;
+	optimizationSettings->gpu_max_threads = dp.maxThreadsPerBlock;
 
-	InputOuputHelper::read_csv_file(B_mat, ldB, m, n, settings->data_file);
-	stat->n = n;
+	InputOuputHelper::read_csv_file(B_mat, ldB, m, n, optimizationSettings->data_file);
+	optimizationStatistics->n = n;
 
 	const int MEMORY_BANK_FLOAT_SIZE = MEMORY_ALIGNMENT / sizeof(F);
 	const unsigned int LD_M = (
@@ -70,16 +70,16 @@ int test_solver(SolverStructures::OptimizationSettings * settings,
 	// move data to DEVICE
 	thrust::device_vector<F> d_B = h_B;
 
-	cublasStatus_t status;
+	cublasoptimizationStatisticsus_t optimizationStatisticsus;
 	cublasHandle_t handle;
-	status = cublasCreate(&handle);
-	if (status != CUBLAS_STATUS_SUCCESS) {
+	optimizationStatisticsus = cublasCreate(&handle);
+	if (optimizationStatisticsus != CUBLAS_optimizationStatisticsUS_SUCCESS) {
 		fprintf(stderr, "! CUBLAS initialization error\n");
 		return EXIT_FAILURE;
 	} else {
 		printf("CUBLAS initialized.\n");
 	}
-	settings->gpu_use_k_selection_algorithm = false;
+	optimizationSettings->gpu_use_k_selection_algorithm = false;
 	std::vector<SolverStructures::SparsePCA_Algorithm> algorithms(8);
 	algorithms[0] = SolverStructures::L0_penalized_L1_PCA;
 	algorithms[1] = SolverStructures::L0_penalized_L2_PCA;
@@ -89,23 +89,23 @@ int test_solver(SolverStructures::OptimizationSettings * settings,
 	algorithms[5] = SolverStructures::L0_constrained_L2_PCA;
 	algorithms[6] = SolverStructures::L1_constrained_L1_PCA;
 	algorithms[7] = SolverStructures::L1_constrained_L2_PCA;
-	char* resultGPU = settings->result_file;
+	char* resultGPU = optimizationSettings->result_file;
 	for (int al = 0; al < 8; al++) {
-		settings->algorithm = algorithms[al];
-		SPCASolver::gpu_sparse_PCA_solver(handle, m, n, d_B, h_x, settings,
-				stat, LD_M, LD_N);
-		settings->result_file=resultGPU;
-		InputOuputHelper::save_results(stat, settings, &h_x[0], n);
-		if (settings->proccess_node == 0) {
-			SPCASolver::MulticoreSolver::denseDataSolver(B, ldB, x, m, n, settings, stat2);
-			settings->result_file = multicoreResult;
-			InputOuputHelper::save_results(stat2, settings, x, n);
-			cout << "Test " << al << " " << settings->algorithm << " "
-					<< stat->fval << "  " << stat2->fval << endl;
+		optimizationSettings->algorithm = algorithms[al];
+		SPCASolver::GPUSolver::gpu_sparse_PCA_solver(handle, m, n, d_B, h_x, optimizationSettings,
+				optimizationStatistics, LD_M, LD_N);
+		optimizationSettings->result_file=resultGPU;
+		InputOuputHelper::save_results(optimizationStatistics, optimizationSettings, &h_x[0], n);
+		if (optimizationSettings->proccess_node == 0) {
+			SPCASolver::MulticoreSolver::denseDataSolver(B, ldB, x, m, n, optimizationSettings, optimizationStatistics2);
+			optimizationSettings->result_file = multicoreResult;
+			InputOuputHelper::save_results(optimizationStatistics2, optimizationSettings, x, n);
+			cout << "Test " << al << " " << optimizationSettings->algorithm << " "
+					<< optimizationStatistics->fval << "  " << optimizationStatistics2->fval << endl;
 		}
 	}
-	status = cublasDestroy(handle);
-	if (status != CUBLAS_STATUS_SUCCESS) {
+	optimizationStatisticsus = cublasDestroy(handle);
+	if (optimizationStatisticsus != CUBLAS_optimizationStatisticsUS_SUCCESS) {
 		fprintf(stderr, "!cublas shutdown error\n");
 		return EXIT_FAILURE;
 	}
@@ -113,22 +113,22 @@ int test_solver(SolverStructures::OptimizationSettings * settings,
 }
 
 int main(int argc, char *argv[]) {
-	SolverStructures::OptimizationSettings* settings =
+	SolverStructures::OptimizationSettings* optimizationSettings =
 			new OptimizationSettings();
-	settings->result_file = "results/gpu_unittest.txt";
+	optimizationSettings->result_file = "results/gpu_unittest.txt";
 	char* multicoreDataset = "datasets/distributed.dat.all";
-	settings->data_file = multicoreDataset;
+	optimizationSettings->data_file = multicoreDataset;
 	char* multicoreResult = "results/gpu_unittest_multicore.txt";
-	settings->verbose = false;
-	settings->starting_points = 1024;
-	settings->batch_size = settings->starting_points;
-	settings->on_the_fly_generation=false;
-	settings->gpu_use_k_selection_algorithm=false;
-	settings->constrain = 20;
-	settings->toll = 0.0001;
-	settings->max_it = 100;
+	optimizationSettings->verbose = false;
+	optimizationSettings->starting_points = 1024;
+	optimizationSettings->batch_size = optimizationSettings->starting_points;
+	optimizationSettings->onTheFlyMethod=false;
+	optimizationSettings->gpu_use_k_selection_algorithm=false;
+	optimizationSettings->constrain = 20;
+	optimizationSettings->toll = 0.0001;
+	optimizationSettings->max_it = 100;
 	cout << "Double test" << endl;
-	test_solver<double>(settings, multicoreDataset, multicoreResult);
+	test_solver<double>(optimizationSettings, multicoreDataset, multicoreResult);
 	return 0;
 }
 

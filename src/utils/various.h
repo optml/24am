@@ -17,7 +17,7 @@
 
 
 template<typename F>
-class value_coordinate_holder {
+class ValueCoordinateHolder {
 public:
 	F val;
 	F prev_val;
@@ -25,7 +25,7 @@ public:
 	F current_error;
 	bool done;
 	unsigned int idx;
-	value_coordinate_holder() {
+	ValueCoordinateHolder() {
 		idx=0;
 		val = 0;
 		tmp=0;

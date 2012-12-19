@@ -20,13 +20,13 @@
 // this function generate initial points
 template<typename F>
 void getSignleStartingPoint(F* V, F* Z,
-		SolverStructures::OptimizationSettings* settings,
+		SolverStructures::OptimizationSettings* optimizationSettings,
 		const unsigned int n, const unsigned int m, int batchshift,
 		unsigned int j) {
-	if (settings->isConstrainedProblem()) {
+	if (optimizationSettings->isConstrainedProblem()) {
 		myseed = j + batchshift;
 		F tmp_norm = 0;
-		for (unsigned int i = 0; i < settings->constrain; i++) {
+		for (unsigned int i = 0; i < optimizationSettings->constrain; i++) {
 			unsigned int idx = (int) (n * (F) rand_r(&myseed) / (RAND_MAX));
 			if (idx == n)
 				idx--;
@@ -49,8 +49,8 @@ void getSignleStartingPoint(F* V, F* Z,
 //initialize starting points
 template<typename F>
 void initialize_starting_points(F* V, F* Z,
-		SolverStructures::OptimizationSettings* settings,
-		SolverStructures::OptimizationStatistics* stat,
+		SolverStructures::OptimizationSettings* optimizationSettings,
+		SolverStructures::OptimizationStatisticsistics* optimizationStatistics,
 		const unsigned int number_of_experiments_per_batch,
 		const unsigned int n, const unsigned int m, const int ldB, const F* B,
 		int batchshift = 0) {
@@ -58,7 +58,7 @@ void initialize_starting_points(F* V, F* Z,
 #pragma omp parallel for
 #endif
 	for (unsigned int j = 0; j < number_of_experiments_per_batch; j++) {
-		getSignleStartingPoint(&V[j * n], &Z[j * m], settings, n, m, batchshift,
+		getSignleStartingPoint(&V[j * n], &Z[j * m], optimizationSettings, n, m, batchshift,
 				j);
 	}
 }
@@ -66,17 +66,17 @@ void initialize_starting_points(F* V, F* Z,
 // do one iteration for constrained PCA
 template<typename F>
 void perform_one_iteration_for_constrained_pca(F* V, F* Z,
-		SolverStructures::OptimizationSettings* settings,
-		SolverStructures::OptimizationStatistics* stat,
+		SolverStructures::OptimizationSettings* optimizationSettings,
+		SolverStructures::OptimizationStatisticsistics* optimizationStatistics,
 		const unsigned int number_of_experiments_per_batch,
 		const unsigned int n, const unsigned int m, const int ldB, const F* B,
-		F* max_errors, value_coordinate_holder<F>* vals, std::vector<F>* buffer,
-		unsigned int it, unsigned int statistical_shift) {
+		F* max_errors, ValueCoordinateHolder<F>* vals, std::vector<F>* buffer,
+		unsigned int it, unsigned int optimizationStatisticsistical_shift) {
 	cblas_matrix_matrix_multiply(CblasColMajor, CblasNoTrans, CblasNoTrans, m,
 			number_of_experiments_per_batch, n, 1, B, ldB, V, n, 0, Z, m); // Multiply z = B*V
 	//set Z=sgn(Z)
-	if (settings->algorithm == SolverStructures::L0_constrained_L1_PCA
-			|| settings->algorithm
+	if (optimizationSettings->algorithm == SolverStructures::L0_constrained_L1_PCA
+			|| optimizationSettings->algorithm
 					== SolverStructures::L1_constrained_L1_PCA) {
 #ifdef _OPENMP
 #pragma omp parallel for
@@ -94,39 +94,39 @@ void perform_one_iteration_for_constrained_pca(F* V, F* Z,
 #endif
 	for (unsigned int j = 0; j < number_of_experiments_per_batch; j++) {
 		F fval_current = 0;
-		if (settings->algorithm == SolverStructures::L0_constrained_L2_PCA
-				|| settings->algorithm
+		if (optimizationSettings->algorithm == SolverStructures::L0_constrained_L2_PCA
+				|| optimizationSettings->algorithm
 						== SolverStructures::L1_constrained_L2_PCA) {
 			fval_current = cblas_l2_norm(m, &Z[m * j], 1);
 		}
 		F norm_of_x;
-		if (settings->isL1ConstrainedProblem()) {
-			norm_of_x = soft_thresholding(&V[n * j], n, settings->constrain,
-					buffer[j], settings); // x = S_w(x)
+		if (optimizationSettings->isL1ConstrainedProblem()) {
+			norm_of_x = soft_thresholding(&V[n * j], n, optimizationSettings->constrain,
+					buffer[j], optimizationSettings); // x = S_w(x)
 		} else {
-			norm_of_x = k_hard_thresholding(&V[n * j], n, settings->constrain,
-					buffer[j], settings); // x = T_k(x)
+			norm_of_x = k_hard_thresholding(&V[n * j], n, optimizationSettings->constrain,
+					buffer[j], optimizationSettings); // x = T_k(x)
 		}
 
 		cblas_vector_scale(n, &V[j * n], 1 / norm_of_x);
-		if (settings->algorithm == SolverStructures::L0_constrained_L1_PCA
-				|| settings->algorithm
+		if (optimizationSettings->algorithm == SolverStructures::L0_constrained_L1_PCA
+				|| optimizationSettings->algorithm
 						== SolverStructures::L1_constrained_L1_PCA) {
 			fval_current = vals[j].tmp;
 		}
-		F tmp_error = computeTheError(fval_current, vals[j].val, settings);
+		F tmp_error = computeTheError(fval_current, vals[j].val, optimizationSettings);
 		vals[j].current_error = tmp_error;
 		//Log end of iteration for given point
-		if (settings->get_it_for_all_points
-				&& termination_criteria(tmp_error, it, settings)
-				&& stat->iters[statistical_shift + j] == -1) {
-			stat->iters[statistical_shift + j] = it;
-			stat->cardinalities[statistical_shift + j] = vector_get_nnz(
+		if (optimizationSettings->storeIterationsForAllPoints
+				&& termination_criteria(tmp_error, it, optimizationSettings)
+				&& optimizationStatistics->iters[optimizationStatisticsistical_shift + j] == -1) {
+			optimizationStatistics->iters[optimizationStatisticsistical_shift + j] = it;
+			optimizationStatistics->cardinalities[optimizationStatisticsistical_shift + j] = vector_get_nnz(
 					&V[j * n], n);
-		} else if (settings->get_it_for_all_points
-				&& !termination_criteria(tmp_error, it, settings)
-				&& stat->iters[statistical_shift + j] != -1) {
-			stat->iters[j + statistical_shift] = -1;
+		} else if (optimizationSettings->storeIterationsForAllPoints
+				&& !termination_criteria(tmp_error, it, optimizationSettings)
+				&& optimizationStatistics->iters[optimizationStatisticsistical_shift + j] != -1) {
+			optimizationStatistics->iters[j + optimizationStatisticsistical_shift] = -1;
 		}
 		//---------------
 		if (max_errors[my_thread_id] < tmp_error)
@@ -138,17 +138,17 @@ void perform_one_iteration_for_constrained_pca(F* V, F* Z,
 // do one iteration for penalize PCA
 template<typename F>
 void perform_one_iteration_for_penalized_pca(F* V, F* Z,
-		SolverStructures::OptimizationSettings* settings,
-		SolverStructures::OptimizationStatistics* stat,
+		SolverStructures::OptimizationSettings* optimizationSettings,
+		SolverStructures::OptimizationStatisticsistics* optimizationStatistics,
 		const unsigned int number_of_experiments_per_batch,
 		const unsigned int n, const unsigned int m, const int ldB, const F* B,
-		F* max_errors, value_coordinate_holder<F>* vals, unsigned int it,
-		unsigned int statistical_shift) {
+		F* max_errors, ValueCoordinateHolder<F>* vals, unsigned int it,
+		unsigned int optimizationStatisticsistical_shift) {
 	//scale Z
 	cblas_matrix_matrix_multiply(CblasColMajor, CblasNoTrans, CblasNoTrans, m,
 			number_of_experiments_per_batch, n, 1, B, ldB, V, n, 0, Z, m); // Multiply z = B*w
-	if (settings->algorithm == SolverStructures::L0_penalized_L1_PCA
-			|| settings->algorithm == SolverStructures::L1_penalized_L1_PCA) {
+	if (optimizationSettings->algorithm == SolverStructures::L0_penalized_L1_PCA
+			|| optimizationSettings->algorithm == SolverStructures::L1_penalized_L1_PCA) {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
@@ -166,12 +166,12 @@ void perform_one_iteration_for_penalized_pca(F* V, F* Z,
 	}
 	cblas_matrix_matrix_multiply(CblasColMajor, CblasTrans, CblasNoTrans, n,
 			number_of_experiments_per_batch, m, 1, B, ldB, Z, m, 0, V, n); // Multiply v = B'*z
-	if (settings->isL1PenalizedProblem()) {
+	if (optimizationSettings->isL1PenalizedProblem()) {
 		L1_penalized_thresholding(number_of_experiments_per_batch, n, V,
-				settings, max_errors, vals, stat, it);
+				optimizationSettings, max_errors, vals, optimizationStatistics, it);
 	} else {
 		L0_penalized_thresholding(number_of_experiments_per_batch, n, V,
-				settings, max_errors, vals, stat, it);
+				optimizationSettings, max_errors, vals, optimizationStatistics, it);
 	}
 
 }

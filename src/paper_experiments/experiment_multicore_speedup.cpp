@@ -23,8 +23,8 @@ using namespace SolverStructures;
 #include "experiment_utils.h"
 
 template<typename F>
-void run_experiments(OptimizationSettings* settings) {
-	OptimizationStatistics* stat = new OptimizationStatistics();
+void run_experiments(OptimizationSettings* optimizationSettings) {
+	OptimizationStatisticsistics* optimizationStatistics = new OptimizationStatisticsistics();
 	ofstream fileOut;
 	fileOut.open("results/paper_experiment_multicore_speedup.txt");
 	mytimer* mt = new mytimer();
@@ -39,22 +39,22 @@ void run_experiments(OptimizationSettings* settings) {
 		x.resize(n);
 		y.resize(m);
 		generateProblem(n, m, &h_B[0], m, n);
-		settings->max_it = 100;
-		settings->toll = 0;
-		settings->starting_points = 1024;
-		settings->penalty = 0.02;
-		settings->constrain = n / 100;
-		settings->algorithm = L0_penalized_L2_PCA;
-		settings->batch_size = settings->starting_points;
-		settings->on_the_fly_generation = false;
+		optimizationSettings->max_it = 100;
+		optimizationSettings->toll = 0;
+		optimizationSettings->starting_points = 1024;
+		optimizationSettings->penalty = 0.02;
+		optimizationSettings->constrain = n / 100;
+		optimizationSettings->algorithm = L0_penalized_L2_PCA;
+		optimizationSettings->batch_size = optimizationSettings->starting_points;
+		optimizationSettings->onTheFlyMethod = false;
 		for (int i = 1; i <= 8; i=i*2) {
 			omp_set_num_threads(i);
 			init_random_seeds();
 			mt->start();
-			SPCASolver::MulticoreSolver::denseDataSolver(&h_B[0], m, &x[0], m, n, settings,
-					stat);
+			SPCASolver::MulticoreSolver::denseDataSolver(&h_B[0], m, &x[0], m, n, optimizationSettings,
+					optimizationStatistics);
 			mt->end();
-			logTime(fileOut, mt, stat, settings, x, m, n);
+			logTime(fileOut, mt, optimizationStatistics, optimizationSettings, x, m, n);
 		}
 	}
 
@@ -62,7 +62,7 @@ void run_experiments(OptimizationSettings* settings) {
 }
 
 int main(int argc, char *argv[]) {
-	OptimizationSettings* settings = new OptimizationSettings();
-	run_experiments<double>(settings);
+	OptimizationSettings* optimizationSettings = new OptimizationSettings();
+	run_experiments<double>(optimizationSettings);
 	return 0;
 }

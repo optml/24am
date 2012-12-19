@@ -26,9 +26,9 @@ using namespace SolverStructures;
 #include "../gpower/sparse_PCA_solver_for_CSC.h"
 
 template<typename F>
-void run_experiments(OptimizationSettings* settings, const char* filename,
+void run_experiments(OptimizationSettings* optimizationSettings, const char* filename,
 		const char* description, const char* logfilename) {
-	OptimizationStatistics* stat = new OptimizationStatistics();
+	OptimizationStatisticsistics* optimizationStatistics = new OptimizationStatisticsistics();
 	ofstream fileOut;
 	fileOut.open(logfilename);
 	mytimer* mt = new mytimer();
@@ -46,9 +46,9 @@ void run_experiments(OptimizationSettings* settings, const char* filename,
 
 	for (int i = 0; i < 10; i++) {
 		SPCASolver::sparse_PCA_solver_CSC(&B_CSC_Vals[0], &B_CSC_Row_Id[0],
-				&B_CSC_Col_Ptr[0], &x[0], m, n, settings, stat, doMean,
+				&B_CSC_Col_Ptr[0], &x[0], m, n, optimizationSettings, optimizationStatistics, doMean,
 				&means[0]);
-		printDescriptions(&x[0], n, description, stat, fileOut);
+		printDescriptions(&x[0], n, description, optimizationStatistics, fileOut);
 		for (int col = 0; col < n; col++) {
 			if (x[col] != 0) {
 				means[col] = 0;
@@ -64,28 +64,28 @@ void run_experiments(OptimizationSettings* settings, const char* filename,
 }
 
 int main(int argc, char *argv[]) {
-	OptimizationSettings* settings = new OptimizationSettings();
+	OptimizationSettings* optimizationSettings = new OptimizationSettings();
 
-	settings->max_it = 50;
-	settings->toll = 0.0001;
-	settings->starting_points = 1024;
-	settings->constrain = 5;
-	settings->algorithm = L0_constrained_L2_PCA;
+	optimizationSettings->max_it = 50;
+	optimizationSettings->toll = 0.0001;
+	optimizationSettings->starting_points = 1024;
+	optimizationSettings->constrain = 5;
+	optimizationSettings->algorithm = L0_constrained_L2_PCA;
 
 //	char* filename = "datasets/docword.nips.txt";
 //	char* description = "datasets/vocab.nips.txt";
 //	char* logfilename = "results/nips.txt";
-//	run_experiments<double>(settings, filename, description, logfilename);
+//	run_experiments<double>(optimizationSettings, filename, description, logfilename);
 
 	char* filename = "datasets/docword.nytimes.txt";
 	char* description = "datasets/vocab.nytimes.txt";
 	char* logfilename = "results/nytimes.txt";
-	run_experiments<double>(settings, filename, description, logfilename);
+	run_experiments<double>(optimizationSettings, filename, description, logfilename);
 
 	filename = "datasets/docword.pubmed.txt";
 	description = "datasets/vocab.pubmed.txt";
 	logfilename = "results/pubmed.txt";
-	run_experiments<double>(settings, filename, description, logfilename);
+	run_experiments<double>(optimizationSettings, filename, description, logfilename);
 
 	return 0;
 }

@@ -15,12 +15,12 @@
  *      Author: taki
  *
  *
- *  Class used to specify settings for solver
+ *  Class used to specify optimizationSettings for solver
  *
  */
 
-#ifndef OPTIMIZATION_SETTINGS_H_
-#define OPTIMIZATION_SETTINGS_H_
+#ifndef optimization_settings_H_
+#define optimization_settings_H_
 
 namespace SolverStructures {
 
@@ -67,7 +67,7 @@ T& operator<<(T& stream, SparsePCA_Algorithm& algo) {
 	return stream;
 }
 
-//class used to set settings to solver
+//class used to set optimizationSettings to solver
 class OptimizationSettings {
 public:
 	int proccess_node; // used only for distributed solver. This is set automatically and contains rank of MPI process
@@ -81,17 +81,17 @@ public:
 	double penalty; // value of penalty parameter
 	unsigned int constrain; //value of constrain parameter
 	char* data_file; //   path to source data file
-	char* result_file; // path to file where result and statistics will be used
+	char* result_file; // path to file where result and optimizationStatisticsistics will be used
 	int gpu_sm_count; // gpu number of Streaming Processors
 	int gpu_max_threads; // gpu - max number of threads
 	enum SparsePCA_Algorithm algorithm; // algorithm which should be used
 	bool get_values_for_all_points; // determines if algorithm should store values for all starting points
-	bool get_it_for_all_points; // determines if algorithm should store elapsed iterations for all starting points
+	bool storeIterationsForAllPoints; // determines if algorithm should store elapsed iterations for all starting points
 	int max_it; //max iteration which one starting point can consume
 	int starting_points; // number of starting points which algorithm should use
 	int batch_size; // size of batch
 	unsigned int number_of_batches; // number of bathes - is computer by solver
-	bool on_the_fly_generation; // on the fly generation - not applicable for distributed solver
+	bool onTheFlyMethod; // on the fly generation - not applicable for distributed solver
 
 	OptimizationSettings() {
 		distributed_row_grid_file = 0;
@@ -102,11 +102,11 @@ public:
 		verbose = false;
 		starting_points = 64;
 		hard_thresholding_using_sort = false;
-		on_the_fly_generation = false;
+		onTheFlyMethod = false;
 		max_it = 100;
 		get_values_for_all_points = true;
 		gpu_use_k_selection_algorithm = true;
-		get_it_for_all_points = true;
+		storeIterationsForAllPoints = true;
 		double_precission = false;
 	}
 
@@ -139,7 +139,7 @@ public:
 
 	}
 
-	// check input settings
+	// check input optimizationSettings
 	void chceckInputAndModifyIt(unsigned int n) {
 		if (this->constrain > n) {
 			this->constrain = n;
@@ -156,4 +156,4 @@ public:
 
 };
 }
-#endif /* OPTIMIZATION_SETTINGS_H_ */
+#endif /* optimization_settings_H_ */

@@ -15,16 +15,16 @@
  *      Author: taki
  *
  *
- *   This class is used to store statistics during solver
+ *   This class is used to store optimizationStatisticsistics during solver
  *
  */
 
-#ifndef OPTIMIZATION_STATISTICS_H_
-#define OPTIMIZATION_STATISTICS_H_
+#ifndef optimization_StatisticsISTICS_H_
+#define optimization_StatisticsISTICS_H_
 
 #include <vector>
 namespace SolverStructures {
-class OptimizationStatistics {
+class OptimizationStatisticsistics {
 
 public:
 	unsigned int it; // total iterations solver did
@@ -37,12 +37,12 @@ public:
 	                             // creating some figures in paper.
 	std::vector<int> iters; // the same as before, but holds the number of iterations for given starting point
 	std::vector<int> cardinalities; // cardinalities for given starting point. For L0 constrained method doesn't make sense as
-	                                // it's value has to be constrain parameter from settings
+	                                // it's value has to be constrain parameter from optimizationSettings
 	int total_threads_used;
-	OptimizationStatistics() {
+	OptimizationStatisticsistics() {
 		it = 0;
 		total_threads_used=1;
 	}
 };
 }
-#endif /* OPTIMIZATION_STATISTICS_H_ */
+#endif /* optimization_StatisticsISTICS_H_ */

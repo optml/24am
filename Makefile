@@ -3,7 +3,7 @@ GSL_INCLUDE = -I/exports/applications/apps/gsl/1.9/include
 GSL_LIB= -L/exports/applications/apps/gsl/1.9/lib
 
 
-# Path to Intel MKL + Linking settings
+# Path to Intel MKL + Linking optimizationSettings
 MKLROOT = /exports/applications/apps/SL5/intel/MKL/10.2.3.029
 MKL_MULTICORE_LIB =    -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lgsl -lm  
 #MKL_MULTICORE_LIB =   -Wl,--start-group  $(MKLROOT)/lib/intel64/libmkl_intel_lp64.a $(MKLROOT)/lib/intel64/libmkl_gnu_thread.a $(MKLROOT)/lib/intel64/libmkl_core.a -Wl,--end-group -ldl -lpthread -lm -mkl=parallel 

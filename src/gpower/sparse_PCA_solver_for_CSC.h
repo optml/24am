@@ -28,7 +28,7 @@
 
 template<typename F>
 void printDescriptions(F* x, int length, const char* description,
-		SolverStructures::OptimizationStatistics* stat, ofstream& stream) {
+		SolverStructures::OptimizationStatisticsistics* optimizationStatistics, ofstream& stream) {
 	FILE * fin = fopen(description, "r");
 	char buffer[1000];
 	if (fin == NULL) {
@@ -36,8 +36,8 @@ void printDescriptions(F* x, int length, const char* description,
 		exit(1);
 	} else {
 		printf("------\n");
-		cout << "Objective value: " << stat->fval << endl;
-		stream << "Objective value: " << stat->fval << endl;
+		cout << "Objective value: " << optimizationStatistics->fval << endl;
+		stream << "Objective value: " << optimizationStatistics->fval << endl;
 		for (int k = 0; k < length; k++) {
 			fscanf(fin, "%s\n", &buffer);
 			if (x[k] != 0) {
@@ -57,24 +57,24 @@ namespace SPCASolver {
  */
 template<typename F>
 F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
-		F * x, int m, int n, SolverStructures::OptimizationSettings* settings,
-		SolverStructures::OptimizationStatistics* stat, bool doMean,
+		F * x, int m, int n, SolverStructures::OptimizationSettings* optimizationSettings,
+		SolverStructures::OptimizationStatisticsistics* optimizationStatistics, bool doMean,
 		F * means) {
-	int number_of_experiments = settings->starting_points;
-	value_coordinate_holder<F>* vals = (value_coordinate_holder<F>*) calloc(
-			number_of_experiments, sizeof(value_coordinate_holder<F> ));
+	int number_of_experiments = optimizationSettings->starting_points;
+	ValueCoordinateHolder<F>* vals = (ValueCoordinateHolder<F>*) calloc(
+			number_of_experiments, sizeof(ValueCoordinateHolder<F> ));
 	F * Z = (F*) calloc(m * number_of_experiments, sizeof(F));
 	F * V = (F*) calloc(n * number_of_experiments, sizeof(F));
 	F * ZZ = (F*) calloc(m * number_of_experiments, sizeof(F));
 	F * VV = (F*) calloc(n * number_of_experiments, sizeof(F));
 
-	stat->it = settings->max_it;
-	// Allocate vector for stat to return which point needs how much iterations
-	if (settings->get_it_for_all_points) {
-		stat->iters.resize(settings->starting_points, -1);
+	optimizationStatistics->it = optimizationSettings->max_it;
+	// Allocate vector for optimizationStatistics to return which point needs how much iterations
+	if (optimizationSettings->storeIterationsForAllPoints) {
+		optimizationStatistics->iters.resize(optimizationSettings->starting_points, -1);
 	}
 	F FLOATING_ZERO = 0;
-	if (settings->isConstrainedProblem()) {
+	if (optimizationSettings->isConstrainedProblem()) {
 		//				cblas_dscal(n * number_of_experiments, 0, V, 1);
 #ifdef _OPENMP
 //#pragma omp parallel for
@@ -82,7 +82,7 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 		for (unsigned int j = 0; j < number_of_experiments; j++) {
 			myseed = rand();
 			F tmp_norm = 0;
-			//			for (unsigned int i = 0; i < n;i++){//settings->constrain; i++) {
+			//			for (unsigned int i = 0; i < n;i++){//optimizationSettings->constrain; i++) {
 			//				unsigned int idx = i;
 
 			for (unsigned int i = 0; i < n; i++) {
@@ -127,18 +127,18 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 
 	std::vector<F>* buffer = (std::vector<F>*) calloc(number_of_experiments,
 			sizeof(std::vector<F>));
-	if (settings->isConstrainedProblem()) {
+	if (optimizationSettings->isConstrainedProblem()) {
 		for (unsigned int j = 0; j < number_of_experiments; j++) {
 			buffer[j].resize(n);
 		}
 	}
 
 	double start_time_of_iterations = gettime();
-	for (unsigned int it = 0; it < settings->max_it; it++) {
+	for (unsigned int it = 0; it < optimizationSettings->max_it; it++) {
 		for (unsigned int tmp = 0; tmp < TOTAL_THREADS; tmp++) {
 			max_errors[tmp] = 0;
 		}
-		if (settings->isConstrainedProblem()) {
+		if (optimizationSettings->isConstrainedProblem()) {
 
 			if (doMean) {
 				my_mm_multiply(false, m, n, number_of_experiments, B_CSC_Vals,
@@ -161,8 +161,8 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 
 			}
 			//set Z=sgn(Z)
-			if (settings->algorithm == SolverStructures::L0_constrained_L1_PCA
-					|| settings->algorithm
+			if (optimizationSettings->algorithm == SolverStructures::L0_constrained_L1_PCA
+					|| optimizationSettings->algorithm
 							== SolverStructures::L1_constrained_L1_PCA) {
 #ifdef _OPENMP
 #pragma omp parallel for
@@ -197,39 +197,39 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 #endif
 			for (unsigned int j = 0; j < number_of_experiments; j++) {
 				F fval_current = 0;
-				if (settings->algorithm
+				if (optimizationSettings->algorithm
 						== SolverStructures::L0_constrained_L2_PCA
-						|| settings->algorithm
+						|| optimizationSettings->algorithm
 								== SolverStructures::L1_constrained_L2_PCA) {
 					fval_current = cblas_l2_norm(m, &Z[m * j], 1);
 				}
 				F norm_of_x;
-				if (settings->isL1ConstrainedProblem()) {
+				if (optimizationSettings->isL1ConstrainedProblem()) {
 					norm_of_x = soft_thresholding(&V[n * j], n,
-							settings->constrain, buffer[j], settings); // x = S_w(x)
+							optimizationSettings->constrain, buffer[j], optimizationSettings); // x = S_w(x)
 				} else {
 					norm_of_x = k_hard_thresholding(&V[n * j], n,
-							settings->constrain, buffer[j], settings); // x = T_k(x)
+							optimizationSettings->constrain, buffer[j], optimizationSettings); // x = T_k(x)
 				}
 
 				cblas_vector_scale(n, &V[j * n], 1 / norm_of_x);
-				if (settings->algorithm
+				if (optimizationSettings->algorithm
 						== SolverStructures::L0_constrained_L1_PCA
-						|| settings->algorithm
+						|| optimizationSettings->algorithm
 								== SolverStructures::L1_constrained_L1_PCA) {
 					fval_current = vals[j].tmp;
 				}
 				F tmp_error = computeTheError(fval_current, vals[j].val,
-						settings);
+						optimizationSettings);
 				//Log end of iteration for given point
-				if (settings->get_it_for_all_points
-						&& termination_criteria(tmp_error, it, settings)
-						&& stat->iters[j] == -1) {
-					stat->iters[j] = it;
-				} else if (settings->get_it_for_all_points
-						&& !termination_criteria(tmp_error, it, settings)
-						&& stat->iters[j] != -1) {
-					stat->iters[j] = -1;
+				if (optimizationSettings->storeIterationsForAllPoints
+						&& termination_criteria(tmp_error, it, optimizationSettings)
+						&& optimizationStatistics->iters[j] == -1) {
+					optimizationStatistics->iters[j] = it;
+				} else if (optimizationSettings->storeIterationsForAllPoints
+						&& !termination_criteria(tmp_error, it, optimizationSettings)
+						&& optimizationStatistics->iters[j] != -1) {
+					optimizationStatistics->iters[j] = -1;
 				}
 				//---------------
 				if (max_errors[my_thread_id] < tmp_error)
@@ -238,8 +238,8 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 			}
 		} else {
 			//scale Z
-			if (settings->algorithm == SolverStructures::L0_penalized_L1_PCA
-					|| settings->algorithm
+			if (optimizationSettings->algorithm == SolverStructures::L0_penalized_L1_PCA
+					|| optimizationSettings->algorithm
 							== SolverStructures::L1_penalized_L1_PCA) {
 #ifdef _OPENMP
 #pragma omp parallel for
@@ -261,12 +261,12 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 					B_CSC_Vals, B_CSC_Row_Id, B_CSC_Col_Ptr, &B_CSC_Col_Ptr[1],
 					Z, ONE_MKL_INT, &floating_zero, V, ONE_MKL_INT);
 
-			if (settings->isL1PenalizedProblem()) {
-				L1_penalized_thresholding(number_of_experiments, n, V, settings,
-						max_errors, vals, stat, it);
+			if (optimizationSettings->isL1PenalizedProblem()) {
+				L1_penalized_thresholding(number_of_experiments, n, V, optimizationSettings,
+						max_errors, vals, optimizationStatistics, it);
 			} else {
-				L0_penalized_thresholding(number_of_experiments, n, V, settings,
-						max_errors, vals, stat, it);
+				L0_penalized_thresholding(number_of_experiments, n, V, optimizationSettings,
+						max_errors, vals, optimizationStatistics, it);
 			}
 
 			sparse_matrix_matrix_multiply(MY_SPARSE_WRAPPER_NOTRANS, m,
@@ -276,22 +276,22 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 		}
 		error =
 				max_errors[cblas_vector_max_index(TOTAL_THREADS, max_errors, 1)];
-		if (termination_criteria(error, it, settings)) {
-			stat->it = it;
+		if (termination_criteria(error, it, optimizationSettings)) {
+			optimizationStatistics->it = it;
 			break;
 		}
 
 	}
 	double end_time_of_iterations = gettime();
 	//compute corresponding x
-	stat->values.resize(settings->starting_points);
+	optimizationStatistics->values.resize(optimizationSettings->starting_points);
 	int selected_idx = 0;
 	F best_value = vals[selected_idx].val;
-	stat->values[0] = best_value;
-	stat->true_computation_time = (end_time_of_iterations
+	optimizationStatistics->values[0] = best_value;
+	optimizationStatistics->true_computation_time = (end_time_of_iterations
 			- start_time_of_iterations);
 	for (unsigned int i = 1; i < number_of_experiments; i++) {
-		stat->values[i] = vals[i].val;
+		optimizationStatistics->values[i] = vals[i].val;
 		if (vals[i].val > best_value) {
 			best_value = vals[i].val;
 			selected_idx = i;
@@ -305,7 +305,7 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 	free(VV);
 	free(ZZ);
 	free(vals);
-	stat->fval = best_value;
+	optimizationStatistics->fval = best_value;
 	return best_value;
 }
 

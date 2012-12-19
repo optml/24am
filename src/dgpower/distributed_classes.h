@@ -28,7 +28,7 @@ namespace DistributedClasses {
  * this class is used to hold all parameters for distributed computing
  * and the context for pblas.
  */
-class distributed_parameters {
+class DistributedParameters {
 public:
 	MKL_INT ictxt; // parallel context
 	MKL_INT row_blocking; // determines partition in rows (see PBLAS manual)
@@ -43,7 +43,7 @@ public:
 	int nprow; // total number of rows in grid
 
 	// set default parameters. Number 64 is recommended by PBLAS
-	distributed_parameters() {
+	DistributedParameters() {
 		row_blocking = 64;
 		col_blocking = 64;
 		x_vector_blocking = 64;
@@ -87,7 +87,7 @@ public:
 	MDESC descB;
 	MDESC descx;
 	F* norms;
-	distributed_parameters params;
+	DistributedParameters params;
 
 	OptimizationData() {
 		is_init_data_for_constrained = false;
@@ -95,16 +95,16 @@ public:
 
 	// allocate data for constrained versions
 	void init_data_for_constrained(
-			SolverStructures::OptimizationSettings* settings) {
+			SolverStructures::OptimizationSettings* optimizationSettings) {
 		if (!this->is_init_data_for_constrained) {
 			this->V_tr_mp = numroc_(&this->params.DIM_N, &this->params.DIM_N,
 					&this->params.myrow, &i_zero, &this->params.nprow);
-			this->V_tr_nq = numroc_(&settings->batch_size, &i_one,
+			this->V_tr_nq = numroc_(&optimizationSettings->batch_size, &i_one,
 					&this->params.mycol, &i_zero, &this->params.npcol);
 			MKL_INT i_tmp1 = MAX(1, this->V_tr_mp);
 			MKL_INT info;
 			descinit_(this->descV_threshold, &this->params.DIM_N,
-					&settings->batch_size, &this->params.DIM_N, &i_one, &i_zero,
+					&optimizationSettings->batch_size, &this->params.DIM_N, &i_one, &i_zero,
 					&i_zero, &this->params.ictxt, &i_tmp1, &info);
 			this->nnz_v_tr = this->V_tr_mp * this->V_tr_nq;
 			this->V_constr_threshold = (F*) calloc(this->nnz_v_tr, sizeof(F));

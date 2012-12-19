@@ -27,9 +27,9 @@
 #include "various.h"
 
 template<typename F>
-F computeTheError(const F fval, const F fval_prev,const SolverStructures::OptimizationSettings* settings) {
+F computeTheError(const F fval, const F fval_prev,const SolverStructures::OptimizationSettings* optimizationSettings) {
 #ifdef DEBUG
-	if (fval_prev > fval+1E-2 && settings->verbose)
+	if (fval_prev > fval+1E-2 && optimizationSettings->verbose)
 		printf("Error detected: %1.16f < %1.16f\n", fval_prev, fval);
 #endif
 	return (myabs(fval - fval_prev) / fval_prev);
@@ -37,16 +37,16 @@ F computeTheError(const F fval, const F fval_prev,const SolverStructures::Optimi
 
 template<typename F>
 bool termination_criteria(const F error, int it,
-		const SolverStructures::OptimizationSettings* settings) {
-	if (it > 0 && error < settings->toll)
+		const SolverStructures::OptimizationSettings* optimizationSettings) {
+	if (it > 0 && error < optimizationSettings->toll)
 		return true;
 	return false;
 }
 
 template<typename F>
 bool termination_criteria(const F fval, const F fval_prev, int it,
-		const SolverStructures::OptimizationSettings* settings) {
-	if (it > 0 && computeTheError(fval, fval_prev) < settings->toll)
+		const SolverStructures::OptimizationSettings* optimizationSettings) {
+	if (it > 0 && computeTheError(fval, fval_prev) < optimizationSettings->toll)
 		return true;
 	return false;
 }

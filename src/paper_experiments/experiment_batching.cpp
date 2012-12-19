@@ -23,8 +23,8 @@ using namespace SolverStructures;
 #include "experiment_utils.h"
 
 template<typename F>
-void run_experiments(OptimizationSettings* settings) {
-	OptimizationStatistics* stat = new OptimizationStatistics();
+void run_experiments(OptimizationSettings* optimizationSettings) {
+	OptimizationStatisticsistics* optimizationStatistics = new OptimizationStatisticsistics();
 	ofstream fileOut;
 	fileOut.open("results/paper_experiment_batching.txt");
 	mytimer* mt = new mytimer();
@@ -39,30 +39,30 @@ void run_experiments(OptimizationSettings* settings) {
 		x.resize(n);
 		y.resize(m);
 		generateProblem(n, m, &h_B[0], m, n);
-		settings->max_it = 10;
-		settings->toll = 0;
-		settings->starting_points = 256;
-		settings->constrain = n / 100;
-		settings->penalty = 0.02;
-		settings->algorithm = L0_penalized_L2_PCA;
-//		settings->algorithm = L0_constrained_L2_PCA;
-		settings->on_the_fly_generation = false;
+		optimizationSettings->max_it = 10;
+		optimizationSettings->toll = 0;
+		optimizationSettings->starting_points = 256;
+		optimizationSettings->constrain = n / 100;
+		optimizationSettings->penalty = 0.02;
+		optimizationSettings->algorithm = L0_penalized_L2_PCA;
+//		optimizationSettings->algorithm = L0_constrained_L2_PCA;
+		optimizationSettings->onTheFlyMethod = false;
 		for (int strategy = 0; strategy < 5; strategy++) {
 			switch (strategy) {
 			case 0:
-				settings->batch_size = 1;
+				optimizationSettings->batch_size = 1;
 				break;
 			case 1:
-				settings->batch_size = 4;
+				optimizationSettings->batch_size = 4;
 				break;
 			case 2:
-				settings->batch_size = 16;
+				optimizationSettings->batch_size = 16;
 				break;
 			case 3:
-				settings->batch_size = 64;
+				optimizationSettings->batch_size = 64;
 				break;
 			case 4:
-				settings->batch_size = settings->starting_points;
+				optimizationSettings->batch_size = optimizationSettings->starting_points;
 				break;
 			default:
 				break;
@@ -71,18 +71,18 @@ void run_experiments(OptimizationSettings* settings) {
 			omp_set_num_threads(1);
 			init_random_seeds();
 			mt->start();
-			SPCASolver::MulticoreSolver::denseDataSolver(&h_B[0], m, &x[0], m, n, settings,
-					stat);
+			SPCASolver::MulticoreSolver::denseDataSolver(&h_B[0], m, &x[0], m, n, optimizationSettings,
+					optimizationStatistics);
 			mt->end();
-			logTime(fileOut, mt, stat, settings, x, m, n);
+			logTime(fileOut, mt, optimizationStatistics, optimizationSettings, x, m, n);
 
 			omp_set_num_threads(8);
 			init_random_seeds();
 			mt->start();
-			SPCASolver::MulticoreSolver::denseDataSolver(&h_B[0], m, &x[0], m, n, settings,
-					stat);
+			SPCASolver::MulticoreSolver::denseDataSolver(&h_B[0], m, &x[0], m, n, optimizationSettings,
+					optimizationStatistics);
 			mt->end();
-			logTime(fileOut, mt, stat, settings, x, m, n);
+			logTime(fileOut, mt, optimizationStatistics, optimizationSettings, x, m, n);
 		}
 
 	}
@@ -91,8 +91,8 @@ void run_experiments(OptimizationSettings* settings) {
 }
 
 int main(int argc, char *argv[]) {
-	OptimizationSettings* settings = new OptimizationSettings();
-	run_experiments<double>(settings);
+	OptimizationSettings* optimizationSettings = new OptimizationSettings();
+	run_experiments<double>(optimizationSettings);
 	return 0;
 }
 
@@ -118,9 +118,9 @@ int main(int argc, char *argv[]) {
 //		y.resize(m);
 //		generateProblem(n, m, &h_B[0]);
 //
-//		optimization_statistics* stat = new optimization_statistics();
+//		optimization_Statisticsistics* optimizationStatistics = new optimization_Statisticsistics();
 //
-//		optimization_settings* settings = new optimization_settings();
+//		optimization_settings* optimizationSettings = new optimization_settings();
 //
 
 //
@@ -132,19 +132,19 @@ int main(int argc, char *argv[]) {
 //		cout << "Problem generation took " << mt->getElapsedCPUTime() << " "
 //				<< mt->getElapsedWallClockTime() << endl;
 //		//============================
-//		settings->constrain = 10;
-//		settings->penalty = 0.01;
-//		const F penalty = settings->penalty;
-//		const unsigned int constrain = settings->constrain;
+//		optimizationSettings->constrain = 10;
+//		optimizationSettings->penalty = 0.01;
+//		const F penalty = optimizationSettings->penalty;
+//		const unsigned int constrain = optimizationSettings->constrain;
 //
 //
 //
 //
 //
 //			//----------------- CPU L1 Penalized L1 PCA
-//			settings->algorithm = L1_penalized_L1_PCA;
+//			optimizationSettings->algorithm = L1_penalized_L1_PCA;
 //			mt->start();
-//			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, settings, stat);
+//			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, optimizationSettings, optimizationStatistics);
 //			mt->end();
 //			cblas_matrix_matrix_multiply(CblasColMajor, CblasNoTrans,
 //					CblasNoTrans, m, 1, n, 1, &h_B[0], m, &x[0], n, 0, &y[0],
@@ -152,12 +152,12 @@ int main(int argc, char *argv[]) {
 //			nnz = vector_get_nnz(&x[0], n);
 //			fval2 = cblas_l1_norm(m, &y[0], 1)
 //					- penalty * cblas_l1_norm(n, &x[0], 1);
-//			logTime("L1-Pen-L1   ", fval, fval2, nnz, mt, stat, settings, m, n,
+//			logTime("L1-Pen-L1   ", fval, fval2, nnz, mt, optimizationStatistics, optimizationSettings, m, n,
 //					computeReferentialValue(&h_B[0], &x[0], &y[0], m, n));
 //			//----------------- CPU L1 Penalized L2 PCA
-//			settings->algorithm = L1_penalized_L2_PCA;
+//			optimizationSettings->algorithm = L1_penalized_L2_PCA;
 //			mt->start();
-//			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, settings, stat);
+//			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, optimizationSettings, optimizationStatistics);
 //			mt->end();
 //			cblas_matrix_matrix_multiply(CblasColMajor, CblasNoTrans,
 //					CblasNoTrans, m, 1, n, 1, &h_B[0], m, &x[0], n, 0, &y[0],
@@ -165,13 +165,13 @@ int main(int argc, char *argv[]) {
 //			nnz = vector_get_nnz(&x[0], n);
 //			fval2 = cblas_l2_norm(m, &y[0], 1)
 //					- penalty * cblas_l1_norm(n, &x[0], 1);
-//			logTime("L1-Pen-L2 BT", fval, fval2, nnz, mt, stat, settings, m, n,
+//			logTime("L1-Pen-L2 BT", fval, fval2, nnz, mt, optimizationStatistics, optimizationSettings, m, n,
 //					computeReferentialValue(&h_B[0], &x[0], &y[0], m, n));
 //
 //			//----------------- CPU L0 Penalized L1 PCA
-//			settings->algorithm = L0_penalized_L1_PCA;
+//			optimizationSettings->algorithm = L0_penalized_L1_PCA;
 //			mt->start();
-//			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, settings, stat);
+//			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, optimizationSettings, optimizationStatistics);
 //			mt->end();
 //			cblas_matrix_matrix_multiply(CblasColMajor, CblasNoTrans,
 //					CblasNoTrans, m, 1, n, 1, &h_B[0], m, &x[0], n, 0, &y[0],
@@ -179,13 +179,13 @@ int main(int argc, char *argv[]) {
 //			nnz = vector_get_nnz(&x[0], n);
 //			fval2 = cblas_l1_norm(m, &y[0], 1);
 //			fval2 = fval2 * fval2 - penalty * nnz;
-//			logTime("L0-Pen-L1   ", fval, fval2, nnz, mt, stat, settings, m, n,
+//			logTime("L0-Pen-L1   ", fval, fval2, nnz, mt, optimizationStatistics, optimizationSettings, m, n,
 //					computeReferentialValue(&h_B[0], &x[0], &y[0], m, n));
 //
 //			//============= L0 Pen L2
-//			settings->algorithm = L0_penalized_L2_PCA;
+//			optimizationSettings->algorithm = L0_penalized_L2_PCA;
 //			mt->start();
-//			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, settings, stat);
+//			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, optimizationSettings, optimizationStatistics);
 //			mt->end();
 //			cblas_matrix_matrix_multiply(CblasColMajor, CblasNoTrans,
 //					CblasNoTrans, m, 1, n, 1, &h_B[0], m, &x[0], n, 0, &y[0],
@@ -193,26 +193,26 @@ int main(int argc, char *argv[]) {
 //			nnz = vector_get_nnz(&x[0], n);
 //			fval2 = cblas_l2_norm(m, &y[0], 1);
 //			fval2 = fval2 * fval2 - penalty * nnz;
-//			logTime("L0-Pen-L2 M1", fval, fval2, nnz, mt, stat, settings, m, n,
+//			logTime("L0-Pen-L2 M1", fval, fval2, nnz, mt, optimizationStatistics, optimizationSettings, m, n,
 //					computeReferentialValue(&h_B[0], &x[0], &y[0], m, n));
 //
 //			//----------------- CPU L0 Constrained L2 PCA
-//			settings->algorithm = L0_constrained_L2_PCA;
+//			optimizationSettings->algorithm = L0_constrained_L2_PCA;
 //			mt->start();
-//			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, settings, stat);
+//			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, optimizationSettings, optimizationStatistics);
 //			mt->end();
 //			cblas_matrix_matrix_multiply(CblasColMajor, CblasNoTrans,
 //					CblasNoTrans, m, 1, n, 1, &h_B[0], m, &x[0], n, 0, &y[0],
 //					m);
 //			nnz = vector_get_nnz(&x[0], n);
 //			fval2 = cblas_l2_norm(m, &y[0], 1);
-//			logTime("L0-Con-L2   ", fval, fval2, nnz, mt, stat, settings, m, n,
+//			logTime("L0-Con-L2   ", fval, fval2, nnz, mt, optimizationStatistics, optimizationSettings, m, n,
 //					computeReferentialValue(&h_B[0], &x[0], &y[0], m, n));
 //
 //			//----------------- CPU L1 Constrained L2 PCA
-//			settings->algorithm = L1_constrained_L2_PCA;
+//			optimizationSettings->algorithm = L1_constrained_L2_PCA;
 //			mt->start();
-//			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, settings, stat);
+//			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, optimizationSettings, optimizationStatistics);
 //			mt->end();
 //			cblas_matrix_matrix_multiply(CblasColMajor, CblasNoTrans,
 //					CblasNoTrans, m, 1, n, 1, &h_B[0], m, &x[0], n, 0, &y[0],
@@ -220,48 +220,48 @@ int main(int argc, char *argv[]) {
 //			nnz = vector_get_nnz(&x[0], n);
 //			fval2 = cblas_l2_norm(m, &y[0], 1);
 //			l1_norm = cblas_l1_norm(n, &x[0], 1);
-//			logTime("L1-Con-L2   ", fval, fval2, nnz, mt, stat, settings, m, n,
+//			logTime("L1-Con-L2   ", fval, fval2, nnz, mt, optimizationStatistics, optimizationSettings, m, n,
 //					computeReferentialValue(&h_B[0], &x[0], &y[0], m, n));
 //			printf("Sanity check on l1 constrain %f==%f\n", l1_norm,
 //					sqrt(constrain));
 //			//----------------- CPU L0 Constrained L1 PCA
-//			settings->algorithm = L0_constrained_L1_PCA;
+//			optimizationSettings->algorithm = L0_constrained_L1_PCA;
 //
-//			settings->hard_tresholding_using_sort = false;
+//			optimizationSettings->hard_tresholding_using_sort = false;
 //			mt->start();
-//			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, settings, stat);
+//			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, optimizationSettings, optimizationStatistics);
 //			mt->end();
 //			cblas_matrix_matrix_multiply(CblasColMajor, CblasNoTrans,
 //					CblasNoTrans, m, 1, n, 1, &h_B[0], m, &x[0], n, 0, &y[0],
 //					m);
 //			nnz = vector_get_nnz(&x[0], n);
 //			fval2 = cblas_l1_norm(m, &y[0], 1);
-//			logTime("L0-Con-L1  k", fval, fval2, nnz, mt, stat, settings, m, n,
+//			logTime("L0-Con-L1  k", fval, fval2, nnz, mt, optimizationStatistics, optimizationSettings, m, n,
 //					computeReferentialValue(&h_B[0], &x[0], &y[0], m, n));
 //
-//			settings->hard_tresholding_using_sort = true;
+//			optimizationSettings->hard_tresholding_using_sort = true;
 //			mt->start();
-//			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, settings, stat);
+//			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, optimizationSettings, optimizationStatistics);
 //			mt->end();
 //			cblas_matrix_matrix_multiply(CblasColMajor, CblasNoTrans,
 //					CblasNoTrans, m, 1, n, 1, &h_B[0], m, &x[0], n, 0, &y[0],
 //					m);
 //			nnz = vector_get_nnz(&x[0], n);
 //			fval2 = cblas_l1_norm(m, &y[0], 1);
-//			logTime("L0-Con-L1  s", fval, fval2, nnz, mt, stat, settings, m, n,
+//			logTime("L0-Con-L1  s", fval, fval2, nnz, mt, optimizationStatistics, optimizationSettings, m, n,
 //					computeReferentialValue(&h_B[0], &x[0], &y[0], m, n));
 //
 //			//----------------- CPU L1 Constrained L1 PCA
-//			settings->algorithm = L1_constrained_L1_PCA;
+//			optimizationSettings->algorithm = L1_constrained_L1_PCA;
 //			mt->start();
-//			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, settings, stat);
+//			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, optimizationSettings, optimizationStatistics);
 //			mt->end();
 //			cblas_matrix_matrix_multiply(CblasColMajor, CblasNoTrans,
 //					CblasNoTrans, m, 1, n, 1, &h_B[0], m, &x[0], n, 0, &y[0],
 //					m);
 //			nnz = vector_get_nnz(&x[0], n);
 //			fval2 = cblas_l1_norm(m, &y[0], 1);
-//			logTime("L1-Con-L1   ", fval, fval2, nnz, mt, stat, settings, m, n,
+//			logTime("L1-Con-L1   ", fval, fval2, nnz, mt, optimizationStatistics, optimizationSettings, m, n,
 //					computeReferentialValue(&h_B[0], &x[0], &y[0], m, n));
 //			printf("Sanity check on l1 constrain %f==%f\n", l1_norm,
 //					sqrt(constrain));

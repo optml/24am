@@ -36,72 +36,72 @@ namespace DistributedSolver {
 
 template<typename F>
 void denseDataSolver(
-		SPCASolver::DistributedClasses::OptimizationData<F>& optimization_data_inst,
-		SolverStructures::OptimizationSettings* settings,
-		SolverStructures::OptimizationStatistics* stat) {
+		SPCASolver::DistributedClasses::OptimizationData<F>& optimizationDataInstance,
+		SolverStructures::OptimizationSettings* optimizationSettings,
+		SolverStructures::OptimizationStatisticsistics* optimizationStatistics) {
 	F zero = 0.0e+0, one = 1.0e+0, two = 2.0e+0, negone = -1.0e+0;
 	MKL_INT myrow, mycol, nprow, npcol, info;
-	MKL_INT ictxt = optimization_data_inst.params.ictxt;
-	MKL_INT M = optimization_data_inst.params.DIM_M;
-	MKL_INT N = optimization_data_inst.params.DIM_N;
+	MKL_INT ictxt = optimizationDataInstance.params.ictxt;
+	MKL_INT M = optimizationDataInstance.params.DIM_M;
+	MKL_INT N = optimizationDataInstance.params.DIM_N;
 	blacs_gridinfo_(&ictxt, &nprow, &npcol, &myrow, &mycol);
 
-	if (settings->verbose && settings->proccess_node == 0) {
+	if (optimizationSettings->verbose && optimizationSettings->proccess_node == 0) {
 		std::cout << "Solver started " << std::endl;
 	}
-	settings->chceckInputAndModifyIt(N);
-	stat->it = settings->max_it;
-	// Allocate vector for stat to return which point needs how much iterations
-	if (settings->get_it_for_all_points) {
-		stat->iters.resize(settings->starting_points, -1);
-		stat->cardinalities.resize(settings->starting_points, -1);
-		stat->values.resize(settings->starting_points, -1);
+	optimizationSettings->chceckInputAndModifyIt(N);
+	optimizationStatistics->it = optimizationSettings->max_it;
+	// Allocate vector for optimizationStatistics to return which point needs how much iterations
+	if (optimizationSettings->storeIterationsForAllPoints) {
+		optimizationStatistics->iters.resize(optimizationSettings->starting_points, -1);
+		optimizationStatistics->cardinalities.resize(optimizationSettings->starting_points, -1);
+		optimizationStatistics->values.resize(optimizationSettings->starting_points, -1);
 
 	}
-	const unsigned int number_of_experiments_per_batch = settings->batch_size;
+	const unsigned int number_of_experiments_per_batch = optimizationSettings->batch_size;
 	// TODO implement on the fly and other strategies...
 
-	F* B = &optimization_data_inst.B[0];
-	F* x = &optimization_data_inst.x[0];
+	F* B = &optimizationDataInstance.B[0];
+	F* x = &optimizationDataInstance.x[0];
 
-	MKL_INT ROW_BLOCKING = optimization_data_inst.params.row_blocking;
-	MKL_INT X_VECTOR_BLOCKING = optimization_data_inst.params.x_vector_blocking;
+	MKL_INT ROW_BLOCKING = optimizationDataInstance.params.row_blocking;
+	MKL_INT X_VECTOR_BLOCKING = optimizationDataInstance.params.x_vector_blocking;
 
 	int i, j;
 	// create vector "z"
-	optimization_data_inst.z_mp = numroc_(&M, &ROW_BLOCKING, &myrow, &i_zero,
+	optimizationDataInstance.z_mp = numroc_(&M, &ROW_BLOCKING, &myrow, &i_zero,
 			&nprow);
-	optimization_data_inst.z_nq = numroc_(&settings->batch_size, &ROW_BLOCKING,
+	optimizationDataInstance.z_nq = numroc_(&optimizationSettings->batch_size, &ROW_BLOCKING,
 			&mycol, &i_zero, &npcol);
 
 	unsigned int seed = mycol * nprow + myrow;
-	optimization_data_inst.nnz_z = optimization_data_inst.z_mp
-			* optimization_data_inst.z_nq;
-	optimization_data_inst.Z = (F*) calloc(optimization_data_inst.nnz_z,
+	optimizationDataInstance.nnz_z = optimizationDataInstance.z_mp
+			* optimizationDataInstance.z_nq;
+	optimizationDataInstance.Z = (F*) calloc(optimizationDataInstance.nnz_z,
 			sizeof(F));
-	MKL_INT i_tmp1 = MAX(1, optimization_data_inst.z_mp);
-	descinit_(optimization_data_inst.descZ, &M, &settings->batch_size,
+	MKL_INT i_tmp1 = MAX(1, optimizationDataInstance.z_mp);
+	descinit_(optimizationDataInstance.descZ, &M, &optimizationSettings->batch_size,
 			&ROW_BLOCKING, &ROW_BLOCKING, &i_zero, &i_zero, &ictxt, &i_tmp1,
 			&info);
 	//=============== Create description for "V"
-	optimization_data_inst.V_mp = numroc_(&N, &X_VECTOR_BLOCKING, &myrow,
+	optimizationDataInstance.V_mp = numroc_(&N, &X_VECTOR_BLOCKING, &myrow,
 			&i_zero, &nprow);
-	optimization_data_inst.V_nq = numroc_(&settings->batch_size,
+	optimizationDataInstance.V_nq = numroc_(&optimizationSettings->batch_size,
 			&X_VECTOR_BLOCKING, &mycol, &i_zero, &npcol);
-	i_tmp1 = MAX(1, optimization_data_inst.V_mp);
-	descinit_(optimization_data_inst.descV, &N, &settings->batch_size,
+	i_tmp1 = MAX(1, optimizationDataInstance.V_mp);
+	descinit_(optimizationDataInstance.descV, &N, &optimizationSettings->batch_size,
 			&X_VECTOR_BLOCKING, &X_VECTOR_BLOCKING, &i_zero, &i_zero, &ictxt,
 			&i_tmp1, &info);
-	optimization_data_inst.nnz_v = optimization_data_inst.V_mp
-			* optimization_data_inst.V_nq;
-	optimization_data_inst.V = (F*) calloc(optimization_data_inst.nnz_v,
+	optimizationDataInstance.nnz_v = optimizationDataInstance.V_mp
+			* optimizationDataInstance.V_nq;
+	optimizationDataInstance.V = (F*) calloc(optimizationDataInstance.nnz_v,
 			sizeof(F));
-	for (i = 0; i < optimization_data_inst.nnz_v; i++) {
-		optimization_data_inst.V[i] = -1 + 2 * (F) rand_r(&seed) / RAND_MAX;
+	for (i = 0; i < optimizationDataInstance.nnz_v; i++) {
+		optimizationDataInstance.V[i] = -1 + 2 * (F) rand_r(&seed) / RAND_MAX;
 	}
 	// initial thresholding of matrix "V".....
-	if (settings->isConstrainedProblem()) {
-		SPCASolver::distributed_thresholdings::threshold_V_for_constrained(optimization_data_inst, settings, stat);
+	if (optimizationSettings->isConstrainedProblem()) {
+		SPCASolver::distributed_thresholdings::threshold_V_for_constrained(optimizationDataInstance, optimizationSettings, optimizationStatistics);
 	}
 
 	//=============== Create description for "x"
@@ -113,100 +113,100 @@ void denseDataSolver(
 	descinit_(desc_x, &N, &i_one, &X_VECTOR_BLOCKING, &X_VECTOR_BLOCKING,
 			&i_zero, &i_zero, &ictxt, &i_tmp1, &info);
 	//=============== Create vector for "norms"
-	optimization_data_inst.norms = (F*) calloc(settings->starting_points,
+	optimizationDataInstance.norms = (F*) calloc(optimizationSettings->starting_points,
 			sizeof(F));
-	std::vector<value_coordinate_holder<F> > values(settings->starting_points);
+	std::vector<ValueCoordinateHolder<F> > values(optimizationSettings->starting_points);
 	// ======================== RUN SOLVER
-	stat->it = 0;
+	optimizationStatistics->it = 0;
 	double fval = 0;
 	double fval_prev = 0;
 	unsigned int it;
-	for (it = 0; it < settings->max_it; it++) {
-		stat->it++;
-		if (settings->isConstrainedProblem()) {
+	for (it = 0; it < optimizationSettings->max_it; it++) {
+		optimizationStatistics->it++;
+		if (optimizationSettings->isConstrainedProblem()) {
 			SPCASolver::distributed_thresholdings::perform_one_distributed_iteration_for_constrained_pca(
-					optimization_data_inst, settings, stat);
+					optimizationDataInstance, optimizationSettings, optimizationStatistics);
 		} else {
 			SPCASolver::distributed_thresholdings::perform_one_distributed_iteration_for_penalized_pca(
-					optimization_data_inst, settings, stat);
+					optimizationDataInstance, optimizationSettings, optimizationStatistics);
 		}
 		//Agregate FVAL
 		Xgsum2d(&ictxt, &C_CHAR_SCOPE_ALL, &C_CHAR_GENERAL_TREE_CATHER,
-				&settings->starting_points, &i_one,
-				optimization_data_inst.norms, &settings->starting_points,
+				&optimizationSettings->starting_points, &i_one,
+				optimizationDataInstance.norms, &optimizationSettings->starting_points,
 				&i_negone, &i_negone);
 		double max_error = 0;
-		for (i = 0; i < settings->starting_points; i++) {
-			if (settings->algorithm == SolverStructures::L0_penalized_L1_PCA
-					|| settings->algorithm
+		for (i = 0; i < optimizationSettings->starting_points; i++) {
+			if (optimizationSettings->algorithm == SolverStructures::L0_penalized_L1_PCA
+					|| optimizationSettings->algorithm
 							== SolverStructures::L0_penalized_L2_PCA
-					|| settings->algorithm
+					|| optimizationSettings->algorithm
 							== SolverStructures::L0_constrained_L1_PCA
-					|| settings->algorithm
+					|| optimizationSettings->algorithm
 							== SolverStructures::L1_constrained_L1_PCA) {
-				values[i].val = optimization_data_inst.norms[i];
+				values[i].val = optimizationDataInstance.norms[i];
 			} else {
-				values[i].val = sqrt(optimization_data_inst.norms[i]);
+				values[i].val = sqrt(optimizationDataInstance.norms[i]);
 			}
 			if (it > 0) {
 				double tmp_error = computeTheError(values[i].val,
-						values[i].prev_val, settings);
+						values[i].prev_val, optimizationSettings);
 				if (tmp_error > max_error)
 					max_error = tmp_error;
 			}
 			values[i].prev_val = values[i].val;
 		}
 
-		if (it > 0 && termination_criteria(max_error, it, settings)) { //FIXME CHECK
+		if (it > 0 && termination_criteria(max_error, it, optimizationSettings)) { //FIXME CHECK
 			break;
 		}
 	}
 
-	stat->fval = -1;
+	optimizationStatistics->fval = -1;
 	int max_selection_idx = -1;
-	for (i = 0; i < settings->starting_points; i++) {
-		if (values[i].val > stat->fval) {
+	for (i = 0; i < optimizationSettings->starting_points; i++) {
+		if (values[i].val > optimizationStatistics->fval) {
 			max_selection_idx = i;
-			stat->fval = values[i].val;
+			optimizationStatistics->fval = values[i].val;
 		}
 	}
 	//copy "MAX_SELECTION_IDX" column from matrix V into vector x!
 	//	sub(C):=beta*sub(C) + alpha*op(sub(A)),
 	max_selection_idx++;	// because next fucntion use 1-based
-	pXgeadd(&transNo, &N, &i_one, &one, optimization_data_inst.V, &i_one,
-			&max_selection_idx, optimization_data_inst.descV, &zero, x, &i_one,
+	pXgeadd(&transNo, &N, &i_one, &one, optimizationDataInstance.V, &i_one,
+			&max_selection_idx, optimizationDataInstance.descV, &zero, x, &i_one,
 			&i_one, desc_x);
 	//============== COMPUTE final "x"
 	F norm_of_x = 0;
 	pXnrm2(&N, &norm_of_x, x, &i_one, &i_one, desc_x, &i_one);
 	norm_of_x = 1 / norm_of_x;
-	for (i = 0; i < optimization_data_inst.x.size(); i++) {
+	for (i = 0; i < optimizationDataInstance.x.size(); i++) {
 		x[i] = x[i] * norm_of_x;
 	}
-	optimization_data_inst.free_extra_data();
-	free(optimization_data_inst.Z);
-	free(optimization_data_inst.V);
-	free(optimization_data_inst.norms);
+	optimizationDataInstance.free_extra_data();
+	free(optimizationDataInstance.Z);
+	free(optimizationDataInstance.V);
+	free(optimizationDataInstance.norms);
 }
 
 template<typename F>
 int loadDataFrom2DFilesAndDistribute(
-		SPCASolver::DistributedClasses::OptimizationData<F> &optimization_data_inst,
-		SolverStructures::OptimizationSettings* settings,
-		SolverStructures::OptimizationStatistics* stat) {
+		SPCASolver::DistributedClasses::OptimizationData<F> &optimizationDataInstance,
+		SolverStructures::OptimizationSettings* optimizationSettings,
+		SolverStructures::OptimizationStatisticsistics* optimizationStatistics) {
 	F zero = 0.0e+0, one = 1.0e+0, two = 2.0e+0, negone = -1.0e+0;
-	MKL_INT X_VECTOR_BLOCKING = optimization_data_inst.params.x_vector_blocking;
-	MKL_INT ROW_BLOCKING = optimization_data_inst.params.row_blocking;
-	MKL_INT COL_BLOCKING = optimization_data_inst.params.col_blocking;
-	char* filename = settings->data_file;
-	char* outputfile = settings->result_file;
+	MKL_INT X_VECTOR_BLOCKING = optimizationDataInstance.params.x_vector_blocking;
+	MKL_INT ROW_BLOCKING = optimizationDataInstance.params.row_blocking;
+	MKL_INT COL_BLOCKING = optimizationDataInstance.params.col_blocking;
+	char* filename = optimizationSettings->data_file;
+	char* outputfile = optimizationSettings->result_file;
 	MKL_INT iam, nprocs, ictxt, ictxt2, myrow, mycol, nprow, npcol;
 	MKL_INT info;
 	MKL_INT m, n, nb, mb, mp, nq, lld, lld_local;
 	int i, j, k;
 	blacs_pinfo_(&iam, &nprocs);
 	blacs_get_(&i_negone, &i_zero, &ictxt);
-	int MAP_X = settings->distributed_row_grid_file;
+	int MAP_X = optimizationSettings->distributed_row_grid_file;
 	int MAP_Y = nprocs / MAP_X;
 	if (MAP_X * MAP_Y != nprocs) {
 		if (iam == 0)
@@ -215,12 +215,12 @@ int loadDataFrom2DFilesAndDistribute(
 	}
 	blacs_gridinit_(&ictxt, "C", &MAP_X, &MAP_Y); // Create row map
 	blacs_gridinfo_(&ictxt, &nprow, &npcol, &myrow, &mycol);
-	optimization_data_inst.params.mycol = mycol;
-	optimization_data_inst.params.npcol = npcol;
-	optimization_data_inst.params.myrow = myrow;
-	optimization_data_inst.params.nprow = nprow;
+	optimizationDataInstance.params.mycol = mycol;
+	optimizationDataInstance.params.npcol = npcol;
+	optimizationDataInstance.params.myrow = myrow;
+	optimizationDataInstance.params.nprow = nprow;
 
-	optimization_data_inst.params.ictxt = ictxt;
+	optimizationDataInstance.params.ictxt = ictxt;
 
 	/* ===========================================================================================
 	 *                LOAD DATA FROM FILES AND DISTRIBUTE IT ACROS NODES
@@ -304,7 +304,7 @@ int loadDataFrom2DFilesAndDistribute(
 	nq = numroc_(&DIM_N, &COL_BLOCKING, &mycol, &i_zero, &npcol);
 	lld = MAX(mp, 1);
 
-	descinit_(optimization_data_inst.descB, &DIM_M, &DIM_N, &ROW_BLOCKING,
+	descinit_(optimizationDataInstance.descB, &DIM_M, &DIM_N, &ROW_BLOCKING,
 			&COL_BLOCKING, &i_zero, &i_zero, &ictxt, &lld, &info);
 
 	end_time = gettime();
@@ -316,10 +316,10 @@ int loadDataFrom2DFilesAndDistribute(
 	blacs_barrier_(&ictxt, &C_CHAR_SCOPE_ALL);
 	start_time = gettime();
 
-	optimization_data_inst.B.resize(mp * nq);
+	optimizationDataInstance.B.resize(mp * nq);
 	pXgeadd(&transNo, &DIM_M, &DIM_N, &one, B_Local, &i_one, &i_one,
-			descB_local, &zero, &optimization_data_inst.B[0], &i_one, &i_one,
-			optimization_data_inst.descB);
+			descB_local, &zero, &optimizationDataInstance.B[0], &i_one, &i_one,
+			optimizationDataInstance.descB);
 	free(B_Local);
 
 	end_time = gettime();
@@ -336,23 +336,23 @@ int loadDataFrom2DFilesAndDistribute(
 
 	MKL_INT x_mp = numroc_(&DIM_N, &X_VECTOR_BLOCKING, &myrow, &i_zero, &nprow);
 	MKL_INT x_nq = numroc_(&i_one, &X_VECTOR_BLOCKING, &mycol, &i_zero, &npcol);
-	optimization_data_inst.x.resize(x_mp * x_nq);
+	optimizationDataInstance.x.resize(x_mp * x_nq);
 
 	i_tmp1 = MAX(1, x_mp);
-	descinit_(optimization_data_inst.descx, &DIM_N, &i_one, &X_VECTOR_BLOCKING,
+	descinit_(optimizationDataInstance.descx, &DIM_N, &i_one, &X_VECTOR_BLOCKING,
 			&X_VECTOR_BLOCKING, &i_zero, &i_zero, &ictxt, &i_tmp1, &info);
 
-	optimization_data_inst.params.DIM_M = DIM_M;
-	optimization_data_inst.params.DIM_N = DIM_N;
+	optimizationDataInstance.params.DIM_M = DIM_M;
+	optimizationDataInstance.params.DIM_N = DIM_N;
 
 	return 0;
 }
 
 template<typename F>
-int gather_and_store_best_result_to_file(
-		SPCASolver::DistributedClasses::OptimizationData<F> &optimization_data_inst,
-		SolverStructures::OptimizationSettings* settings,
-		SolverStructures::OptimizationStatistics* stat) {
+int gatherAndStoreBestResultToOutputFile(
+		SPCASolver::DistributedClasses::OptimizationData<F> &optimizationDataInstance,
+		SolverStructures::OptimizationSettings* optimizationSettings,
+		SolverStructures::OptimizationStatisticsistics* optimizationStatistics) {
 	F zero = 0.0e+0, one = 1.0e+0, two = 2.0e+0, negone = -1.0e+0;
 	/* =============================================================
 	 *          STORE RESULT
@@ -362,10 +362,10 @@ int gather_and_store_best_result_to_file(
 	MKL_INT iam, nprocs;
 	blacs_pinfo_(&iam, &nprocs);
 	MKL_INT myrow, mycol, nprow, npcol, info;
-	MKL_INT ictxt = optimization_data_inst.params.ictxt;
+	MKL_INT ictxt = optimizationDataInstance.params.ictxt;
 	blacs_gridinfo_(&ictxt, &nprow, &npcol, &myrow, &mycol);
 
-	MKL_INT DIM_N = optimization_data_inst.params.DIM_N;
+	MKL_INT DIM_N = optimizationDataInstance.params.DIM_N;
 	F* x_local = NULL;
 	if (iam == 0) {
 		x_local = (F*) calloc(DIM_N, sizeof(F));
@@ -378,11 +378,11 @@ int gather_and_store_best_result_to_file(
 	i_tmp1 = MAX(1, x_local_mq);
 	descinit_(desc_x_local, &DIM_N, &i_one, &DIM_N, &i_one, &i_zero, &i_zero,
 			&ictxt, &i_tmp1, &info);
-	pXgeadd(&transNo, &DIM_N, &i_one, &one, &optimization_data_inst.x[0],
-			&i_one, &i_one, optimization_data_inst.descx, &zero, x_local,
+	pXgeadd(&transNo, &DIM_N, &i_one, &one, &optimizationDataInstance.x[0],
+			&i_one, &i_one, optimizationDataInstance.descx, &zero, x_local,
 			&i_one, &i_one, desc_x_local);
 	if (iam == 0) {
-		FILE * fin = fopen(settings->result_file, "w");
+		FILE * fin = fopen(optimizationSettings->result_file, "w");
 		for (int i = 0; i < DIM_N; i++) {
 			fprintf(fin, "%f;", x_local[i]);
 		}

@@ -25,8 +25,8 @@ void getFileSize(const char* filename, int& DIM_M, int& DIM_N) {
 	if (fin == NULL) {
 
 	} else {
-		int status = fscanf(fin, "%d;%d", &DIM_M, &DIM_N);
-		if (status) exit(0);
+		int optimizationStatisticsus = fscanf(fin, "%d;%d", &DIM_M, &DIM_N);
+		if (optimizationStatisticsus) exit(0);
 		fclose(fin);
 	}
 }
@@ -37,11 +37,11 @@ void readFromFile(const char* filename, int& DIM_M, int& DIM_N, gsl_matrix * B,
 	FILE * fin = fopen(filename, "r");
 	if (fin == NULL) {
 	} else {
-		int status = fscanf(fin, "%d;%d", &DIM_M, &DIM_N);
+		int optimizationStatisticsus = fscanf(fin, "%d;%d", &DIM_M, &DIM_N);
 		for (j = 0; j < DIM_M; j++) {
 			for (i = 0; i < DIM_N; i++) {
 				float tmp = -1;
-				status = fscanf(fin, "%f;", &tmp);
+				optimizationStatisticsus = fscanf(fin, "%f;", &tmp);
 				gsl_matrix_set(B, j, i, tmp);
 				gsl_matrix_set(BT, i, j, tmp);
 			}

@@ -23,8 +23,8 @@ using namespace SolverStructures;
 #include "experiment_utils.h"
 
 template<typename F>
-void run_experiments(OptimizationSettings* settings) {
-	OptimizationStatistics* stat = new OptimizationStatistics();
+void run_experiments(OptimizationSettings* optimizationSettings) {
+	OptimizationStatisticsistics* optimizationStatistics = new OptimizationStatisticsistics();
 	ofstream fileOut;
 	fileOut.open("results/paper_experiment_boxplots.txt");
 	mytimer* mt = new mytimer();
@@ -38,23 +38,23 @@ void run_experiments(OptimizationSettings* settings) {
 	y.resize(m);
 	generateProblem(n, m, &h_B[0], m, n,true);
 
-	for (settings->constrain = 1; settings->constrain <= n;
-			settings->constrain = settings->constrain * 2) {
-		settings->max_it = 20;
-		settings->toll = 0.000001;
-		settings->starting_points = 1000;
-		settings->batch_size = settings->starting_points;
-		settings->algorithm = L0_constrained_L2_PCA;
-		settings->get_values_for_all_points = true;
+	for (optimizationSettings->constrain = 1; optimizationSettings->constrain <= n;
+			optimizationSettings->constrain = optimizationSettings->constrain * 2) {
+		optimizationSettings->max_it = 20;
+		optimizationSettings->toll = 0.000001;
+		optimizationSettings->starting_points = 1000;
+		optimizationSettings->batch_size = optimizationSettings->starting_points;
+		optimizationSettings->algorithm = L0_constrained_L2_PCA;
+		optimizationSettings->get_values_for_all_points = true;
 
 		omp_set_num_threads(1);
 		init_random_seeds();
 		mt->start();
-		SPCASolver::MulticoreSolver::denseDataSolver(&h_B[0], m, &x[0], m, n, settings, stat);
+		SPCASolver::MulticoreSolver::denseDataSolver(&h_B[0], m, &x[0], m, n, optimizationSettings, optimizationStatistics);
 		mt->end();
-		fileOut << settings->constrain << ",";
-		for (int i = 0; i < stat->values.size(); i++) {
-			fileOut << stat->values[i] << ",";
+		fileOut << optimizationSettings->constrain << ",";
+		for (int i = 0; i < optimizationStatistics->values.size(); i++) {
+			fileOut << optimizationStatistics->values[i] << ",";
 		}
 		fileOut << endl;
 
@@ -64,8 +64,8 @@ void run_experiments(OptimizationSettings* settings) {
 }
 
 int main(int argc, char *argv[]) {
-	OptimizationSettings* settings = new OptimizationSettings();
-	run_experiments<double>(settings);
+	OptimizationSettings* optimizationSettings = new OptimizationSettings();
+	run_experiments<double>(optimizationSettings);
 	return 0;
 }
 
@@ -162,9 +162,9 @@ int main(int argc, char *argv[]) {
 //}
 //
 //void logTime(const char* label, double fval, double fval2, int nnz,
-//		mytimer* mt, optimization_statistics* stat, double refval) {
+//		mytimer* mt, optimization_Statisticsistics* optimizationStatistics, double refval) {
 //	printf("%s,%1.5f,%1.5f,%d,%f,%f,%d,%f\n", label, fval, fval2, nnz,
-//			mt->getElapsedCPUTime(), mt->getElapsedWallClockTime(), stat->it,
+//			mt->getElapsedCPUTime(), mt->getElapsedWallClockTime(), optimizationStatistics->it,
 //			refval);
 //}
 //
@@ -239,14 +239,14 @@ int main(int argc, char *argv[]) {
 //
 //		gsl_vector * y = gsl_vector_alloc(m);
 //
-//		optimization_statistics* stat = new optimization_statistics();
+//		optimization_Statisticsistics* optimizationStatistics = new optimization_Statisticsistics();
 //
-//		optimization_settings* settings = new optimization_settings();
+//		optimization_settings* optimizationSettings = new optimization_settings();
 //
-//		settings->max_it = 200;
-//		settings->toll = 0.000001;
-//		settings->starting_points = 1000;
-//				settings->batch_size=settings->starting_points;
+//		optimizationSettings->max_it = 200;
+//		optimizationSettings->toll = 0.000001;
+//		optimizationSettings->starting_points = 1000;
+//				optimizationSettings->batch_size=optimizationSettings->starting_points;
 //
 //		F fval = 0;
 //		F fval2 = 0;
@@ -256,10 +256,10 @@ int main(int argc, char *argv[]) {
 //		cout << "Problem generation took " << mt->getElapsedCPUTime() << " "
 //				<< mt->getElapsedWallClockTime() << endl;
 //		//============================
-//		settings->constrain = 10;
-//		settings->penalty = 0.00001;
-//		const F penalty = settings->penalty;
-//		const unsigned int constrain = settings->constrain;
+//		optimizationSettings->constrain = 10;
+//		optimizationSettings->penalty = 0.00001;
+//		const F penalty = optimizationSettings->penalty;
+//		const unsigned int constrain = optimizationSettings->constrain;
 //
 //		SparsePCA_Algorithm algorithms[8];
 //
@@ -274,47 +274,47 @@ int main(int argc, char *argv[]) {
 //
 //
 //
-//		settings->penalty = 0;
-//		settings->constrain = 0;
+//		optimizationSettings->penalty = 0;
+//		optimizationSettings->constrain = 0;
 //
 ////		FILE * fin =
 ////				fopen("/document/phd/c/GPower/resources/boxplots.txt", "w");
-////		for (settings->penalty = 2*  4.096; settings->penalty >= 0.00001; settings->penalty
-////				= settings->penalty * 0.65) {
+////		for (optimizationSettings->penalty = 2*  4.096; optimizationSettings->penalty >= 0.00001; optimizationSettings->penalty
+////				= optimizationSettings->penalty * 0.65) {
 ////		for (int alg =1; alg < 2; alg++) {
 //
 //
 //				FILE * fin = fopen("/document/phd/c/GPower/resources/boxplots_con.txt",
 //						"w");
-//					for (settings->constrain = 1; settings->constrain <= n; settings->constrain
-//							= settings->constrain * 2) {
+//					for (optimizationSettings->constrain = 1; optimizationSettings->constrain <= n; optimizationSettings->constrain
+//							= optimizationSettings->constrain * 2) {
 //
 //
 //
 //			for (int alg =5; alg < 6; alg++) {
 //
 //
-//				settings->algorithm = algorithms[alg];
+//				optimizationSettings->algorithm = algorithms[alg];
 //				mt->start();
 //
 //
 //
 //
-//				stat->fval = sparse_PCA_solver(h_B, m, x, m, n, settings, stat);
+//				optimizationStatistics->fval = sparse_PCA_solver(h_B, m, x, m, n, optimizationSettings, optimizationStatistics);
 //
 //
 //
 //				int nnz = vector_get_nnz(x, n);
-//				printf("%f,%d,%d,%d,%d,%f,%d\n", stat->fval, stat->it, alg, m,
-//						n, settings->constrain + 0.0 + settings->penalty, nnz);
-//				fprintf(fin, "%f,%d,%d,%d,%d,%f,%d", stat->fval, stat->it, alg,
-//						m, n, settings->constrain + 0.0 + settings->penalty,
+//				printf("%f,%d,%d,%d,%d,%f,%d\n", optimizationStatistics->fval, optimizationStatistics->it, alg, m,
+//						n, optimizationSettings->constrain + 0.0 + optimizationSettings->penalty, nnz);
+//				fprintf(fin, "%f,%d,%d,%d,%d,%f,%d", optimizationStatistics->fval, optimizationStatistics->it, alg,
+//						m, n, optimizationSettings->constrain + 0.0 + optimizationSettings->penalty,
 //						nnz);
-//				for (int i = 0; i < settings->starting_points; i++) {
-//					fprintf(fin, ",%f", stat->values[i]);
+//				for (int i = 0; i < optimizationSettings->starting_points; i++) {
+//					fprintf(fin, ",%f", optimizationStatistics->values[i]);
 //				}
-//				for (int i = 0; i < settings->starting_points; i++) {
-//					fprintf(fin, ",%d", stat->cardinalities[i]);
+//				for (int i = 0; i < optimizationSettings->starting_points; i++) {
+//					fprintf(fin, ",%d", optimizationStatistics->cardinalities[i]);
 //				}
 //				fprintf(fin, "\n");
 //
@@ -330,102 +330,102 @@ int main(int argc, char *argv[]) {
 //	}
 //
 //	/*	//----------------- CPU L1 Penalized L1 PCA
-//	 settings->algorithm = L1_penalized_L1_PCA;
+//	 optimizationSettings->algorithm = L1_penalized_L1_PCA;
 //	 mt->start();
 //	 fval = sparse_PCA_solver(h_B, m, x->data, B->size1, B->size2,
-//	 settings, stat);
+//	 optimizationSettings, optimizationStatistics);
 //	 mt->end();
 //	 gsl_blas_dgemv(CblasNoTrans, 1, B, x, 0.0, y); // Multiply y = B*x
 //	 nnz = vector_get_nnz(x);
 //	 fval2 = gsl_blas_dasum(y) - penalty * gsl_blas_dasum(x);
-//	 logTime("L1-Pen-L1   ", fval, fval2, nnz, mt, stat,
+//	 logTime("L1-Pen-L1   ", fval, fval2, nnz, mt, optimizationStatistics,
 //	 computeReferentialValue(B, x, y));
 //
 //	 //----------------- CPU L1 Penalized L2 PCA
-//	 settings->algorithm = L1_penalized_L2_PCA;
+//	 optimizationSettings->algorithm = L1_penalized_L2_PCA;
 //	 mt->start();
 //	 fval = sparse_PCA_solver(BT->data, BT->tda, x->data, B->size1, B->size2,
-//	 settings, stat);
+//	 optimizationSettings, optimizationStatistics);
 //	 mt->end();
 //	 gsl_blas_dgemv(CblasNoTrans, 1, B, x, 0.0, y); // Multiply y = B*x
 //	 nnz = vector_get_nnz(x);
 //	 fval2 = gsl_blas_dnrm2(y) - penalty * gsl_blas_dasum(x);
-//	 logTime("L1-Pen-L2 BT", fval, fval2, nnz, mt, stat,
+//	 logTime("L1-Pen-L2 BT", fval, fval2, nnz, mt, optimizationStatistics,
 //	 computeReferentialValue(B, x, y));
 //
 //	 //----------------- CPU L0 Penalized L1 PCA
-//	 settings->algorithm = L0_penalized_L1_PCA;
+//	 optimizationSettings->algorithm = L0_penalized_L1_PCA;
 //	 mt->start();
 //	 fval = sparse_PCA_solver(BT->data, BT->tda, x->data, B->size1, B->size2,
-//	 settings, stat);
+//	 optimizationSettings, optimizationStatistics);
 //	 mt->end();
 //	 gsl_blas_dgemv(CblasNoTrans, 1, B, x, 0.0, y); // Multiply y = B*x
 //	 nnz = vector_get_nnz(x);
 //	 fval2 = gsl_blas_dasum(y);
 //	 fval2 = fval2 * fval2 - penalty * nnz;
-//	 logTime("L0-Pen-L1   ", fval, fval2, nnz, mt, stat,
+//	 logTime("L0-Pen-L1   ", fval, fval2, nnz, mt, optimizationStatistics,
 //	 computeReferentialValue(B, x, y));
 //
 //	 //============= L0 Pen L2
-//	 settings->algorithm = L0_penalized_L2_PCA;
+//	 optimizationSettings->algorithm = L0_penalized_L2_PCA;
 //	 mt->start();
 //	 fval = sparse_PCA_solver(BT->data, BT->tda, x->data, B->size1, B->size2,
-//	 settings, stat);
+//	 optimizationSettings, optimizationStatistics);
 //	 mt->end();
 //	 gsl_blas_dgemv(CblasNoTrans, 1, B, x, 0.0, y); // Multiply y = B*x
 //	 nnz = vector_get_nnz(x);
 //	 fval2 = gsl_blas_dnrm2(y);
 //	 fval2 = fval2 * fval2 - penalty * nnz;
-//	 logTime("L0-Pen-L2 M1", fval, fval2, nnz, mt, stat,
+//	 logTime("L0-Pen-L2 M1", fval, fval2, nnz, mt, optimizationStatistics,
 //	 computeReferentialValue(B, x, y));
 //
 //	 //----------------- CPU L0 Constrained L2 PCA
-//	 settings->algorithm = L0_constrained_L2_PCA;
+//	 optimizationSettings->algorithm = L0_constrained_L2_PCA;
 //	 mt->start();
 //	 fval = sparse_PCA_solver(BT->data, BT->tda, x->data, B->size1, B->size2,
-//	 settings, stat);
+//	 optimizationSettings, optimizationStatistics);
 //	 mt->end();
 //	 gsl_blas_dgemv(CblasNoTrans, 1, B, x, 0.0, y); // Multiply y = B*x
 //	 nnz = vector_get_nnz(x);
 //	 fval2 = gsl_blas_dnrm2(y);
-//	 logTime("L0-Con-L2   ", fval, fval2, nnz, mt, stat,
+//	 logTime("L0-Con-L2   ", fval, fval2, nnz, mt, optimizationStatistics,
 //	 computeReferentialValue(B, x, y));
 //
 //	 //----------------- CPU L1 Constrained L2 PCA
-//	 settings->algorithm = L1_constrained_L2_PCA;
+//	 optimizationSettings->algorithm = L1_constrained_L2_PCA;
 //	 mt->start();
 //	 fval = sparse_PCA_solver(BT->data, BT->tda, x->data, B->size1, B->size2,
-//	 settings, stat);
+//	 optimizationSettings, optimizationStatistics);
 //	 mt->end();
 //	 gsl_blas_dgemv(CblasNoTrans, 1, B, x, 0.0, y); // Multiply y = B*x
 //	 nnz = vector_get_nnz(x);
 //	 fval2 = gsl_blas_dnrm2(y);
 //	 l1_norm = gsl_blas_dasum(x);
-//	 logTime("L1-Con-L2   ", fval, fval2, nnz, mt, stat,
+//	 logTime("L1-Con-L2   ", fval, fval2, nnz, mt, optimizationStatistics,
 //	 computeReferentialValue(B, x, y));
 //	 printf("Sanity check on l1 constrain %f==%f\n", l1_norm, sqrt(constrain));
 //	 //----------------- CPU L0 Constrained L1 PCA
-//	 settings->algorithm = L0_constrained_L1_PCA;
+//	 optimizationSettings->algorithm = L0_constrained_L1_PCA;
 //	 mt->start();
 //	 fval = sparse_PCA_solver(BT->data, BT->tda, x->data, B->size1, B->size2,
-//	 settings, stat);
+//	 optimizationSettings, optimizationStatistics);
 //	 mt->end();
 //	 gsl_blas_dgemv(CblasNoTrans, 1, B, x, 0.0, y); // Multiply y = B*x
 //	 nnz = vector_get_nnz(x);
 //	 fval2 = gsl_blas_dasum(y);
-//	 logTime("L0-Con-L1   ", fval, fval2, nnz, mt, stat,
+//	 logTime("L0-Con-L1   ", fval, fval2, nnz, mt, optimizationStatistics,
 //	 computeReferentialValue(B, x, y));
 //
 //	 //----------------- CPU L1 Constrained L1 PCA
-//	 settings->algorithm = L1_constrained_L1_PCA;
+//	 optimizationSettings->algorithm = L1_constrained_L1_PCA;
 //	 mt->start();
 //	 fval = sparse_PCA_solver(BT->data, BT->tda, x->data, B->size1, B->size2,
-//	 settings, stat);
+//	 optimizationSettings, optimizationStatistics);
 //	 mt->end();
 //	 gsl_blas_dgemv(CblasNoTrans, 1, B, x, 0.0, y); // Multiply y = B*x
 //	 nnz = vector_get_nnz(x);
 //	 fval2 = gsl_blas_dasum(y);
-//	 logTime("L1-Con-L1   ", fval, fval2, nnz, mt, stat,
+//	 logTime("L1-Con-L1   ", fval, fval2, nnz, mt, optimizationStatistics,
 //	 computeReferentialValue(B, x, y));
 //	 printf("Sanity check on l1 constrain %f==%f\n", l1_norm, sqrt(constrain));
 //	 */

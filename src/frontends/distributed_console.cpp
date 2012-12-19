@@ -27,52 +27,52 @@
 #include "../utils/option_console_parser.h"
 
 template<typename F>
-void runSolver(SolverStructures::OptimizationSettings * settings) {
-	SolverStructures::OptimizationStatistics* stat =
-			new OptimizationStatistics();
+void runSolver(SolverStructures::OptimizationSettings * optimizationSettings) {
+	SolverStructures::OptimizationStatisticsistics* optimizationStatistics =
+			new OptimizationStatisticsistics();
 	MKL_INT iam, nprocs;
 	blacs_pinfo_(&iam, &nprocs);
 	double start_all = gettime();
-	SPCASolver::DistributedClasses::OptimizationData<F> optimization_data_inst;
+	SPCASolver::DistributedClasses::OptimizationData<F> optimizationDataInstance;
 	SPCASolver::DistributedSolver::loadDataFrom2DFilesAndDistribute<F>(
-			optimization_data_inst, settings, stat);
+			optimizationDataInstance, optimizationSettings, optimizationStatistics);
 
 	/*
 	 *  RUN SOLVER
 	 */
 	double start_time = gettime();
 	SPCASolver::DistributedSolver::denseDataSolver(
-			optimization_data_inst, settings, stat);
+			optimizationDataInstance, optimizationSettings, optimizationStatistics);
 	double end_time = gettime();
-	stat->true_computation_time = end_time - start_time;
+	optimizationStatistics->true_computation_time = end_time - start_time;
 	/*
 	 * STORE RESULT INTO FILE
 	 */
-	SPCASolver::DistributedSolver::gather_and_store_best_result_to_file(
-			optimization_data_inst, settings, stat);
+	SPCASolver::DistributedSolver::gatherAndStoreBestResultToOutputFile(
+			optimizationDataInstance, optimizationSettings, optimizationStatistics);
 	if (iam == 0) {
-		stat->total_elapsed_time = gettime() - start_all;
-		InputOuputHelper::save_statistics(stat, settings);
+		optimizationStatistics->total_elapsed_time = gettime() - start_all;
+		InputOuputHelper::save_optimizationStatisticsistics(optimizationStatistics, optimizationSettings);
 	}
 
-	blacs_gridexit_(&optimization_data_inst.params.ictxt);
+	blacs_gridexit_(&optimizationDataInstance.params.ictxt);
 }
 
 
 int main(int argc, char *argv[]) {
-	SolverStructures::OptimizationSettings* settings =
+	SolverStructures::OptimizationSettings* optimizationSettings =
 			new OptimizationSettings();
 	MPI_Init(&argc, &argv);
-	MPI_Comm_rank(MPI_COMM_WORLD, &settings->proccess_node);
-	int status = parseConsoleOptions(settings, argc, argv);
-	if (status > 0) {
+	MPI_Comm_rank(MPI_COMM_WORLD, &optimizationSettings->proccess_node);
+	int optimizationStatisticsus = parseConsoleOptions(optimizationSettings, argc, argv);
+	if (optimizationStatisticsus > 0) {
 		MPI_Finalize();
-		return status;
+		return optimizationStatisticsus;
 	}
-	if (settings->double_precission) {
-		runSolver<double>(settings);
+	if (optimizationSettings->double_precission) {
+		runSolver<double>(optimizationSettings);
 	} else {
-		runSolver<float>(settings);
+		runSolver<float>(optimizationSettings);
 	}
 	MPI_Finalize();
 	return 0;

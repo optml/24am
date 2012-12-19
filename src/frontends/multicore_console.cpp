@@ -22,35 +22,35 @@ using namespace SolverStructures;
 #include "../utils/option_console_parser.h"
 
 template<typename F>
-void load_data_and_run_solver(OptimizationSettings* settings) {
+void load_data_and_run_solver(OptimizationSettings* optimizationSettings) {
 	double start_wall_time = gettime();
 	std::vector<F> B_mat;
 	unsigned int ldB, m, n;
 	// load data from CSV file
-	InputOuputHelper::readCSVFile(B_mat, ldB, m, n, settings->data_file);
-	OptimizationStatistics* stat = new OptimizationStatistics();
-	stat->n = n;
+	InputOuputHelper::readCSVFile(B_mat, ldB, m, n, optimizationSettings->data_file);
+	OptimizationStatisticsistics* optimizationStatistics = new OptimizationStatisticsistics();
+	optimizationStatistics->n = n;
 	std::vector<F> x_vec(n, 0);
 	// run SOLVER
-	SPCASolver::MulticoreSolver::denseDataSolver(&B_mat[0], ldB, &x_vec[0], m, n, settings,
-			stat);
+	SPCASolver::MulticoreSolver::denseDataSolver(&B_mat[0], ldB, &x_vec[0], m, n, optimizationSettings,
+			optimizationStatistics);
 	double end_wall_time = gettime();
-	stat->total_elapsed_time = end_wall_time - start_wall_time;
+	optimizationStatistics->total_elapsed_time = end_wall_time - start_wall_time;
     // store result into file
-	InputOuputHelper::save_results(stat, settings, &x_vec[0], n);
-	// store statistics into stat file
-	InputOuputHelper::save_statistics(stat, settings);
+	InputOuputHelper::save_results(optimizationStatistics, optimizationSettings, &x_vec[0], n);
+	// store optimizationStatisticsistics into optimizationStatistics file
+	InputOuputHelper::save_optimizationStatisticsistics(optimizationStatistics, optimizationSettings);
 }
 
 int main(int argc, char *argv[]) {
-	OptimizationSettings* settings = new OptimizationSettings();
-	int status = parseConsoleOptions(settings, argc, argv);
-	if (status > 0)
-		return status;
-	if (settings->double_precission) {
-		load_data_and_run_solver<double>(settings);
+	OptimizationSettings* optimizationSettings = new OptimizationSettings();
+	int optimizationStatisticsus = parseConsoleOptions(optimizationSettings, argc, argv);
+	if (optimizationStatisticsus > 0)
+		return optimizationStatisticsus;
+	if (optimizationSettings->double_precission) {
+		load_data_and_run_solver<double>(optimizationSettings);
 	} else {
-		load_data_and_run_solver<float>(settings);
+		load_data_and_run_solver<float>(optimizationSettings);
 	}
 	return 0;
 }

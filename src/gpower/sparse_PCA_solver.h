@@ -32,60 +32,59 @@
  */
 
 namespace SPCASolver {
-namespace MulticoreSolver {
-
+namespace MulticoreSolver{
 template<typename F>
 F denseDataSolver(const F * B, const int ldB, F * x, const unsigned int m,
-		const unsigned int n, SolverStructures::OptimizationSettings* settings,
-		SolverStructures::OptimizationStatistics* stat) {
+		const unsigned int n, SolverStructures::OptimizationSettings* optimizationSettings,
+		SolverStructures::OptimizationStatisticsistics* optimizationStatistics) {
 #ifdef _OPENMP
 #pragma omp parallel
 	{
-		stat->total_threads_used = omp_get_num_threads();
+	optimizationStatistics->total_threads_used = omp_get_num_threads();
 	}
 #endif
 
-	if (settings->verbose) {
+	if (optimizationSettings->verbose) {
 		cout << "Solver started " << endl;
 	}
-	settings->chceckInputAndModifyIt(n);
-	stat->it = settings->max_it;
+	optimizationSettings->chceckInputAndModifyIt(n);
+	optimizationStatistics->it = optimizationSettings->max_it;
 	F FLOATING_ZERO = 0;
-	// Allocate vector for stat to return which point needs how much iterations
-	if (settings->get_it_for_all_points) {
-		stat->iters.resize(settings->starting_points, -1);
-		stat->cardinalities.resize(settings->starting_points, -1);
-		stat->values.resize(settings->starting_points, -1);
+	// Allocate vector for optimizationStatistics to return which point needs how much iterations
+	if (optimizationSettings->storeIterationsForAllPoints) {
+		optimizationStatistics->iters.resize(optimizationSettings->starting_points, -1);
+		optimizationStatistics->cardinalities.resize(optimizationSettings->starting_points, -1);
+		optimizationStatistics->values.resize(optimizationSettings->starting_points, -1);
 
 	}
-	const unsigned int number_of_experiments_per_batch = settings->batch_size;
+	const unsigned int number_of_experiments_per_batch = optimizationSettings->batch_size;
 	F * Z = (F*) calloc(m * number_of_experiments_per_batch, sizeof(F));
-	value_coordinate_holder<F>* vals = (value_coordinate_holder<F>*) calloc(
+	ValueCoordinateHolder<F>* vals = (ValueCoordinateHolder<F>*) calloc(
 			number_of_experiments_per_batch,
-			sizeof(value_coordinate_holder<F> ));
+			sizeof(ValueCoordinateHolder<F> ));
 	F * V = (F*) calloc(n * number_of_experiments_per_batch, sizeof(F));
-	stat->true_computation_time = 0;
+	optimizationStatistics->true_computation_time = 0;
 	F error = 0;
 	F max_errors[TOTAL_THREADS];
 	std::vector<F>* buffer = (std::vector<F>*) calloc(
 			number_of_experiments_per_batch, sizeof(std::vector<F>));
-	if (settings->isConstrainedProblem()) {
+	if (optimizationSettings->isConstrainedProblem()) {
 		for (unsigned int j = 0; j < number_of_experiments_per_batch; j++) {
 			buffer[j].resize(n);
 		}
 	}
 	F the_best_solution_value = -1;
 	unsigned int total_iterations = 0;
-	stat->it = 0;
-	if (settings->on_the_fly_generation) {
-		settings->get_it_for_all_points = false;
+	optimizationStatistics->it = 0;
+	if (optimizationSettings->onTheFlyMethod) {
+		optimizationSettings->storeIterationsForAllPoints = false;
 		cblas_vector_scale(n * number_of_experiments_per_batch, V,
 				FLOATING_ZERO);
-		initialize_starting_points(V, Z, settings, stat,
+		initialize_starting_points(V, Z, optimizationSettings, optimizationStatistics,
 				number_of_experiments_per_batch, n, m, ldB, B, 0);
 		unsigned int generated_points = number_of_experiments_per_batch;
 		bool do_iterate = true;
-		unsigned int statistical_shift = 0;
+		unsigned int optimizationStatisticsistical_shift = 0;
 
 		std::vector<unsigned int> current_iteration(
 				number_of_experiments_per_batch, 0);
@@ -100,14 +99,14 @@ F denseDataSolver(const F * B, const int ldB, F * x, const unsigned int m,
 			for (unsigned int tmp = 0; tmp < TOTAL_THREADS; tmp++) {
 				max_errors[tmp] = 0;
 			}
-			if (settings->isConstrainedProblem()) {
-				perform_one_iteration_for_constrained_pca(V, Z, settings, stat,
+			if (optimizationSettings->isConstrainedProblem()) {
+				perform_one_iteration_for_constrained_pca(V, Z, optimizationSettings, optimizationStatistics,
 						number_of_experiments_per_batch, n, m, ldB, B,
-						max_errors, vals, buffer, 0, statistical_shift);
+						max_errors, vals, buffer, 0, optimizationStatisticsistical_shift);
 			} else {
-				perform_one_iteration_for_penalized_pca(V, Z, settings, stat,
+				perform_one_iteration_for_penalized_pca(V, Z, optimizationSettings, optimizationStatistics,
 						number_of_experiments_per_batch, n, m, ldB, B,
-						max_errors, vals, 0, statistical_shift);
+						max_errors, vals, 0, optimizationStatisticsistical_shift);
 			}
 
 			do_iterate = false;
@@ -115,14 +114,14 @@ F denseDataSolver(const F * B, const int ldB, F * x, const unsigned int m,
 			for (unsigned int i = 0; i < number_of_experiments_per_batch; i++) {
 				current_iteration[i]++;
 				if (termination_criteria(vals[i].current_error,
-						current_iteration[i], settings)
-						|| current_iteration[i] >= settings->max_it) {
-					// this point reached it convergence criterion, stat again....
+						current_iteration[i], optimizationSettings)
+						|| current_iteration[i] >= optimizationSettings->max_it) {
+					// this point reached it convergence criterion, optimizationStatistics again....
 					if (the_best_solution_value < vals[i].val) {
 						the_best_solution_value = vals[i].val;
 						cblas_vector_copy(n, &V[n * i], 1, x, 1);
 					}
-					if (generated_points < settings->starting_points) {
+					if (generated_points < optimizationSettings->starting_points) {
 						vals[i].reset();
 						current_order[i] = generated_points;
 						number_of_new_points++;
@@ -142,10 +141,10 @@ F denseDataSolver(const F * B, const int ldB, F * x, const unsigned int m,
 				for (unsigned int j = 0; j < number_of_experiments_per_batch;
 						j++) {
 					if (current_iteration[j] == 0) {
-						if (settings->isConstrainedProblem()) {
+						if (optimizationSettings->isConstrainedProblem()) {
 							cblas_vector_scale(n, &V[j * n], FLOATING_ZERO);
 						}
-						getSignleStartingPoint(&V[j * n], &Z[j * m], settings,
+						getSignleStartingPoint(&V[j * n], &Z[j * m], optimizationSettings,
 								n, m, current_order[j], 0);
 					}
 				}
@@ -153,53 +152,53 @@ F denseDataSolver(const F * B, const int ldB, F * x, const unsigned int m,
 
 		}
 		double end_time_of_iterations = gettime();
-		stat->true_computation_time += (end_time_of_iterations
-				- start_time_of_iterations);
+					optimizationStatistics->true_computation_time += (end_time_of_iterations
+							- start_time_of_iterations);
 	} else {
 		//====================== MAIN LOOP THROUGHT BATCHES
-		for (unsigned int batch = 0; batch < settings->number_of_batches;
+		for (unsigned int batch = 0; batch < optimizationSettings->number_of_batches;
 				batch++) {
-			unsigned int statistical_shift = batch * settings->batch_size;
+			unsigned int optimizationStatisticsistical_shift = batch * optimizationSettings->batch_size;
 			cblas_vector_scale(n * number_of_experiments_per_batch, V,
 					FLOATING_ZERO);
-			initialize_starting_points(V, Z, settings, stat,
+			initialize_starting_points(V, Z, optimizationSettings, optimizationStatistics,
 					number_of_experiments_per_batch, n, m, ldB, B,
-					statistical_shift);
+					optimizationStatisticsistical_shift);
 			for (unsigned int j = 0; j < number_of_experiments_per_batch; j++) {
 				vals[j].reset();
 			}
 			double start_time_of_iterations = gettime();
-			for (unsigned int it = 0; it < settings->max_it; it++) {
+			for (unsigned int it = 0; it < optimizationSettings->max_it; it++) {
 				total_iterations++;
 				for (unsigned int tmp = 0; tmp < TOTAL_THREADS; tmp++) {
 					max_errors[tmp] = 0;
 				}
-				if (settings->isConstrainedProblem()) {
-					perform_one_iteration_for_constrained_pca(V, Z, settings,
-							stat, number_of_experiments_per_batch, n, m, ldB, B,
-							max_errors, vals, buffer, it, statistical_shift);
+				if (optimizationSettings->isConstrainedProblem()) {
+					perform_one_iteration_for_constrained_pca(V, Z, optimizationSettings,
+							optimizationStatistics, number_of_experiments_per_batch, n, m, ldB, B,
+							max_errors, vals, buffer, it, optimizationStatisticsistical_shift);
 				} else {
-					perform_one_iteration_for_penalized_pca(V, Z, settings,
-							stat, number_of_experiments_per_batch, n, m, ldB, B,
-							max_errors, vals, it, statistical_shift);
+					perform_one_iteration_for_penalized_pca(V, Z, optimizationSettings,
+							optimizationStatistics, number_of_experiments_per_batch, n, m, ldB, B,
+							max_errors, vals, it, optimizationStatisticsistical_shift);
 				}
 				error = max_errors[cblas_vector_max_index(TOTAL_THREADS,
 						max_errors, 1)];
-				if (termination_criteria(error, it, settings)) {
+				if (termination_criteria(error, it, optimizationSettings)) {
 					break;
 				}
 			}
 			double end_time_of_iterations = gettime();
-			stat->true_computation_time += (end_time_of_iterations
+			optimizationStatistics->true_computation_time += (end_time_of_iterations
 					- start_time_of_iterations);
 			//============= save the best solution==========
 			int selected_idx = 0;
 			F best_value = vals[selected_idx].val;
-			if (settings->get_it_for_all_points)
-				stat->values[0 + statistical_shift] = best_value;
+			if (optimizationSettings->storeIterationsForAllPoints)
+				optimizationStatistics->values[0 + optimizationStatisticsistical_shift] = best_value;
 			for (unsigned int i = 1; i < number_of_experiments_per_batch; i++) {
-				if (settings->get_it_for_all_points)
-					stat->values[i + statistical_shift] = vals[i].val;
+				if (optimizationSettings->storeIterationsForAllPoints)
+					optimizationStatistics->values[i + optimizationStatisticsistical_shift] = vals[i].val;
 				if (vals[i].val > best_value) {
 					best_value = vals[i].val;
 					selected_idx = i;
@@ -211,14 +210,14 @@ F denseDataSolver(const F * B, const int ldB, F * x, const unsigned int m,
 			}
 		}
 	}
-	stat->it = total_iterations;
+	optimizationStatistics->it = total_iterations;
 	//compute corresponding x
 	F norm_of_x = cblas_l2_norm(n, x, 1);
 	cblas_vector_scale(n, x, 1 / norm_of_x); //Final x
 	free(Z);
 	free(V);
 	free(vals);
-	stat->fval = the_best_solution_value;
+	optimizationStatistics->fval = the_best_solution_value;
 	return the_best_solution_value;
 }
 }

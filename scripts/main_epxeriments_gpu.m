@@ -4,10 +4,10 @@ clear all
  
 
 Data = importdata('gpu_test2.log'); 
-% printf("%d,%d,%1.5f,%d,%f,%f,%d,%d,%d,%d,%d\n", settings->algorithm, GPU,
-%			stat->fval, nnz, mt->getElapsedCPUTime(),
-%			mt->getElapsedWallClockTime(), stat->it, n, m,
-%			settings->starting_points,sizeofvariable);
+% printf("%d,%d,%1.5f,%d,%f,%f,%d,%d,%d,%d,%d\n", optimizationSettings->algorithm, GPU,
+%			optimizationStatistics->fval, nnz, mt->getElapsedCPUTime(),
+%			mt->getElapsedWallClockTime(), optimizationStatistics->it, n, m,
+%			optimizationSettings->starting_points,sizeofvariable);
  
  
  
