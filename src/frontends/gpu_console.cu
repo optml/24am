@@ -26,8 +26,8 @@ template<typename F>
 int load_data_and_run_solver(SolverStructures::OptimizationSettings* optimizationSettings) {
 	mytimer* mt = new mytimer();
 	mt->start();
-	SolverStructures::OptimizationStatisticsistics* optimizationStatistics =
-			new OptimizationStatisticsistics();
+	SolverStructures::OptimizationStatistics* optimizationStatistics =
+			new OptimizationStatistics();
 	cudaDeviceProp dp;
 	cudaGetDeviceProperties(&dp, 0);
 	optimizationSettings->gpu_sm_count = dp.multiProcessorCount;
@@ -78,7 +78,7 @@ int load_data_and_run_solver(SolverStructures::OptimizationSettings* optimizatio
 	mt->end();
 	optimizationStatistics->totalElapsedTime = mt->getElapsedWallClockTime();
 	InputOuputHelper::save_results(optimizationStatistics, optimizationSettings, &h_x[0], n);
-	InputOuputHelper::save_optimizationStatisticsistics(optimizationStatistics, optimizationSettings);
+	InputOuputHelper::save_OptimizationStatistics(optimizationStatistics, optimizationSettings);
 	optimizationStatisticsus = cublasDestroy(handle);
 	if (optimizationStatisticsus != CUBLAS_optimizationStatisticsUS_SUCCESS) {
 		fprintf(stderr, "!cublas shutdown error\n");

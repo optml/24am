@@ -27,8 +27,8 @@ using namespace SolverStructures;
 
 template<typename F>
 int test_solver(SolverStructures::OptimizationSettings * optimizationSettings) {
-	SolverStructures::OptimizationStatisticsistics* optimizationStatistics =
-			new OptimizationStatisticsistics();
+	SolverStructures::OptimizationStatistics* optimizationStatistics =
+			new OptimizationStatistics();
 
 	ofstream fileOut;
 	fileOut.open("results/paper_experiment_gpu_speedup.txt");

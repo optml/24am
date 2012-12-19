@@ -81,7 +81,7 @@ public:
 	double penalty; // value of penalty parameter
 	unsigned int constrain; //value of constrain parameter
 	char* data_file; //   path to source data file
-	char* result_file; // path to file where result and optimizationStatisticsistics will be used
+	char* result_file; // path to file where result and OptimizationStatistics will be used
 	int gpu_sm_count; // gpu number of Streaming Processors
 	int gpu_max_threads; // gpu - max number of threads
 	enum SPCA_Algorithm algorithm; // algorithm which should be used

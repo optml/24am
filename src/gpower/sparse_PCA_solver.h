@@ -36,7 +36,7 @@ namespace MulticoreSolver{
 template<typename F>
 F denseDataSolver(const F * B, const int ldB, F * x, const unsigned int m,
 		const unsigned int n, SolverStructures::OptimizationSettings* optimizationSettings,
-		SolverStructures::OptimizationStatisticsistics* optimizationStatistics) {
+		SolverStructures::OptimizationStatistics* optimizationStatistics) {
 #ifdef _OPENMP
 #pragma omp parallel
 	{

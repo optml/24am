@@ -38,7 +38,7 @@ template<typename F>
 void denseDataSolver(
 		SPCASolver::DistributedClasses::OptimizationData<F>& optimizationDataInstance,
 		SolverStructures::OptimizationSettings* optimizationSettings,
-		SolverStructures::OptimizationStatisticsistics* optimizationStatistics) {
+		SolverStructures::OptimizationStatistics* optimizationStatistics) {
 	F zero = 0.0e+0, one = 1.0e+0, two = 2.0e+0, negone = -1.0e+0;
 	MKL_INT myrow, mycol, nprow, npcol, info;
 	MKL_INT ictxt = optimizationDataInstance.params.ictxt;
@@ -193,7 +193,7 @@ template<typename F>
 int loadDataFrom2DFilesAndDistribute(
 		SPCASolver::DistributedClasses::OptimizationData<F> &optimizationDataInstance,
 		SolverStructures::OptimizationSettings* optimizationSettings,
-		SolverStructures::OptimizationStatisticsistics* optimizationStatistics) {
+		SolverStructures::OptimizationStatistics* optimizationStatistics) {
 	F zero = 0.0e+0, one = 1.0e+0, two = 2.0e+0, negone = -1.0e+0;
 	MKL_INT X_VECTOR_BLOCKING = optimizationDataInstance.params.x_vector_blocking;
 	MKL_INT ROW_BLOCKING = optimizationDataInstance.params.row_blocking;
@@ -352,7 +352,7 @@ template<typename F>
 int gatherAndStoreBestResultToOutputFile(
 		SPCASolver::DistributedClasses::OptimizationData<F> &optimizationDataInstance,
 		SolverStructures::OptimizationSettings* optimizationSettings,
-		SolverStructures::OptimizationStatisticsistics* optimizationStatistics) {
+		SolverStructures::OptimizationStatistics* optimizationStatistics) {
 	F zero = 0.0e+0, one = 1.0e+0, two = 2.0e+0, negone = -1.0e+0;
 	/* =============================================================
 	 *          STORE RESULT

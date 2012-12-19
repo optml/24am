@@ -34,7 +34,7 @@ char final_file[1000];
 //
 //
 void logTime(const char* label, double fval, double fval2, int nnz,
-		mytimer* mt, OptimizationStatisticsistics* optimizationStatistics, double refval) {
+		mytimer* mt, OptimizationStatistics* optimizationStatistics, double refval) {
 	printf("%s,%1.5f,%1.5f,%d,%f,%f,%d,%f\n", label, fval, fval2, nnz,
 			mt->getElapsedCPUTime(), mt->getElapsedWallClockTime(), optimizationStatistics->it,
 			refval);
@@ -79,7 +79,7 @@ int test() {
 			//		x = gsl_vector_alloc(n);
 		}
 
-		OptimizationStatisticsistics* optimizationStatistics = new OptimizationStatisticsistics();
+		OptimizationStatistics* optimizationStatistics = new OptimizationStatistics();
 
 		OptimizationSettings* optimizationSettings = new OptimizationSettings();
 

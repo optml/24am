@@ -37,7 +37,7 @@ template<typename F>
 void perform_one_distributed_iteration_for_penalized_pca(
 		SPCASolver::DistributedClasses::OptimizationData<F>& optimizationDataInstance,
 		SolverStructures::OptimizationSettings* optimizationSettings,
-		SolverStructures::OptimizationStatisticsistics* optimizationStatistics) {
+		SolverStructures::OptimizationStatistics* optimizationStatistics) {
 	F zero = 0.0e+0, one = 1.0e+0, two = 2.0e+0, negone = -1.0e+0;
 
 	// z= B*V
@@ -152,7 +152,7 @@ template<typename F>
 void threshold_V_for_constrained(
 		SPCASolver::DistributedClasses::OptimizationData<F>& optimizationDataInstance,
 		SolverStructures::OptimizationSettings* optimizationSettings,
-		SolverStructures::OptimizationStatisticsistics* optimizationStatistics) {
+		SolverStructures::OptimizationStatistics* optimizationStatistics) {
 	F zero = 0.0e+0, one = 1.0e+0, two = 2.0e+0, negone = -1.0e+0;
 	//================== Treshhold matrix V
 	optimizationDataInstance.initializeDataForConstrainedMethod(optimizationSettings);
@@ -205,7 +205,7 @@ template<typename F>
 void perform_one_distributed_iteration_for_constrained_pca(
 		SPCASolver::DistributedClasses::OptimizationData<F>& optimizationDataInstance,
 		SolverStructures::OptimizationSettings* optimizationSettings,
-		SolverStructures::OptimizationStatisticsistics* optimizationStatistics) {
+		SolverStructures::OptimizationStatistics* optimizationStatistics) {
 	// standard constants used in MKL library
 	F zero = 0.0e+0, one = 1.0e+0, two = 2.0e+0, negone = -1.0e+0;
 	clear_local_vector(optimizationDataInstance.norms, optimizationSettings->batch_size); // we use NORMS to store objective values

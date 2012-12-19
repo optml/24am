@@ -28,14 +28,14 @@ using namespace SolverStructures;
 template<typename F>
 int test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 		char* multicoreDataset, char* multicoreResult) {
-	SolverStructures::OptimizationStatisticsistics* optimizationStatistics =
-			new OptimizationStatisticsistics();
+	SolverStructures::OptimizationStatistics* optimizationStatistics =
+			new OptimizationStatistics();
 	std::vector<F> B_mat;
 	unsigned int ldB;
 	unsigned int m;
 	unsigned int n;
 	InputOuputHelper::readCSVFile(B_mat, ldB, m, n, multicoreDataset);
-	OptimizationStatisticsistics* optimizationStatistics2 = new OptimizationStatisticsistics();
+	OptimizationStatistics* optimizationStatistics2 = new OptimizationStatistics();
 	optimizationStatistics2->n = n;
 	const F * B = &B_mat[0];
 	std::vector<F> x_vec(n, 0);

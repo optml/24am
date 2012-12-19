@@ -15,7 +15,7 @@
  *      Author: taki
  *
  *
- *   This class is used to store optimizationStatisticsistics during solver
+ *   This class is used to store OptimizationStatistics during solver
  *
  */
 
@@ -24,7 +24,7 @@
 
 #include <vector>
 namespace SolverStructures {
-class OptimizationStatisticsistics {
+class OptimizationStatistics {
 
 public:
 	unsigned int it; // total iterations solver did
@@ -39,7 +39,7 @@ public:
 	std::vector<int> cardinalities; // cardinalities for given starting point. For L0 constrained method doesn't make sense as
 	                                // it's value has to be constrain parameter from optimizationSettings
 	int totalThreadsUsed;
-	OptimizationStatisticsistics() {
+	OptimizationStatistics() {
 		it = 0;
 		totalThreadsUsed=1;
 	}

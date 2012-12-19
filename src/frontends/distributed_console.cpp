@@ -28,8 +28,8 @@
 
 template<typename F>
 void runSolver(SolverStructures::OptimizationSettings * optimizationSettings) {
-	SolverStructures::OptimizationStatisticsistics* optimizationStatistics =
-			new OptimizationStatisticsistics();
+	SolverStructures::OptimizationStatistics* optimizationStatistics =
+			new OptimizationStatistics();
 	MKL_INT iam, nprocs;
 	blacs_pinfo_(&iam, &nprocs);
 	double start_all = gettime();
@@ -52,7 +52,7 @@ void runSolver(SolverStructures::OptimizationSettings * optimizationSettings) {
 			optimizationDataInstance, optimizationSettings, optimizationStatistics);
 	if (iam == 0) {
 		optimizationStatistics->totalElapsedTime = gettime() - start_all;
-		InputOuputHelper::save_optimizationStatisticsistics(optimizationStatistics, optimizationSettings);
+		InputOuputHelper::save_OptimizationStatistics(optimizationStatistics, optimizationSettings);
 	}
 
 	blacs_gridexit_(&optimizationDataInstance.params.ictxt);

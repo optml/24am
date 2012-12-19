@@ -31,7 +31,7 @@ int denseDataSolver(cublasHandle_t &handle, const unsigned int m,
 		const unsigned int n, thrust::device_vector<F> &d_B,
 		thrust::host_vector<F>& h_x,
 		SolverStructures::OptimizationSettings* optimizationSettings,
-		SolverStructures::OptimizationStatisticsistics* optimizationStatistics,
+		SolverStructures::OptimizationStatistics* optimizationStatistics,
 		const unsigned int LD_M, const unsigned int LD_N) {
 	bool low_memory = false;
 	double total_memory = LD_N * LD_M + LD_N * optimizationSettings->starting_points * 2

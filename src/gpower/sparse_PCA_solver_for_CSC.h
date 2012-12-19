@@ -28,7 +28,7 @@
 
 template<typename F>
 void printDescriptions(F* x, int length, const char* description,
-		SolverStructures::OptimizationStatisticsistics* optimizationStatistics, ofstream& stream) {
+		SolverStructures::OptimizationStatistics* optimizationStatistics, ofstream& stream) {
 	FILE * fin = fopen(description, "r");
 	char buffer[1000];
 	if (fin == NULL) {
@@ -58,7 +58,7 @@ namespace SPCASolver {
 template<typename F>
 F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 		F * x, int m, int n, SolverStructures::OptimizationSettings* optimizationSettings,
-		SolverStructures::OptimizationStatisticsistics* optimizationStatistics, bool doMean,
+		SolverStructures::OptimizationStatistics* optimizationStatistics, bool doMean,
 		F * means) {
 	int number_of_experiments = optimizationSettings->starting_points;
 	ValueCoordinateHolder<F>* vals = (ValueCoordinateHolder<F>*) calloc(

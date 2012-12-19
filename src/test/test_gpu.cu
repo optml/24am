@@ -39,7 +39,7 @@ void run_solver(OptimizationSettings* optimizationSettings) {
 //	PCA_solver::denseDataSolver(B, ldB, x, m, n, optimizationSettings, optimizationStatistics);
 //	double end_wall_time = gettime();
 //	optimizationStatistics->totalElapsedTime=end_wall_time-start_wall_time;
-//	input_ouput_helper::save_optimizationStatisticsistics_and_results(optimizationStatistics, optimizationSettings,x_vec);
+//	input_ouput_helper::save_OptimizationStatistics_and_results(optimizationStatistics, optimizationSettings,x_vec);
 
 }
 
@@ -66,7 +66,7 @@ int mainX(int argc, char *argv[]) {
 
 template<typename F>
 int runTest() {
-	OptimizationStatisticsistics* optimizationStatistics = new OptimizationStatisticsistics();
+	OptimizationStatistics* optimizationStatistics = new OptimizationStatistics();
 	OptimizationSettings* optimizationSettings = new OptimizationSettings();
 	optimizationSettings->maximumIterations = 5;
 	optimizationSettings->toll = 0.0001;

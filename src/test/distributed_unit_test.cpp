@@ -28,8 +28,8 @@ using namespace SolverStructures;
 template<typename F>
 void test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 		char* multicoreDataset, char* multicoreResult) {
-	SolverStructures::OptimizationStatisticsistics* optimizationStatistics =
-			new OptimizationStatisticsistics();
+	SolverStructures::OptimizationStatistics* optimizationStatistics =
+			new OptimizationStatistics();
 	MKL_INT iam, nprocs;
 	blacs_pinfo_(&iam, &nprocs);
 	double start_all = gettime();
@@ -42,7 +42,7 @@ void test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 	unsigned int m;
 	unsigned int n;
 	InputOuputHelper::readCSVFile(B_mat, ldB, m, n, multicoreDataset);
-	OptimizationStatisticsistics* optimizationStatistics2 = new OptimizationStatisticsistics();
+	OptimizationStatistics* optimizationStatistics2 = new OptimizationStatistics();
 	optimizationStatistics2->n = n;
 	const F * B = &B_mat[0];
 	std::vector<F> x_vec(n, 0);
@@ -79,7 +79,7 @@ void test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 			optimizationDataInstance, optimizationSettings, optimizationStatistics);
 	if (iam == 0) {
 		optimizationStatistics->totalElapsedTime = gettime() - start_all;
-		InputOuputHelper::save_optimizationStatisticsistics(optimizationStatistics, optimizationSettings);
+		InputOuputHelper::save_OptimizationStatistics(optimizationStatistics, optimizationSettings);
 	}
 
 	blacs_gridexit_(&optimizationDataInstance.params.ictxt);

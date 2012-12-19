@@ -28,7 +28,7 @@ using namespace SolverStructures;
 template<typename F>
 void run_experiments(OptimizationSettings* optimizationSettings, const char* filename,
 		const char* description, const char* logfilename) {
-	OptimizationStatisticsistics* optimizationStatistics = new OptimizationStatisticsistics();
+	OptimizationStatistics* optimizationStatistics = new OptimizationStatistics();
 	ofstream fileOut;
 	fileOut.open(logfilename);
 	mytimer* mt = new mytimer();

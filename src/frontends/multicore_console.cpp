@@ -28,7 +28,7 @@ void load_data_and_run_solver(OptimizationSettings* optimizationSettings) {
 	unsigned int ldB, m, n;
 	// load data from CSV file
 	InputOuputHelper::readCSVFile(B_mat, ldB, m, n, optimizationSettings->data_file);
-	OptimizationStatisticsistics* optimizationStatistics = new OptimizationStatisticsistics();
+	OptimizationStatistics* optimizationStatistics = new OptimizationStatistics();
 	optimizationStatistics->n = n;
 	std::vector<F> x_vec(n, 0);
 	// run SOLVER
@@ -38,8 +38,8 @@ void load_data_and_run_solver(OptimizationSettings* optimizationSettings) {
 	optimizationStatistics->totalElapsedTime = end_wall_time - start_wall_time;
     // store result into file
 	InputOuputHelper::save_results(optimizationStatistics, optimizationSettings, &x_vec[0], n);
-	// store optimizationStatisticsistics into optimizationStatistics file
-	InputOuputHelper::save_optimizationStatisticsistics(optimizationStatistics, optimizationSettings);
+	// store OptimizationStatistics into optimizationStatistics file
+	InputOuputHelper::save_OptimizationStatistics(optimizationStatistics, optimizationSettings);
 }
 
 int main(int argc, char *argv[]) {

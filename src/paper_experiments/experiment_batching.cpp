@@ -24,7 +24,7 @@ using namespace SolverStructures;
 
 template<typename F>
 void run_experiments(OptimizationSettings* optimizationSettings) {
-	OptimizationStatisticsistics* optimizationStatistics = new OptimizationStatisticsistics();
+	OptimizationStatistics* optimizationStatistics = new OptimizationStatistics();
 	ofstream fileOut;
 	fileOut.open("results/paper_experiment_batching.txt");
 	mytimer* mt = new mytimer();
