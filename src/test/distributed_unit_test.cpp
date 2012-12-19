@@ -57,14 +57,14 @@ void test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 	algorithms[5] = SolverStructures::L0_constrained_L2_PCA;
 	algorithms[6] = SolverStructures::L1_constrained_L1_PCA;
 	algorithms[7] = SolverStructures::L1_constrained_L2_PCA;
-	char* resultDistributed = optimizationSettings->result_file;
+	char* resultDistributed = optimizationSettings->resultFilePath;
 	for (int al = 0; al < 8; al++) {
 		optimizationSettings->algorithm = algorithms[al];
 		SPCASolver::DistributedSolver::denseDataSolver(
 				optimizationDataInstance, optimizationSettings, optimizationStatistics);
-		if (optimizationSettings->proccess_node == 0) {
+		if (optimizationSettings->proccessNode == 0) {
 			SPCASolver::MulticoreSolver::denseDataSolver(B, ldB, x, m, n, optimizationSettings, optimizationStatistics2);
-			optimizationSettings->result_file=multicoreResult;
+			optimizationSettings->resultFilePath=multicoreResult;
 			InputOuputHelper::save_results(optimizationStatistics, optimizationSettings, x, n);
 			cout << "Test " << al << " " << optimizationSettings->algorithm << " "
 					<< optimizationStatistics->fval << "  " << optimizationStatistics2->fval << endl;
@@ -74,7 +74,7 @@ void test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 	/*
 	 * STORE RESULT INTO FILE
 	 */
-	optimizationSettings->result_file=resultDistributed;
+	optimizationSettings->resultFilePath=resultDistributed;
 	SPCASolver::DistributedSolver::gatherAndStoreBestResultToOutputFile(
 			optimizationDataInstance, optimizationSettings, optimizationStatistics);
 	if (iam == 0) {
@@ -89,20 +89,20 @@ int main(int argc, char *argv[]) {
 	SolverStructures::OptimizationSettings* optimizationSettings =
 			new OptimizationSettings();
 	MPI_Init(&argc, &argv);
-	MPI_Comm_rank(MPI_COMM_WORLD, &optimizationSettings->proccess_node);
+	MPI_Comm_rank(MPI_COMM_WORLD, &optimizationSettings->proccessNode);
 
-	optimizationSettings->data_file = "datasets/distributed.dat.";
-	optimizationSettings->result_file = "results/distributed_unittest.txt";
+	optimizationSettings->dataFilePath = "datasets/distributed.dat.";
+	optimizationSettings->resultFilePath = "results/distributed_unittest.txt";
 	char* multicoreDataset = "datasets/distributed.dat.all";
 	char* multicoreResult = "results/distributed_unittest_multicore.txt";
-	optimizationSettings->distributed_row_grid_file = 2;
+	optimizationSettings->distributedRowGridFile = 2;
 	optimizationSettings->verbose = false;
-	optimizationSettings->batch_size = 64;
-	optimizationSettings->starting_points = 64;
+	optimizationSettings->batchSize = 64;
+	optimizationSettings->totalStartingPoints = 64;
 	optimizationSettings->constrain = 20;
 	optimizationSettings->toll = 0.001;
 	optimizationSettings->maximumIterations = 100;
-	if (optimizationSettings->proccess_node == 0)
+	if (optimizationSettings->proccessNode == 0)
 		cout << "Double test" << endl;
 	test_solver<double>(optimizationSettings, multicoreDataset, multicoreResult);
 	MPI_Finalize();

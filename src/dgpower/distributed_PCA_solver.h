@@ -46,19 +46,19 @@ void denseDataSolver(
 	MKL_INT N = optimizationDataInstance.params.DIM_N;
 	blacs_gridinfo_(&ictxt, &nprow, &npcol, &myrow, &mycol);
 
-	if (optimizationSettings->verbose && optimizationSettings->proccess_node == 0) {
+	if (optimizationSettings->verbose && optimizationSettings->proccessNode == 0) {
 		std::cout << "Solver started " << std::endl;
 	}
 	optimizationSettings->chceckInputAndModifyIt(N);
 	optimizationStatistics->it = optimizationSettings->maximumIterations;
 	// Allocate vector for optimizationStatistics to return which point needs how much iterations
 	if (optimizationSettings->storeIterationsForAllPoints) {
-		optimizationStatistics->iters.resize(optimizationSettings->starting_points, -1);
-		optimizationStatistics->cardinalities.resize(optimizationSettings->starting_points, -1);
-		optimizationStatistics->values.resize(optimizationSettings->starting_points, -1);
+		optimizationStatistics->iters.resize(optimizationSettings->totalStartingPoints, -1);
+		optimizationStatistics->cardinalities.resize(optimizationSettings->totalStartingPoints, -1);
+		optimizationStatistics->values.resize(optimizationSettings->totalStartingPoints, -1);
 
 	}
-	const unsigned int number_of_experiments_per_batch = optimizationSettings->batch_size;
+	const unsigned int number_of_experiments_per_batch = optimizationSettings->batchSize;
 	// TODO implement on the fly and other strategies...
 
 	F* B = &optimizationDataInstance.B[0];
@@ -71,7 +71,7 @@ void denseDataSolver(
 	// create vector "z"
 	optimizationDataInstance.z_mp = numroc_(&M, &ROW_BLOCKING, &myrow, &i_zero,
 			&nprow);
-	optimizationDataInstance.z_nq = numroc_(&optimizationSettings->batch_size, &ROW_BLOCKING,
+	optimizationDataInstance.z_nq = numroc_(&optimizationSettings->batchSize, &ROW_BLOCKING,
 			&mycol, &i_zero, &npcol);
 
 	unsigned int seed = mycol * nprow + myrow;
@@ -80,16 +80,16 @@ void denseDataSolver(
 	optimizationDataInstance.Z = (F*) calloc(optimizationDataInstance.nnz_z,
 			sizeof(F));
 	MKL_INT i_tmp1 = MAX(1, optimizationDataInstance.z_mp);
-	descinit_(optimizationDataInstance.descZ, &M, &optimizationSettings->batch_size,
+	descinit_(optimizationDataInstance.descZ, &M, &optimizationSettings->batchSize,
 			&ROW_BLOCKING, &ROW_BLOCKING, &i_zero, &i_zero, &ictxt, &i_tmp1,
 			&info);
 	//=============== Create description for "V"
 	optimizationDataInstance.V_mp = numroc_(&N, &X_VECTOR_BLOCKING, &myrow,
 			&i_zero, &nprow);
-	optimizationDataInstance.V_nq = numroc_(&optimizationSettings->batch_size,
+	optimizationDataInstance.V_nq = numroc_(&optimizationSettings->batchSize,
 			&X_VECTOR_BLOCKING, &mycol, &i_zero, &npcol);
 	i_tmp1 = MAX(1, optimizationDataInstance.V_mp);
-	descinit_(optimizationDataInstance.descV, &N, &optimizationSettings->batch_size,
+	descinit_(optimizationDataInstance.descV, &N, &optimizationSettings->batchSize,
 			&X_VECTOR_BLOCKING, &X_VECTOR_BLOCKING, &i_zero, &i_zero, &ictxt,
 			&i_tmp1, &info);
 	optimizationDataInstance.nnz_v = optimizationDataInstance.V_mp
@@ -113,9 +113,9 @@ void denseDataSolver(
 	descinit_(desc_x, &N, &i_one, &X_VECTOR_BLOCKING, &X_VECTOR_BLOCKING,
 			&i_zero, &i_zero, &ictxt, &i_tmp1, &info);
 	//=============== Create vector for "norms"
-	optimizationDataInstance.norms = (F*) calloc(optimizationSettings->starting_points,
+	optimizationDataInstance.norms = (F*) calloc(optimizationSettings->totalStartingPoints,
 			sizeof(F));
-	std::vector<ValueCoordinateHolder<F> > values(optimizationSettings->starting_points);
+	std::vector<ValueCoordinateHolder<F> > values(optimizationSettings->totalStartingPoints);
 	// ======================== RUN SOLVER
 	optimizationStatistics->it = 0;
 	double fval = 0;
@@ -132,11 +132,11 @@ void denseDataSolver(
 		}
 		//Agregate FVAL
 		Xgsum2d(&ictxt, &C_CHAR_SCOPE_ALL, &C_CHAR_GENERAL_TREE_CATHER,
-				&optimizationSettings->starting_points, &i_one,
-				optimizationDataInstance.norms, &optimizationSettings->starting_points,
+				&optimizationSettings->totalStartingPoints, &i_one,
+				optimizationDataInstance.norms, &optimizationSettings->totalStartingPoints,
 				&i_negone, &i_negone);
 		double max_error = 0;
-		for (i = 0; i < optimizationSettings->starting_points; i++) {
+		for (i = 0; i < optimizationSettings->totalStartingPoints; i++) {
 			if (optimizationSettings->algorithm == SolverStructures::L0_penalized_L1_PCA
 					|| optimizationSettings->algorithm
 							== SolverStructures::L0_penalized_L2_PCA
@@ -164,7 +164,7 @@ void denseDataSolver(
 
 	optimizationStatistics->fval = -1;
 	int max_selection_idx = -1;
-	for (i = 0; i < optimizationSettings->starting_points; i++) {
+	for (i = 0; i < optimizationSettings->totalStartingPoints; i++) {
 		if (values[i].val > optimizationStatistics->fval) {
 			max_selection_idx = i;
 			optimizationStatistics->fval = values[i].val;
@@ -198,15 +198,15 @@ int loadDataFrom2DFilesAndDistribute(
 	MKL_INT X_VECTOR_BLOCKING = optimizationDataInstance.params.x_vector_blocking;
 	MKL_INT ROW_BLOCKING = optimizationDataInstance.params.row_blocking;
 	MKL_INT COL_BLOCKING = optimizationDataInstance.params.col_blocking;
-	char* filename = optimizationSettings->data_file;
-	char* outputfile = optimizationSettings->result_file;
+	char* filename = optimizationSettings->dataFilePath;
+	char* outputfile = optimizationSettings->resultFilePath;
 	MKL_INT iam, nprocs, ictxt, ictxt2, myrow, mycol, nprow, npcol;
 	MKL_INT info;
 	MKL_INT m, n, nb, mb, mp, nq, lld, lld_local;
 	int i, j, k;
 	blacs_pinfo_(&iam, &nprocs);
 	blacs_get_(&i_negone, &i_zero, &ictxt);
-	int MAP_X = optimizationSettings->distributed_row_grid_file;
+	int MAP_X = optimizationSettings->distributedRowGridFile;
 	int MAP_Y = nprocs / MAP_X;
 	if (MAP_X * MAP_Y != nprocs) {
 		if (iam == 0)
@@ -382,7 +382,7 @@ int gatherAndStoreBestResultToOutputFile(
 			&i_one, &i_one, optimizationDataInstance.descx, &zero, x_local,
 			&i_one, &i_one, desc_x_local);
 	if (iam == 0) {
-		FILE * fin = fopen(optimizationSettings->result_file, "w");
+		FILE * fin = fopen(optimizationSettings->resultFilePath, "w");
 		for (int i = 0; i < DIM_N; i++) {
 			fprintf(fin, "%f;", x_local[i]);
 		}

@@ -46,7 +46,7 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 	optimizationSettings->gpu_sm_count = dp.multiProcessorCount;
 	optimizationSettings->gpu_max_threads = dp.maxThreadsPerBlock;
 
-	InputOuputHelper::read_csv_file(B_mat, ldB, m, n, optimizationSettings->data_file);
+	InputOuputHelper::read_csv_file(B_mat, ldB, m, n, optimizationSettings->dataFilePath);
 	optimizationStatistics->n = n;
 
 	const int MEMORY_BANK_FLOAT_SIZE = MEMORY_ALIGNMENT / sizeof(F);
@@ -79,7 +79,7 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 	} else {
 		printf("CUBLAS initialized.\n");
 	}
-	optimizationSettings->gpu_use_k_selection_algorithm = false;
+	optimizationSettings->useKSelectionAlgorithmGPU = false;
 	std::vector<SolverStructures::SparsePCA_Algorithm> algorithms(8);
 	algorithms[0] = SolverStructures::L0_penalized_L1_PCA;
 	algorithms[1] = SolverStructures::L0_penalized_L2_PCA;
@@ -89,16 +89,16 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 	algorithms[5] = SolverStructures::L0_constrained_L2_PCA;
 	algorithms[6] = SolverStructures::L1_constrained_L1_PCA;
 	algorithms[7] = SolverStructures::L1_constrained_L2_PCA;
-	char* resultGPU = optimizationSettings->result_file;
+	char* resultGPU = optimizationSettings->resultFilePath;
 	for (int al = 0; al < 8; al++) {
 		optimizationSettings->algorithm = algorithms[al];
 		SPCASolver::GPUSolver::gpu_sparse_PCA_solver(handle, m, n, d_B, h_x, optimizationSettings,
 				optimizationStatistics, LD_M, LD_N);
-		optimizationSettings->result_file=resultGPU;
+		optimizationSettings->resultFilePath=resultGPU;
 		InputOuputHelper::save_results(optimizationStatistics, optimizationSettings, &h_x[0], n);
-		if (optimizationSettings->proccess_node == 0) {
+		if (optimizationSettings->proccessNode == 0) {
 			SPCASolver::MulticoreSolver::denseDataSolver(B, ldB, x, m, n, optimizationSettings, optimizationStatistics2);
-			optimizationSettings->result_file = multicoreResult;
+			optimizationSettings->resultFilePath = multicoreResult;
 			InputOuputHelper::save_results(optimizationStatistics2, optimizationSettings, x, n);
 			cout << "Test " << al << " " << optimizationSettings->algorithm << " "
 					<< optimizationStatistics->fval << "  " << optimizationStatistics2->fval << endl;
@@ -115,15 +115,15 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 int main(int argc, char *argv[]) {
 	SolverStructures::OptimizationSettings* optimizationSettings =
 			new OptimizationSettings();
-	optimizationSettings->result_file = "results/gpu_unittest.txt";
+	optimizationSettings->resultFilePath = "results/gpu_unittest.txt";
 	char* multicoreDataset = "datasets/distributed.dat.all";
-	optimizationSettings->data_file = multicoreDataset;
+	optimizationSettings->dataFilePath = multicoreDataset;
 	char* multicoreResult = "results/gpu_unittest_multicore.txt";
 	optimizationSettings->verbose = false;
-	optimizationSettings->starting_points = 1024;
-	optimizationSettings->batch_size = optimizationSettings->starting_points;
+	optimizationSettings->totalStartingPoints = 1024;
+	optimizationSettings->batchSize = optimizationSettings->totalStartingPoints;
 	optimizationSettings->onTheFlyMethod=false;
-	optimizationSettings->gpu_use_k_selection_algorithm=false;
+	optimizationSettings->useKSelectionAlgorithmGPU=false;
 	optimizationSettings->constrain = 20;
 	optimizationSettings->toll = 0.0001;
 	optimizationSettings->maximumIterations = 100;

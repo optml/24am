@@ -70,42 +70,42 @@ T& operator<<(T& stream, SPCA_Algorithm& algo) {
 //class used to set optimizationSettings to solver
 class OptimizationSettings {
 public:
-	int proccess_node; // used only for distributed solver. This is set automatically and contains rank of MPI process
-	int distributed_row_grid_file; // size of row-grid. used only for distributed solver. See documentation
+	int proccessNode; // used only for distributed solver. This is set automatically and contains rank of MPI process
+	int distributedRowGridFile; // size of row-grid. used only for distributed solver. See documentation
 	double toll; // final tollerance for solver
 	bool verbose;
-	bool hard_thresholding_using_sort; // determines if hardthresholding should be done by sorting (better for large constrain value)
+	bool useSortForHardThresholding; // determines if hardthresholding should be done by sorting (better for large constrain value)
 									  // or by using an sorted map (better for small constrain parameter)
-	bool gpu_use_k_selection_algorithm; // use approximate k-selection algorithm (Russel Steinbach, Jeffrey Blanchard, Bradley Gordon, and Toluwaloju Alabi)
+	bool useKSelectionAlgorithmGPU; // use approximate k-selection algorithm (Russel Steinbach, Jeffrey Blanchard, Bradley Gordon, and Toluwaloju Alabi)
 	bool double_precission; // determines if one should use "double" or "float"
 	double penalty; // value of penalty parameter
 	unsigned int constrain; //value of constrain parameter
-	char* data_file; //   path to source data file
-	char* result_file; // path to file where result and OptimizationStatistics will be used
+	char* dataFilePath; //   path to source data file
+	char* resultFilePath; // path to file where result and OptimizationStatistics will be used
 	int gpu_sm_count; // gpu number of Streaming Processors
 	int gpu_max_threads; // gpu - max number of threads
 	enum SPCA_Algorithm algorithm; // algorithm which should be used
-	bool get_values_for_all_points; // determines if algorithm should store values for all starting points
+	bool getValuesForAllStartingPoints; // determines if algorithm should store values for all starting points
 	bool storeIterationsForAllPoints; // determines if algorithm should store elapsed iterations for all starting points
 	int maximumIterations; //max iteration which one starting point can consume
-	int starting_points; // number of starting points which algorithm should use
-	int batch_size; // size of batch
-	unsigned int number_of_batches; // number of bathes - is computer by solver
+	int totalStartingPoints; // number of starting points which algorithm should use
+	int batchSize; // size of batch
+	unsigned int totalBatches; // number of bathes - is computer by solver
 	bool onTheFlyMethod; // on the fly generation - not applicable for distributed solver
 
 	OptimizationSettings() {
-		distributed_row_grid_file = 0;
-		proccess_node = 0;
+		distributedRowGridFile = 0;
+		proccessNode = 0;
 		toll = 0.01;
 		constrain = 10;
 		penalty = 0;
 		verbose = false;
-		starting_points = 64;
-		hard_thresholding_using_sort = false;
+		totalStartingPoints = 64;
+		useSortForHardThresholding = false;
 		onTheFlyMethod = false;
 		maximumIterations = 100;
-		get_values_for_all_points = true;
-		gpu_use_k_selection_algorithm = true;
+		getValuesForAllStartingPoints = true;
+		useKSelectionAlgorithmGPU = true;
 		storeIterationsForAllPoints = true;
 		double_precission = false;
 	}
@@ -144,13 +144,13 @@ public:
 		if (this->constrain > n) {
 			this->constrain = n;
 		}
-		if (this->batch_size == 0) {
-			this->batch_size = this->starting_points;
+		if (this->batchSize == 0) {
+			this->batchSize = this->totalStartingPoints;
 		}
-		this->number_of_batches = this->starting_points / this->batch_size;
-		if (this->number_of_batches * this->batch_size < this->starting_points)
-			this->number_of_batches++;
-		this->starting_points = this->number_of_batches * this->batch_size;
+		this->totalBatches = this->totalStartingPoints / this->batchSize;
+		if (this->totalBatches * this->batchSize < this->totalStartingPoints)
+			this->totalBatches++;
+		this->totalStartingPoints = this->totalBatches * this->batchSize;
 
 	}
 

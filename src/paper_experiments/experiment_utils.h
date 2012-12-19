@@ -15,18 +15,18 @@ void logTime(ofstream &stream, mytimer* mt, optimization_Statisticsistics* optim
 	int nnz = vector_get_nnz(&x[0], n);
 	cout << optimizationSettings->algorithm << "," << nnz << "," << m << "," << n << ","
 			<< mt->getElapsedWallClockTime() << ","
-			<< optimizationStatistics->totalTrueComputationTime << "," << optimizationSettings->batch_size << ","
+			<< optimizationStatistics->totalTrueComputationTime << "," << optimizationSettings->batchSize << ","
 			<< optimizationSettings->on_the_fly_generation
 			<< ","<<optimizationStatistics->totalThreadsUsed
-			<< ","<<optimizationSettings->starting_points
+			<< ","<<optimizationSettings->totalStartingPoints
 			<< ","<<optimizationStatistics->it
 			<< endl;
 	stream<< optimizationSettings->algorithm << "," << nnz << "," << m << "," << n << ","
 			<< mt->getElapsedWallClockTime() << ","
-			<< optimizationStatistics->totalTrueComputationTime << "," << optimizationSettings->batch_size << ","
+			<< optimizationStatistics->totalTrueComputationTime << "," << optimizationSettings->batchSize << ","
 			<< optimizationSettings->on_the_fly_generation
 			<< ","<<optimizationStatistics->totalThreadsUsed
-			<< ","<<optimizationSettings->starting_points
+			<< ","<<optimizationSettings->totalStartingPoints
 			<< ","<<optimizationStatistics->it
 			<< endl;
 }

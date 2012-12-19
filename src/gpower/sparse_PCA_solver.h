@@ -52,12 +52,12 @@ F denseDataSolver(const F * B, const int ldB, F * x, const unsigned int m,
 	F FLOATING_ZERO = 0;
 	// Allocate vector for optimizationStatistics to return which point needs how much iterations
 	if (optimizationSettings->storeIterationsForAllPoints) {
-		optimizationStatistics->iters.resize(optimizationSettings->starting_points, -1);
-		optimizationStatistics->cardinalities.resize(optimizationSettings->starting_points, -1);
-		optimizationStatistics->values.resize(optimizationSettings->starting_points, -1);
+		optimizationStatistics->iters.resize(optimizationSettings->totalStartingPoints, -1);
+		optimizationStatistics->cardinalities.resize(optimizationSettings->totalStartingPoints, -1);
+		optimizationStatistics->values.resize(optimizationSettings->totalStartingPoints, -1);
 
 	}
-	const unsigned int number_of_experiments_per_batch = optimizationSettings->batch_size;
+	const unsigned int number_of_experiments_per_batch = optimizationSettings->batchSize;
 	F * Z = (F*) calloc(m * number_of_experiments_per_batch, sizeof(F));
 	ValueCoordinateHolder<F>* vals = (ValueCoordinateHolder<F>*) calloc(
 			number_of_experiments_per_batch,
@@ -80,7 +80,7 @@ F denseDataSolver(const F * B, const int ldB, F * x, const unsigned int m,
 		optimizationSettings->storeIterationsForAllPoints = false;
 		cblas_vector_scale(n * number_of_experiments_per_batch, V,
 				FLOATING_ZERO);
-		initialize_starting_points(V, Z, optimizationSettings, optimizationStatistics,
+		initialize_totalStartingPoints(V, Z, optimizationSettings, optimizationStatistics,
 				number_of_experiments_per_batch, n, m, ldB, B, 0);
 		unsigned int generated_points = number_of_experiments_per_batch;
 		bool do_iterate = true;
@@ -121,7 +121,7 @@ F denseDataSolver(const F * B, const int ldB, F * x, const unsigned int m,
 						the_best_solution_value = vals[i].val;
 						cblas_vector_copy(n, &V[n * i], 1, x, 1);
 					}
-					if (generated_points < optimizationSettings->starting_points) {
+					if (generated_points < optimizationSettings->totalStartingPoints) {
 						vals[i].reset();
 						current_order[i] = generated_points;
 						number_of_new_points++;
@@ -156,12 +156,12 @@ F denseDataSolver(const F * B, const int ldB, F * x, const unsigned int m,
 							- start_time_of_iterations);
 	} else {
 		//====================== MAIN LOOP THROUGHT BATCHES
-		for (unsigned int batch = 0; batch < optimizationSettings->number_of_batches;
+		for (unsigned int batch = 0; batch < optimizationSettings->totalBatches;
 				batch++) {
-			unsigned int optimizationStatisticsistical_shift = batch * optimizationSettings->batch_size;
+			unsigned int optimizationStatisticsistical_shift = batch * optimizationSettings->batchSize;
 			cblas_vector_scale(n * number_of_experiments_per_batch, V,
 					FLOATING_ZERO);
-			initialize_starting_points(V, Z, optimizationSettings, optimizationStatistics,
+			initialize_totalStartingPoints(V, Z, optimizationSettings, optimizationStatistics,
 					number_of_experiments_per_batch, n, m, ldB, B,
 					optimizationStatisticsistical_shift);
 			for (unsigned int j = 0; j < number_of_experiments_per_batch; j++) {

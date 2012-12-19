@@ -122,7 +122,7 @@ F k_hard_thresholding(F * x, const unsigned int length, const unsigned int k,
 		std::vector<F>& myvector,
 		SolverStructures::OptimizationSettings* optimizationSettings) {
 	F treshHold;
-	if (optimizationSettings->hard_thresholding_using_sort) {
+	if (optimizationSettings->useSortForHardThresholding) {
 		treshHold = find_hard_treshHolding_parameter_with_sorting(x, length, k,
 				myvector);
 	} else {

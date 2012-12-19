@@ -60,7 +60,7 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 		F * x, int m, int n, SolverStructures::OptimizationSettings* optimizationSettings,
 		SolverStructures::OptimizationStatistics* optimizationStatistics, bool doMean,
 		F * means) {
-	int number_of_experiments = optimizationSettings->starting_points;
+	int number_of_experiments = optimizationSettings->totalStartingPoints;
 	ValueCoordinateHolder<F>* vals = (ValueCoordinateHolder<F>*) calloc(
 			number_of_experiments, sizeof(ValueCoordinateHolder<F> ));
 	F * Z = (F*) calloc(m * number_of_experiments, sizeof(F));
@@ -71,7 +71,7 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 	optimizationStatistics->it = optimizationSettings->maximumIterations;
 	// Allocate vector for optimizationStatistics to return which point needs how much iterations
 	if (optimizationSettings->storeIterationsForAllPoints) {
-		optimizationStatistics->iters.resize(optimizationSettings->starting_points, -1);
+		optimizationStatistics->iters.resize(optimizationSettings->totalStartingPoints, -1);
 	}
 	F FLOATING_ZERO = 0;
 	if (optimizationSettings->isConstrainedProblem()) {
@@ -284,7 +284,7 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 	}
 	double end_time_of_iterations = gettime();
 	//compute corresponding x
-	optimizationStatistics->values.resize(optimizationSettings->starting_points);
+	optimizationStatistics->values.resize(optimizationSettings->totalStartingPoints);
 	int selected_idx = 0;
 	F best_value = vals[selected_idx].val;
 	optimizationStatistics->values[0] = best_value;

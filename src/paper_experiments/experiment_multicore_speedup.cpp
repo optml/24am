@@ -41,11 +41,11 @@ void run_experiments(OptimizationSettings* optimizationSettings) {
 		generateProblem(n, m, &h_B[0], m, n);
 		optimizationSettings->maximumIterations = 100;
 		optimizationSettings->toll = 0;
-		optimizationSettings->starting_points = 1024;
+		optimizationSettings->totalStartingPoints = 1024;
 		optimizationSettings->penalty = 0.02;
 		optimizationSettings->constrain = n / 100;
 		optimizationSettings->algorithm = L0_penalized_L2_PCA;
-		optimizationSettings->batch_size = optimizationSettings->starting_points;
+		optimizationSettings->batchSize = optimizationSettings->totalStartingPoints;
 		optimizationSettings->onTheFlyMethod = false;
 		for (int i = 1; i <= 8; i=i*2) {
 			omp_set_num_threads(i);

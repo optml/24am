@@ -85,7 +85,7 @@ int test() {
 
 		optimizationSettings->maximumIterations = 10;
 		optimizationSettings->toll = 0.;
-		optimizationSettings->starting_points = 1;
+		optimizationSettings->totalStartingPoints = 1;
 
 		F fval = 0;
 		F fval2 = 0;
@@ -113,9 +113,9 @@ int test() {
 
 		for (int alg = 0; alg < 8; alg++) {
 			optimizationSettings->algorithm = algorithms[alg];
-			for (optimizationSettings->starting_points = 1; optimizationSettings->starting_points
+			for (optimizationSettings->totalStartingPoints = 1; optimizationSettings->totalStartingPoints
 					<= 128 * 8*4; //
-			optimizationSettings->starting_points = optimizationSettings->starting_points * 2+1) {
+			optimizationSettings->totalStartingPoints = optimizationSettings->totalStartingPoints * 2+1) {
 				mt->start();
 				optimizationStatistics->fval = SPCASolver::MulticoreSolver::denseDataSolver(&h_B[0], m, &x[0], m, n,
 						optimizationSettings, optimizationStatistics);
@@ -123,19 +123,19 @@ int test() {
 				printf(
 						"%d,%d,%f,%f,%d,%d,%d,%d\n",
 						alg,
-						optimizationSettings->starting_points,
+						optimizationSettings->totalStartingPoints,
 						optimizationStatistics->totalTrueComputationTime,
 						optimizationStatistics->totalTrueComputationTime / (0.0
-								+ optimizationSettings->starting_points * optimizationSettings->maximumIterations),
+								+ optimizationSettings->totalStartingPoints * optimizationSettings->maximumIterations),
 						m, n, TOTAL_THREADS, sizeof(F));
 				fprintf(
 						fin,
 						"%d,%d,%f,%f,%d,%d,%d,%d\n",
 						alg,
-						optimizationSettings->starting_points,
+						optimizationSettings->totalStartingPoints,
 						optimizationStatistics->totalTrueComputationTime,
 						optimizationStatistics->totalTrueComputationTime / (0.0
-								+ optimizationSettings->starting_points * optimizationSettings->maximumIterations),
+								+ optimizationSettings->totalStartingPoints * optimizationSettings->maximumIterations),
 						m, n, TOTAL_THREADS, sizeof(F));
 
 			}

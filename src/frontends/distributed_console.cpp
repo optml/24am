@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
 	SolverStructures::OptimizationSettings* optimizationSettings =
 			new OptimizationSettings();
 	MPI_Init(&argc, &argv);
-	MPI_Comm_rank(MPI_COMM_WORLD, &optimizationSettings->proccess_node);
+	MPI_Comm_rank(MPI_COMM_WORLD, &optimizationSettings->proccessNode);
 	int optimizationStatisticsus = parseConsoleOptions(optimizationSettings, argc, argv);
 	if (optimizationStatisticsus > 0) {
 		MPI_Finalize();

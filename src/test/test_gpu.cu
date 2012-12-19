@@ -29,7 +29,7 @@ void run_solver(OptimizationSettings* optimizationSettings) {
 //	unsigned int ldB;
 //	unsigned int m;
 //	unsigned int n;
-//	input_ouput_helper::read_csv_file(B_mat, ldB, m, n, optimizationSettings->data_file);
+//	input_ouput_helper::read_csv_file(B_mat, ldB, m, n, optimizationSettings->dataFilePath);
 //	optimization_Statisticsistics* optimizationStatistics = new optimization_Statisticsistics();
 //	optimizationStatistics->n = n;
 //	const F * B = &B_mat[0];
@@ -70,7 +70,7 @@ int runTest() {
 	OptimizationSettings* optimizationSettings = new OptimizationSettings();
 	optimizationSettings->maximumIterations = 5;
 	optimizationSettings->toll = 0.0001;
-	optimizationSettings->starting_points = 1024;
+	optimizationSettings->totalStartingPoints = 1024;
 
 	mytimer* mt = new mytimer();
 	cudaDeviceProp dp;
@@ -138,12 +138,12 @@ int runTest() {
 	//==================  CONSTRAINED
 	optimizationSettings->algorithm = L0_constrained_L1_PCA;
 
-	optimizationSettings->gpu_use_k_selection_algorithm=false;
+	optimizationSettings->useKSelectionAlgorithmGPU=false;
 	mt->start(); gpu_sparse_PCA_solver(handle,m, n, d_B, h_x, optimizationSettings, optimizationStatistics,LD_M,LD_N);mt->end();
 	nnz = vector_get_nnz(&h_x[0],n);
 	printf("FVAL:%f,nnz:%d,%f\n",optimizationStatistics->fval,nnz,mt->getElapsedWallClockTime());
 
-	optimizationSettings->gpu_use_k_selection_algorithm=true;
+	optimizationSettings->useKSelectionAlgorithmGPU=true;
 	mt->start(); gpu_sparse_PCA_solver(handle,m, n, d_B, h_x, optimizationSettings, optimizationStatistics,LD_M,LD_N);mt->end();
 	nnz = vector_get_nnz(&h_x[0],n);
 	printf("FVAL:%f,nnz:%d,%f\n",optimizationStatistics->fval,nnz,mt->getElapsedWallClockTime());

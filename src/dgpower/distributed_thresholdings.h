@@ -42,7 +42,7 @@ void perform_one_distributed_iteration_for_penalized_pca(
 
 	// z= B*V
 	pXgemm(&transNo, &transNo, &optimizationDataInstance.params.DIM_M,
-			&optimizationSettings->batch_size, &optimizationDataInstance.params.DIM_N, &one,
+			&optimizationSettings->batchSize, &optimizationDataInstance.params.DIM_N, &one,
 			&optimizationDataInstance.B[0], &i_one, &i_one,
 			optimizationDataInstance.descB, optimizationDataInstance.V, &i_one,
 			&i_one, optimizationDataInstance.descV, &zero,
@@ -56,7 +56,7 @@ void perform_one_distributed_iteration_for_penalized_pca(
 			optimizationDataInstance.Z[j] = sgn(optimizationDataInstance.Z[j]);
 		}
 	} else {
-		clear_local_vector(optimizationDataInstance.norms, optimizationSettings->batch_size);
+		clear_local_vector(optimizationDataInstance.norms, optimizationSettings->batchSize);
 		//data are stored in column order
 		for (int i = 0; i < optimizationDataInstance.z_nq; i++) {
 			F tmp = 0;
@@ -73,8 +73,8 @@ void perform_one_distributed_iteration_for_penalized_pca(
 		}
         //	sum up + distribute norms of "Z"
 		Xgsum2d(&optimizationDataInstance.params.ictxt, &C_CHAR_SCOPE_ALL,
-				&C_CHAR_GENERAL_TREE_CATHER, &optimizationSettings->batch_size, &i_one,
-				optimizationDataInstance.norms, &optimizationSettings->batch_size, &i_negone,
+				&C_CHAR_GENERAL_TREE_CATHER, &optimizationSettings->batchSize, &i_one,
+				optimizationDataInstance.norms, &optimizationSettings->batchSize, &i_negone,
 				&i_negone);
 		//normalize local "z"
 		for (int i = 0; i < optimizationDataInstance.z_nq; i++) {
@@ -97,14 +97,14 @@ void perform_one_distributed_iteration_for_penalized_pca(
 	// Multiply V = B'*z
 	//		sub(C) := alpha*op(sub(A))*op(sub(B)) + beta*sub(C),
 	pXgemm(&trans, &transNo, &optimizationDataInstance.params.DIM_N,
-			&optimizationSettings->batch_size, &optimizationDataInstance.params.DIM_M, &one,
+			&optimizationSettings->batchSize, &optimizationDataInstance.params.DIM_M, &one,
 			&optimizationDataInstance.B[0], &i_one, &i_one,
 			optimizationDataInstance.descB, optimizationDataInstance.Z, &i_one,
 			&i_one, optimizationDataInstance.descZ, &zero,
 			optimizationDataInstance.V, &i_one, &i_one,
 			optimizationDataInstance.descV);
 	// perform thresh-holding operations and compute objective values
-	clear_local_vector(optimizationDataInstance.norms, optimizationSettings->starting_points); // we use NORMS to store objective values
+	clear_local_vector(optimizationDataInstance.norms, optimizationSettings->totalStartingPoints); // we use NORMS to store objective values
 	if (optimizationSettings->algorithm == SolverStructures::L0_penalized_L1_PCA
 			|| optimizationSettings->algorithm == SolverStructures::L0_penalized_L2_PCA) {
 		for (int i = 0; i < optimizationDataInstance.V_nq; i++) {
@@ -158,7 +158,7 @@ void threshold_V_for_constrained(
 	optimizationDataInstance.initializeDataForConstrainedMethod(optimizationSettings);
 	// obtain V from all cluster into V_constr_threshold for sorting and thresholding
 	pXgeadd(&transNo, &optimizationDataInstance.params.DIM_N,
-			&optimizationSettings->batch_size, &one, optimizationDataInstance.V, &i_one,
+			&optimizationSettings->batchSize, &one, optimizationDataInstance.V, &i_one,
 			&i_one, optimizationDataInstance.descV, &zero,
 			optimizationDataInstance.V_constr_threshold, &i_one, &i_one,
 			optimizationDataInstance.descV_threshold);
@@ -176,7 +176,7 @@ void threshold_V_for_constrained(
 								optimizationDataInstance.V_constr_sort_buffer[j],
 								optimizationSettings); // x = S_w(x)
 			} else {
-				optimizationSettings->hard_thresholding_using_sort = true;
+				optimizationSettings->useSortForHardThresholding = true;
 				norm_of_x =
 						k_hard_thresholding(
 								&optimizationDataInstance.V_constr_threshold[optimizationDataInstance.params.DIM_N
@@ -193,7 +193,7 @@ void threshold_V_for_constrained(
 	}
 	//return thresholded values
 	pXgeadd(&transNo, &optimizationDataInstance.params.DIM_N,
-			&optimizationSettings->batch_size, &one,
+			&optimizationSettings->batchSize, &one,
 			optimizationDataInstance.V_constr_threshold, &i_one, &i_one,
 			optimizationDataInstance.descV_threshold, &zero,
 			optimizationDataInstance.V, &i_one, &i_one,
@@ -208,10 +208,10 @@ void perform_one_distributed_iteration_for_constrained_pca(
 		SolverStructures::OptimizationStatistics* optimizationStatistics) {
 	// standard constants used in MKL library
 	F zero = 0.0e+0, one = 1.0e+0, two = 2.0e+0, negone = -1.0e+0;
-	clear_local_vector(optimizationDataInstance.norms, optimizationSettings->batch_size); // we use NORMS to store objective values
+	clear_local_vector(optimizationDataInstance.norms, optimizationSettings->batchSize); // we use NORMS to store objective values
 	// z= B*V
 	pXgemm(&transNo, &transNo, &optimizationDataInstance.params.DIM_M,
-			&optimizationSettings->batch_size, &optimizationDataInstance.params.DIM_N, &one,
+			&optimizationSettings->batchSize, &optimizationDataInstance.params.DIM_N, &one,
 			&optimizationDataInstance.B[0], &i_one, &i_one,
 			optimizationDataInstance.descB, optimizationDataInstance.V, &i_one,
 			&i_one, optimizationDataInstance.descV, &zero,
@@ -250,7 +250,7 @@ void perform_one_distributed_iteration_for_constrained_pca(
 	// Multiply V = B'*z
 	//		sub(C) := alpha*op(sub(A))*op(sub(B)) + beta*sub(C),
 	pXgemm(&trans, &transNo, &optimizationDataInstance.params.DIM_N,
-			&optimizationSettings->batch_size, &optimizationDataInstance.params.DIM_M, &one,
+			&optimizationSettings->batchSize, &optimizationDataInstance.params.DIM_M, &one,
 			&optimizationDataInstance.B[0], &i_one, &i_one,
 			optimizationDataInstance.descB, optimizationDataInstance.Z, &i_one,
 			&i_one, optimizationDataInstance.descZ, &zero,

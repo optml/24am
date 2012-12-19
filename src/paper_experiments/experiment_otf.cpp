@@ -41,22 +41,22 @@ void run_experiments(OptimizationSettings* optimizationSettings) {
 		generateProblem(n, m, &h_B[0], m, n);
 		optimizationSettings->maximumIterations = 100;
 		optimizationSettings->toll = 0.01;
-		optimizationSettings->starting_points = 1024;
+		optimizationSettings->totalStartingPoints = 1024;
 		optimizationSettings->penalty=0.02;
 		optimizationSettings->constrain=n/100;
 		optimizationSettings->algorithm=L0_penalized_L2_PCA;
 		for (int strategy = 0; strategy < 3; strategy++) {
 			switch (strategy) {
 			case 0:
-				optimizationSettings->batch_size = 64;
+				optimizationSettings->batchSize = 64;
 				optimizationSettings->onTheFlyMethod = false;
 				break;
 			case 1:
-				optimizationSettings->batch_size = 64;
+				optimizationSettings->batchSize = 64;
 				optimizationSettings->onTheFlyMethod = true;
 				break;
 			case 2:
-				optimizationSettings->batch_size = optimizationSettings->starting_points;
+				optimizationSettings->batchSize = optimizationSettings->totalStartingPoints;
 				optimizationSettings->onTheFlyMethod = false;
 				break;
 			default:

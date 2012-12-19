@@ -59,19 +59,19 @@ int parseConsoleOptions(SolverStructures::OptimizationSettings* optimizationSett
 	 * m - penalty parameter
 	 * x - x-dimension of distributed files (FOR DISTRIBUTED METHOD ONLY)
 	 */
-	bool data_file = false;
-	bool result_file = false;
+	bool dataFilePath = false;
+	bool resultFilePath = false;
 	bool algorithm = false;
 	while ((c = getopt(argc, argv, "d:f:r:i:t:s:b:u:v:p:a:n:m:x:")) != -1) {
 		switch (c) {
 		case 'x':
-			optimizationSettings->distributed_row_grid_file = atoi(optarg);
+			optimizationSettings->distributedRowGridFile = atoi(optarg);
 			break;
 		case 's':
-			optimizationSettings->starting_points = atoi(optarg);
+			optimizationSettings->totalStartingPoints = atoi(optarg);
 			break;
 		case 'b':
-			optimizationSettings->batch_size = atoi(optarg);
+			optimizationSettings->batchSize = atoi(optarg);
 			break;
 		case 'n':
 			optimizationSettings->constrain = atoi(optarg);
@@ -83,12 +83,12 @@ int parseConsoleOptions(SolverStructures::OptimizationSettings* optimizationSett
 			optimizationSettings->maximumIterations = atoi(optarg);
 			break;
 		case 'd':
-			optimizationSettings->data_file = optarg;
-			data_file = true;
+			optimizationSettings->dataFilePath = optarg;
+			dataFilePath = true;
 			break;
 		case 'r':
-			optimizationSettings->result_file = optarg;
-			result_file = true;
+			optimizationSettings->resultFilePath = optarg;
+			resultFilePath = true;
 			break;
 		case 'u':
 			optimizationSettings->onTheFlyMethod= atoi(optarg);
@@ -143,14 +143,14 @@ int parseConsoleOptions(SolverStructures::OptimizationSettings* optimizationSett
 		}
 	}
 
-	if (!data_file || !result_file || !algorithm) {
-		if (optimizationSettings->proccess_node==0)
+	if (!dataFilePath || !resultFilePath || !algorithm) {
+		if (optimizationSettings->proccessNode==0)
 			print_usage();
 		return 1;
 	}
 
-	if (optimizationSettings->batch_size > optimizationSettings->starting_points) {
-		optimizationSettings->starting_points = optimizationSettings->batch_size;
+	if (optimizationSettings->batchSize > optimizationSettings->totalStartingPoints) {
+		optimizationSettings->totalStartingPoints = optimizationSettings->batchSize;
 	}
 	return 0;
 }

@@ -27,7 +27,7 @@ void load_data_and_run_solver(OptimizationSettings* optimizationSettings) {
 	std::vector<F> B_mat;
 	unsigned int ldB, m, n;
 	// load data from CSV file
-	InputOuputHelper::readCSVFile(B_mat, ldB, m, n, optimizationSettings->data_file);
+	InputOuputHelper::readCSVFile(B_mat, ldB, m, n, optimizationSettings->dataFilePath);
 	OptimizationStatistics* optimizationStatistics = new OptimizationStatistics();
 	optimizationStatistics->n = n;
 	std::vector<F> x_vec(n, 0);

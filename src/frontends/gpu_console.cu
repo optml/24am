@@ -37,7 +37,7 @@ int load_data_and_run_solver(SolverStructures::OptimizationSettings* optimizatio
 	unsigned int m;
 	unsigned int n;
 	std::vector<F> B_mat;
-	InputOuputHelper::readCSVFile(B_mat, ldB, m, n, optimizationSettings->data_file);
+	InputOuputHelper::readCSVFile(B_mat, ldB, m, n, optimizationSettings->dataFilePath);
 	optimizationStatistics->n = n;
 
 	const int MEMORY_BANK_FLOAT_SIZE = MEMORY_ALIGNMENT / sizeof(F);
@@ -71,8 +71,8 @@ int load_data_and_run_solver(SolverStructures::OptimizationSettings* optimizatio
 		printf("CUBLAS initialized.\n");
 	}
 //FIXME
-	optimizationSettings->gpu_use_k_selection_algorithm = true;
-	optimizationSettings->gpu_use_k_selection_algorithm = false;
+	optimizationSettings->useKSelectionAlgorithmGPU = true;
+	optimizationSettings->useKSelectionAlgorithmGPU = false;
 	SPCASolver::GPUSolver::gpu_sparse_PCA_solver(handle, m, n, d_B, h_x, optimizationSettings, optimizationStatistics,
 			LD_M, LD_N);
 	mt->end();

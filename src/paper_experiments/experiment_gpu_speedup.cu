@@ -77,16 +77,16 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings) {
 		optimizationSettings->constrain = n / 100;
 		optimizationSettings->algorithm = L1_penalized_L1_PCA;
 		optimizationSettings->onTheFlyMethod = false;
-		optimizationSettings->gpu_use_k_selection_algorithm = false;
+		optimizationSettings->useKSelectionAlgorithmGPU = false;
 		optimizationStatistics->n = n;
 		// move data to DEVICE
 		thrust::device_vector<F> d_B = h_B;
 		// allocate vector for solution
 		thrust::host_vector<F> h_x(n, 0);
 
-		for (optimizationSettings->starting_points = 1; optimizationSettings->starting_points <= 256;
-				optimizationSettings->starting_points = optimizationSettings->starting_points * 16) {
-		optimizationSettings->batch_size = optimizationSettings->starting_points;
+		for (optimizationSettings->totalStartingPoints = 1; optimizationSettings->totalStartingPoints <= 256;
+				optimizationSettings->totalStartingPoints = optimizationSettings->totalStartingPoints * 16) {
+		optimizationSettings->batchSize = optimizationSettings->totalStartingPoints;
 			mt->start();
 			SPCASolver::GPUSolver::gpu_sparse_PCA_solver(handle, m, n, d_B, h_x, optimizationSettings,
 					optimizationStatistics, LD_M, LD_N);
@@ -120,12 +120,12 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings) {
 int main(int argc, char *argv[]) {
 	SolverStructures::OptimizationSettings* optimizationSettings =
 			new OptimizationSettings();
-	optimizationSettings->result_file = "results/gpu_unittest.txt";
+	optimizationSettings->resultFilePath = "results/gpu_unittest.txt";
 	optimizationSettings->verbose = false;
-	optimizationSettings->starting_points = 1024;
-	optimizationSettings->batch_size = optimizationSettings->starting_points;
+	optimizationSettings->totalStartingPoints = 1024;
+	optimizationSettings->batchSize = optimizationSettings->totalStartingPoints;
 	optimizationSettings->onTheFlyMethod = false;
-	optimizationSettings->gpu_use_k_selection_algorithm = false;
+	optimizationSettings->useKSelectionAlgorithmGPU = false;
 	optimizationSettings->constrain = 20;
 	optimizationSettings->toll = 0.0001;
 	optimizationSettings->max_it = 100;

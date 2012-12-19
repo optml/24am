@@ -100,7 +100,7 @@ char* get_file_modified_name(const char* base, string suffix) {
 void save_OptimizationStatistics(SolverStructures::OptimizationStatistics* optimizationStatistics,
 		SolverStructures::OptimizationSettings * optimizationSettings){
 	ofstream statFile;
-		statFile.open(get_file_modified_name(optimizationSettings->result_file, "optimizationStatistics"));
+		statFile.open(get_file_modified_name(optimizationSettings->resultFilePath, "optimizationStatistics"));
 		statFile << "Solver options " << '\n';
 		statFile << "Algorithm: " << optimizationSettings->algorithm << '\n';
 		if (optimizationSettings->isConstrainedProblem()){
@@ -109,8 +109,8 @@ void save_OptimizationStatistics(SolverStructures::OptimizationStatistics* optim
 			statFile << "Penalty parameter: " << optimizationSettings->penalty<< '\n';
 		}
 		statFile << "Max iterations per starting point: " << optimizationSettings->maximumIterations<< '\n';
-		statFile << "Starting points: " << optimizationSettings->starting_points<< '\n';
-		statFile << "Batch size: " << optimizationSettings->batch_size<< '\n';
+		statFile << "Starting points: " << optimizationSettings->totalStartingPoints<< '\n';
+		statFile << "Batch size: " << optimizationSettings->batchSize<< '\n';
 		statFile << "Batching strategy (OTF): " << optimizationSettings->onTheFlyMethod<< '\n';
 		statFile << "Double precision: " << optimizationSettings->double_precission<< '\n';
 		statFile << "Toll: " << optimizationSettings->toll<< '\n';
@@ -125,7 +125,7 @@ void save_OptimizationStatistics(SolverStructures::OptimizationStatistics* optim
 		statFile << '\n'<< "Result " << '\n';
 		statFile << "Objective value: " << setprecision(16)<< optimizationStatistics->fval<< '\n';
 		statFile << "Elapsed it (total): " << optimizationStatistics->it<< '\n';
-		statFile << "Average it (per starting point): "<< setprecision(16) << optimizationStatistics->it*optimizationSettings->batch_size/(0.0+optimizationSettings->starting_points)<< '\n';
+		statFile << "Average it (per starting point): "<< setprecision(16) << optimizationStatistics->it*optimizationSettings->batchSize/(0.0+optimizationSettings->totalStartingPoints)<< '\n';
 
 
 		statFile.close();
@@ -135,14 +135,14 @@ void save_OptimizationStatistics(SolverStructures::OptimizationStatistics* optim
 template<typename F>
 void save_results(SolverStructures::OptimizationStatistics* optimizationStatistics,
 		SolverStructures::OptimizationSettings * optimizationSettings, const F* x, unsigned int lenght) {
-	ofstream result_file;
-	result_file.open(get_file_modified_name(optimizationSettings->result_file, "x"));
+	ofstream resultFilePath;
+	resultFilePath.open(get_file_modified_name(optimizationSettings->resultFilePath, "x"));
 	for (unsigned int i = 0; i < lenght; i++) {
 		if (x[i] != 0) {
-			result_file << i << "," << setprecision(16) << x[i] << '\n';
+			resultFilePath << i << "," << setprecision(16) << x[i] << '\n';
 		}
 	}
-	result_file.close();
+	resultFilePath.close();
 }
 
 }

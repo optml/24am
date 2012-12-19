@@ -438,7 +438,7 @@ void perform_hard_and_soft_thresholdingNEW(thrust::device_vector<float> &d_V,
 	//			make_zip_iterator(make_tuple(dataToSort.begin(), indices_begin)),
 	//			make_zip_iterator(make_tuple(dataToSort.end(), indices_end)),
 	//			comparator_abs_val_for_tuple_with_sequence(LDN));// maybe use stable_sort ???
-	for (unsigned int i = 0; i < optimizationSettings->starting_points; i++) {
+	for (unsigned int i = 0; i < optimizationSettings->totalStartingPoints; i++) {
 		// copy data to x_for_sort
 		if (i > 0)
 			thrust::advance(it_begin, LDN);
@@ -481,7 +481,7 @@ void perform_hard_and_soft_thresholdingNEW(thrust::device_vector<double> &d_V,
 	//			make_zip_iterator(make_tuple(dataToSort.begin(), indices_begin)),
 	//			make_zip_iterator(make_tuple(dataToSort.end(), indices_end)),
 	//			comparator_abs_val_for_tuple_with_sequence(LDN));// maybe use stable_sort ???
-	for (unsigned int i = 0; i < optimizationSettings->starting_points; i++) {
+	for (unsigned int i = 0; i < optimizationSettings->totalStartingPoints; i++) {
 		// copy data to x_for_sort
 		if (i > 0)
 			thrust::advance(it_begin, LDN);
@@ -511,7 +511,7 @@ void perform_hard_and_soft_thresholding(thrust::device_vector<F> &d_V,
 		const unsigned int LDN) {
 
 	if (optimizationSettings->isL1ConstrainedProblem()
-			|| !optimizationSettings->gpu_use_k_selection_algorithm) {
+			|| !optimizationSettings->useKSelectionAlgorithmGPU) {
 		perform_hard_and_soft_thresholding_with_sorting(d_V, optimizationSettings, n,
 				d_x_for_sort, h_x, LDN);
 	} else {
@@ -536,7 +536,7 @@ void perform_hard_thresholding_with_k_selection(
 		thrust::host_vector<float>& h_x, const unsigned int LDN) {
 	thrust::device_vector<float>::iterator it_begin = d_V.begin();
 	float * V = thrust::raw_pointer_cast(&d_V[0]);
-	for (unsigned int i = 0; i < optimizationSettings->starting_points; i++) {
+	for (unsigned int i = 0; i < optimizationSettings->totalStartingPoints; i++) {
 		if (i > 0)
 			thrust::advance(it_begin, LDN);
 		thrust::device_vector<float>::iterator it_end = it_begin + n;
@@ -554,7 +554,7 @@ void perform_hard_thresholding_with_k_selection(
 		thrust::host_vector<double>& h_x, const unsigned int LDN) {
 	thrust::device_vector<double>::iterator it_begin = d_V.begin();
 	double * V = thrust::raw_pointer_cast(&d_V[0]);
-	for (unsigned int i = 0; i < optimizationSettings->starting_points; i++) {
+	for (unsigned int i = 0; i < optimizationSettings->totalStartingPoints; i++) {
 		if (i > 0)
 			thrust::advance(it_begin, LDN);
 		thrust::device_vector<double>::iterator it_end = it_begin + n;
@@ -581,7 +581,7 @@ void perform_hard_and_soft_thresholding_with_sorting(
 		const unsigned int n, thrust::device_vector<float>& d_x_for_sort,
 		thrust::host_vector<float>& h_x, const unsigned int LDN) {
 	thrust::device_vector<float>::iterator it_begin = d_V.begin();
-	for (unsigned int i = 0; i < optimizationSettings->starting_points; i++) {
+	for (unsigned int i = 0; i < optimizationSettings->totalStartingPoints; i++) {
 		// copy data to x_for_sort
 		if (i > 0)
 			thrust::advance(it_begin, LDN);
@@ -610,7 +610,7 @@ void perform_hard_and_soft_thresholding_with_sorting(
 		const unsigned int n, thrust::device_vector<double>& d_x_for_sort,
 		thrust::host_vector<double>& h_x, const unsigned int LDN) {
 	thrust::device_vector<double>::iterator it_begin = d_V.begin();
-	for (unsigned int i = 0; i < optimizationSettings->starting_points; i++) {
+	for (unsigned int i = 0; i < optimizationSettings->totalStartingPoints; i++) {
 		// copy data to x_for_sort
 		if (i > 0)
 			thrust::advance(it_begin, LDN);
@@ -648,7 +648,7 @@ void perform_hard_and_soft_thresholding_for_penalized(
 	thrust::device_vector<double>::iterator it_begin = d_V.begin();
 	if (optimizationSettings->isL1PenalizedProblem()) {
 		//------------L1 PENALIZED
-		for (unsigned int i = 0; i < optimizationSettings->starting_points; i++) {
+		for (unsigned int i = 0; i < optimizationSettings->totalStartingPoints; i++) {
 			if (i > 0)
 				thrust::advance(it_begin, LDN);
 
@@ -662,7 +662,7 @@ void perform_hard_and_soft_thresholding_for_penalized(
 				gpu_l1_penalized_tresholing<double> (optimizationSettings->penalty));
 	} else {
 		//------------L0 PENALIZED
-		for (unsigned int i = 0; i < optimizationSettings->starting_points; i++) {
+		for (unsigned int i = 0; i < optimizationSettings->totalStartingPoints; i++) {
 			if (i > 0)
 				thrust::advance(it_begin, LDN);
 			thrust::device_vector<double>::iterator it_end = it_begin + n;
@@ -683,7 +683,7 @@ void perform_hard_and_soft_thresholding_for_penalized(
 	thrust::device_vector<float>::iterator it_begin = d_V.begin();
 	if (optimizationSettings->isL1PenalizedProblem()) {
 		//------------L1 PENALIZED
-		for (unsigned int i = 0; i < optimizationSettings->starting_points; i++) {
+		for (unsigned int i = 0; i < optimizationSettings->totalStartingPoints; i++) {
 			if (i > 0)
 				thrust::advance(it_begin, LDN);
 			thrust::device_vector<float>::iterator it_end = it_begin + n;
@@ -696,7 +696,7 @@ void perform_hard_and_soft_thresholding_for_penalized(
 				gpu_l1_penalized_tresholing<float> (optimizationSettings->penalty));
 	} else {
 		//------------L0 PENALIZED
-		for (unsigned int i = 0; i < optimizationSettings->starting_points; i++) {
+		for (unsigned int i = 0; i < optimizationSettings->totalStartingPoints; i++) {
 			if (i > 0)
 				thrust::advance(it_begin, LDN);
 			thrust::device_vector<float>::iterator it_end = it_begin + n;

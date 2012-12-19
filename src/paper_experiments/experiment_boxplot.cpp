@@ -42,10 +42,10 @@ void run_experiments(OptimizationSettings* optimizationSettings) {
 			optimizationSettings->constrain = optimizationSettings->constrain * 2) {
 		optimizationSettings->maximumIterations = 20;
 		optimizationSettings->toll = 0.000001;
-		optimizationSettings->starting_points = 1000;
-		optimizationSettings->batch_size = optimizationSettings->starting_points;
+		optimizationSettings->totalStartingPoints = 1000;
+		optimizationSettings->batchSize = optimizationSettings->totalStartingPoints;
 		optimizationSettings->algorithm = L0_constrained_L2_PCA;
-		optimizationSettings->get_values_for_all_points = true;
+		optimizationSettings->getValuesForAllStartingPoints = true;
 
 		omp_set_num_threads(1);
 		init_random_seeds();
@@ -245,8 +245,8 @@ int main(int argc, char *argv[]) {
 //
 //		optimizationSettings->max_it = 200;
 //		optimizationSettings->toll = 0.000001;
-//		optimizationSettings->starting_points = 1000;
-//				optimizationSettings->batch_size=optimizationSettings->starting_points;
+//		optimizationSettings->totalStartingPoints = 1000;
+//				optimizationSettings->batchSize=optimizationSettings->totalStartingPoints;
 //
 //		F fval = 0;
 //		F fval2 = 0;
@@ -310,10 +310,10 @@ int main(int argc, char *argv[]) {
 //				fprintf(fin, "%f,%d,%d,%d,%d,%f,%d", optimizationStatistics->fval, optimizationStatistics->it, alg,
 //						m, n, optimizationSettings->constrain + 0.0 + optimizationSettings->penalty,
 //						nnz);
-//				for (int i = 0; i < optimizationSettings->starting_points; i++) {
+//				for (int i = 0; i < optimizationSettings->totalStartingPoints; i++) {
 //					fprintf(fin, ",%f", optimizationStatistics->values[i]);
 //				}
-//				for (int i = 0; i < optimizationSettings->starting_points; i++) {
+//				for (int i = 0; i < optimizationSettings->totalStartingPoints; i++) {
 //					fprintf(fin, ",%d", optimizationStatistics->cardinalities[i]);
 //				}
 //				fprintf(fin, "\n");

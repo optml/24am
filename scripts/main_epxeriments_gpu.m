@@ -7,7 +7,7 @@ Data = importdata('gpu_test2.log');
 % printf("%d,%d,%1.5f,%d,%f,%f,%d,%d,%d,%d,%d\n", optimizationSettings->algorithm, GPU,
 %			optimizationStatistics->fval, nnz, mt->getElapsedCPUTime(),
 %			mt->getElapsedWallClockTime(), optimizationStatistics->it, n, m,
-%			optimizationSettings->starting_points,sizeofvariable);
+%			optimizationSettings->totalStartingPoints,sizeofvariable);
  
  
  
@@ -17,9 +17,9 @@ ALGS=[2,6];
  
 lw=2
 SIZES=unique(Data(:,8));
-STARTING_POINTS=unique(Data(:,10))
- STARTING_POINTS=STARTING_POINTS(1:2:end)
- STARTING_POINTS=STARTING_POINTS(1:2:end)
+totalStartingPoints=unique(Data(:,10))
+ totalStartingPoints=totalStartingPoints(1:2:end)
+ totalStartingPoints=totalStartingPoints(1:2:end)
 Schema=['r<-';'bh-';'ks-'];
 for alg=2:4:2
    
@@ -30,8 +30,8 @@ for alg=2:4:2
      figure(2)
      set(gca,'FontSize',25)
      hold off
-    for spI=1:length(STARTING_POINTS)
-        sp=STARTING_POINTS(spI);
+    for spI=1:length(totalStartingPoints)
+        sp=totalStartingPoints(spI);
    
      
        

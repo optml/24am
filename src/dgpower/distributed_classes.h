@@ -99,12 +99,12 @@ public:
 		if (!this->isDataForConstrainedMethodInitialized) {
 			this->V_tr_mp = numroc_(&this->params.DIM_N, &this->params.DIM_N,
 					&this->params.myrow, &i_zero, &this->params.nprow);
-			this->V_tr_nq = numroc_(&optimizationSettings->batch_size, &i_one,
+			this->V_tr_nq = numroc_(&optimizationSettings->batchSize, &i_one,
 					&this->params.mycol, &i_zero, &this->params.npcol);
 			MKL_INT i_tmp1 = MAX(1, this->V_tr_mp);
 			MKL_INT info;
 			descinit_(this->descV_threshold, &this->params.DIM_N,
-					&optimizationSettings->batch_size, &this->params.DIM_N, &i_one, &i_zero,
+					&optimizationSettings->batchSize, &this->params.DIM_N, &i_one, &i_zero,
 					&i_zero, &this->params.ictxt, &i_tmp1, &info);
 			this->nnz_v_tr = this->V_tr_mp * this->V_tr_nq;
 			this->V_constr_threshold = (F*) calloc(this->nnz_v_tr, sizeof(F));

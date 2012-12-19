@@ -48,7 +48,7 @@ void getSignleStartingPoint(F* V, F* Z,
 
 //initialize starting points
 template<typename F>
-void initialize_starting_points(F* V, F* Z,
+void initialize_totalStartingPoints(F* V, F* Z,
 		SolverStructures::OptimizationSettings* optimizationSettings,
 		SolverStructures::OptimizationStatistics* optimizationStatistics,
 		const unsigned int number_of_experiments_per_batch,
