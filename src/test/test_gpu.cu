@@ -68,7 +68,7 @@ template<typename F>
 int runTest() {
 	OptimizationStatisticsistics* optimizationStatistics = new OptimizationStatisticsistics();
 	OptimizationSettings* optimizationSettings = new OptimizationSettings();
-	optimizationSettings->max_it = 5;
+	optimizationSettings->maximumIterations = 5;
 	optimizationSettings->toll = 0.0001;
 	optimizationSettings->starting_points = 1024;
 

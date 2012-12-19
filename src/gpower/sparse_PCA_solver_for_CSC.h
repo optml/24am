@@ -68,7 +68,7 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 	F * ZZ = (F*) calloc(m * number_of_experiments, sizeof(F));
 	F * VV = (F*) calloc(n * number_of_experiments, sizeof(F));
 
-	optimizationStatistics->it = optimizationSettings->max_it;
+	optimizationStatistics->it = optimizationSettings->maximumIterations;
 	// Allocate vector for optimizationStatistics to return which point needs how much iterations
 	if (optimizationSettings->storeIterationsForAllPoints) {
 		optimizationStatistics->iters.resize(optimizationSettings->starting_points, -1);
@@ -134,7 +134,7 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 	}
 
 	double start_time_of_iterations = gettime();
-	for (unsigned int it = 0; it < optimizationSettings->max_it; it++) {
+	for (unsigned int it = 0; it < optimizationSettings->maximumIterations; it++) {
 		for (unsigned int tmp = 0; tmp < TOTAL_THREADS; tmp++) {
 			max_errors[tmp] = 0;
 		}

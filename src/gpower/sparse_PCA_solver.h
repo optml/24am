@@ -48,7 +48,7 @@ F denseDataSolver(const F * B, const int ldB, F * x, const unsigned int m,
 		cout << "Solver started " << endl;
 	}
 	optimizationSettings->chceckInputAndModifyIt(n);
-	optimizationStatistics->it = optimizationSettings->max_it;
+	optimizationStatistics->it = optimizationSettings->maximumIterations;
 	F FLOATING_ZERO = 0;
 	// Allocate vector for optimizationStatistics to return which point needs how much iterations
 	if (optimizationSettings->storeIterationsForAllPoints) {
@@ -115,7 +115,7 @@ F denseDataSolver(const F * B, const int ldB, F * x, const unsigned int m,
 				current_iteration[i]++;
 				if (termination_criteria(vals[i].current_error,
 						current_iteration[i], optimizationSettings)
-						|| current_iteration[i] >= optimizationSettings->max_it) {
+						|| current_iteration[i] >= optimizationSettings->maximumIterations) {
 					// this point reached it convergence criterion, optimizationStatistics again....
 					if (the_best_solution_value < vals[i].val) {
 						the_best_solution_value = vals[i].val;
@@ -168,7 +168,7 @@ F denseDataSolver(const F * B, const int ldB, F * x, const unsigned int m,
 				vals[j].reset();
 			}
 			double start_time_of_iterations = gettime();
-			for (unsigned int it = 0; it < optimizationSettings->max_it; it++) {
+			for (unsigned int it = 0; it < optimizationSettings->maximumIterations; it++) {
 				total_iterations++;
 				for (unsigned int tmp = 0; tmp < TOTAL_THREADS; tmp++) {
 					max_errors[tmp] = 0;

@@ -83,7 +83,7 @@ int test() {
 
 		OptimizationSettings* optimizationSettings = new OptimizationSettings();
 
-		optimizationSettings->max_it = 10;
+		optimizationSettings->maximumIterations = 10;
 		optimizationSettings->toll = 0.;
 		optimizationSettings->starting_points = 1;
 
@@ -126,7 +126,7 @@ int test() {
 						optimizationSettings->starting_points,
 						optimizationStatistics->true_computation_time,
 						optimizationStatistics->true_computation_time / (0.0
-								+ optimizationSettings->starting_points * optimizationSettings->max_it),
+								+ optimizationSettings->starting_points * optimizationSettings->maximumIterations),
 						m, n, TOTAL_THREADS, sizeof(F));
 				fprintf(
 						fin,
@@ -135,7 +135,7 @@ int test() {
 						optimizationSettings->starting_points,
 						optimizationStatistics->true_computation_time,
 						optimizationStatistics->true_computation_time / (0.0
-								+ optimizationSettings->starting_points * optimizationSettings->max_it),
+								+ optimizationSettings->starting_points * optimizationSettings->maximumIterations),
 						m, n, TOTAL_THREADS, sizeof(F));
 
 			}

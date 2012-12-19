@@ -40,7 +40,7 @@ void run_experiments(OptimizationSettings* optimizationSettings) {
 
 	for (optimizationSettings->constrain = 1; optimizationSettings->constrain <= n;
 			optimizationSettings->constrain = optimizationSettings->constrain * 2) {
-		optimizationSettings->max_it = 20;
+		optimizationSettings->maximumIterations = 20;
 		optimizationSettings->toll = 0.000001;
 		optimizationSettings->starting_points = 1000;
 		optimizationSettings->batch_size = optimizationSettings->starting_points;

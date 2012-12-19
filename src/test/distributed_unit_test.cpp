@@ -48,7 +48,7 @@ void test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 	std::vector<F> x_vec(n, 0);
 	F * x = &x_vec[0];
 
-	std::vector<SolverStructures::SparsePCA_Algorithm> algorithms(8);
+	std::vector<SolverStructures::SPCA_Algorithm> algorithms(8);
 	algorithms[0] = SolverStructures::L0_penalized_L1_PCA;
 	algorithms[1] = SolverStructures::L0_penalized_L2_PCA;
 	algorithms[2] = SolverStructures::L1_penalized_L1_PCA;
@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
 	optimizationSettings->starting_points = 64;
 	optimizationSettings->constrain = 20;
 	optimizationSettings->toll = 0.001;
-	optimizationSettings->max_it = 100;
+	optimizationSettings->maximumIterations = 100;
 	if (optimizationSettings->proccess_node == 0)
 		cout << "Double test" << endl;
 	test_solver<double>(optimizationSettings, multicoreDataset, multicoreResult);

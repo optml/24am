@@ -99,36 +99,36 @@ char* get_file_modified_name(const char* base, string suffix) {
 
 void save_optimizationStatisticsistics(SolverStructures::OptimizationStatisticsistics* optimizationStatistics,
 		SolverStructures::OptimizationSettings * optimizationSettings){
-	ofstream optimizationStatistics_file;
-		optimizationStatistics_file.open(get_file_modified_name(optimizationSettings->result_file, "optimizationStatistics"));
-		optimizationStatistics_file << "Solver options " << '\n';
-		optimizationStatistics_file << "Algorithm: " << optimizationSettings->algorithm << '\n';
+	ofstream statFile;
+		statFile.open(get_file_modified_name(optimizationSettings->result_file, "optimizationStatistics"));
+		statFile << "Solver options " << '\n';
+		statFile << "Algorithm: " << optimizationSettings->algorithm << '\n';
 		if (optimizationSettings->isConstrainedProblem()){
-			optimizationStatistics_file << "Constraint parameter: " << optimizationSettings->constrain << '\n';
+			statFile << "Constraint parameter: " << optimizationSettings->constrain << '\n';
 		}else{
-			optimizationStatistics_file << "Penalty parameter: " << optimizationSettings->penalty<< '\n';
+			statFile << "Penalty parameter: " << optimizationSettings->penalty<< '\n';
 		}
-		optimizationStatistics_file << "Max iterations per starting point: " << optimizationSettings->max_it<< '\n';
-		optimizationStatistics_file << "Starting points: " << optimizationSettings->starting_points<< '\n';
-		optimizationStatistics_file << "Batch size: " << optimizationSettings->batch_size<< '\n';
-		optimizationStatistics_file << "Batching strategy (OTF): " << optimizationSettings->onTheFlyMethod<< '\n';
-		optimizationStatistics_file << "Double precision: " << optimizationSettings->double_precission<< '\n';
-		optimizationStatistics_file << "Toll: " << optimizationSettings->toll<< '\n';
+		statFile << "Max iterations per starting point: " << optimizationSettings->maximumIterations<< '\n';
+		statFile << "Starting points: " << optimizationSettings->starting_points<< '\n';
+		statFile << "Batch size: " << optimizationSettings->batch_size<< '\n';
+		statFile << "Batching strategy (OTF): " << optimizationSettings->onTheFlyMethod<< '\n';
+		statFile << "Double precision: " << optimizationSettings->double_precission<< '\n';
+		statFile << "Toll: " << optimizationSettings->toll<< '\n';
 	#ifdef DEBUG
-		optimizationStatistics_file << "DEBUG MODE: " << 1<< '\n';
+		statFile << "DEBUG MODE: " << 1<< '\n';
 	#endif
 
-		optimizationStatistics_file << '\n'<< "Timing " << '\n';
-		optimizationStatistics_file << "Total computational time: "<< setprecision(16) << optimizationStatistics->true_computation_time<< " sec"<< '\n';
-		optimizationStatistics_file << "Total elapsed time: "<< setprecision(16) << optimizationStatistics->total_elapsed_time<< " sec"<<'\n';
+		statFile << '\n'<< "Timing " << '\n';
+		statFile << "Total computational time: "<< setprecision(16) << optimizationStatistics->true_computation_time<< " sec"<< '\n';
+		statFile << "Total elapsed time: "<< setprecision(16) << optimizationStatistics->total_elapsed_time<< " sec"<<'\n';
 
-		optimizationStatistics_file << '\n'<< "Result " << '\n';
-		optimizationStatistics_file << "Objective value: " << setprecision(16)<< optimizationStatistics->fval<< '\n';
-		optimizationStatistics_file << "Elapsed it (total): " << optimizationStatistics->it<< '\n';
-		optimizationStatistics_file << "Average it (per starting point): "<< setprecision(16) << optimizationStatistics->it*optimizationSettings->batch_size/(0.0+optimizationSettings->starting_points)<< '\n';
+		statFile << '\n'<< "Result " << '\n';
+		statFile << "Objective value: " << setprecision(16)<< optimizationStatistics->fval<< '\n';
+		statFile << "Elapsed it (total): " << optimizationStatistics->it<< '\n';
+		statFile << "Average it (per starting point): "<< setprecision(16) << optimizationStatistics->it*optimizationSettings->batch_size/(0.0+optimizationSettings->starting_points)<< '\n';
 
 
-		optimizationStatistics_file.close();
+		statFile.close();
 }
 
 

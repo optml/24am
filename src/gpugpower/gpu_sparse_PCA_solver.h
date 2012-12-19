@@ -88,7 +88,7 @@ int denseDataSolver(cublasHandle_t &handle, const unsigned int m,
 	F ONE = 1;
 	F norm_of_z = 0;
 	F norm_of_x = 0;
-	optimizationStatistics->it = optimizationSettings->max_it;
+	optimizationStatistics->it = optimizationSettings->maximumIterations;
 	F error = 0;
 	ValueCoordinateHolder<F>* vals = (ValueCoordinateHolder<F>*) calloc(
 			optimizationSettings->starting_points, sizeof(ValueCoordinateHolder<F> ));
@@ -99,7 +99,7 @@ int denseDataSolver(cublasHandle_t &handle, const unsigned int m,
 	cudaEventCreate(&stop);
 	cudaEventRecord(start, 0);
 	/* -----------------------START ITERATING -------------*/
-	for (unsigned int it = 0; it < optimizationSettings->max_it; it++) {
+	for (unsigned int it = 0; it < optimizationSettings->maximumIterations; it++) {
 		if (optimizationSettings->isConstrainedProblem()) {
 			//=================CONSTRAINED METHODS
 			for (unsigned int i = 0; i < optimizationSettings->starting_points; i++) {

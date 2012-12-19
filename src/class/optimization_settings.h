@@ -24,7 +24,7 @@
 
 namespace SolverStructures {
 
-enum SparsePCA_Algorithm // Formulation of PCA
+enum SPCA_Algorithm // Formulation of PCA
 {
 	L0_penalized_L1_PCA = 0,
 	L0_penalized_L2_PCA,
@@ -37,7 +37,7 @@ enum SparsePCA_Algorithm // Formulation of PCA
 };
 
 template<typename T> // NOTE: We use typename T instead of std::ostream to make this header-only
-T& operator<<(T& stream, SparsePCA_Algorithm& algo) {
+T& operator<<(T& stream, SPCA_Algorithm& algo) {
 	switch (algo) {
 	case L0_penalized_L1_PCA:
 		stream << "L0_penalized_L1_PCA";
@@ -84,10 +84,10 @@ public:
 	char* result_file; // path to file where result and optimizationStatisticsistics will be used
 	int gpu_sm_count; // gpu number of Streaming Processors
 	int gpu_max_threads; // gpu - max number of threads
-	enum SparsePCA_Algorithm algorithm; // algorithm which should be used
+	enum SPCA_Algorithm algorithm; // algorithm which should be used
 	bool get_values_for_all_points; // determines if algorithm should store values for all starting points
 	bool storeIterationsForAllPoints; // determines if algorithm should store elapsed iterations for all starting points
-	int max_it; //max iteration which one starting point can consume
+	int maximumIterations; //max iteration which one starting point can consume
 	int starting_points; // number of starting points which algorithm should use
 	int batch_size; // size of batch
 	unsigned int number_of_batches; // number of bathes - is computer by solver
@@ -103,7 +103,7 @@ public:
 		starting_points = 64;
 		hard_thresholding_using_sort = false;
 		onTheFlyMethod = false;
-		max_it = 100;
+		maximumIterations = 100;
 		get_values_for_all_points = true;
 		gpu_use_k_selection_algorithm = true;
 		storeIterationsForAllPoints = true;

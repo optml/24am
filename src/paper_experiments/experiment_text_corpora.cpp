@@ -66,7 +66,7 @@ void run_experiments(OptimizationSettings* optimizationSettings, const char* fil
 int main(int argc, char *argv[]) {
 	OptimizationSettings* optimizationSettings = new OptimizationSettings();
 
-	optimizationSettings->max_it = 50;
+	optimizationSettings->maximumIterations = 50;
 	optimizationSettings->toll = 0.0001;
 	optimizationSettings->starting_points = 1024;
 	optimizationSettings->constrain = 5;

@@ -80,7 +80,7 @@ int parseConsoleOptions(SolverStructures::OptimizationSettings* optimizationSett
 			optimizationSettings->penalty= atof(optarg);
 			break;
 		case 'i':
-			optimizationSettings->max_it = atoi(optarg);
+			optimizationSettings->maximumIterations = atoi(optarg);
 			break;
 		case 'd':
 			optimizationSettings->data_file = optarg;

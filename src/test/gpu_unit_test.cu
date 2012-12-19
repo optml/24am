@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
 	optimizationSettings->gpu_use_k_selection_algorithm=false;
 	optimizationSettings->constrain = 20;
 	optimizationSettings->toll = 0.0001;
-	optimizationSettings->max_it = 100;
+	optimizationSettings->maximumIterations = 100;
 	cout << "Double test" << endl;
 	test_solver<double>(optimizationSettings, multicoreDataset, multicoreResult);
 	return 0;

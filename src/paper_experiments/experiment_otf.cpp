@@ -39,7 +39,7 @@ void run_experiments(OptimizationSettings* optimizationSettings) {
 		x.resize(n);
 		y.resize(m);
 		generateProblem(n, m, &h_B[0], m, n);
-		optimizationSettings->max_it = 100;
+		optimizationSettings->maximumIterations = 100;
 		optimizationSettings->toll = 0.01;
 		optimizationSettings->starting_points = 1024;
 		optimizationSettings->penalty=0.02;

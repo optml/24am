@@ -50,7 +50,7 @@ void denseDataSolver(
 		std::cout << "Solver started " << std::endl;
 	}
 	optimizationSettings->chceckInputAndModifyIt(N);
-	optimizationStatistics->it = optimizationSettings->max_it;
+	optimizationStatistics->it = optimizationSettings->maximumIterations;
 	// Allocate vector for optimizationStatistics to return which point needs how much iterations
 	if (optimizationSettings->storeIterationsForAllPoints) {
 		optimizationStatistics->iters.resize(optimizationSettings->starting_points, -1);
@@ -121,7 +121,7 @@ void denseDataSolver(
 	double fval = 0;
 	double fval_prev = 0;
 	unsigned int it;
-	for (it = 0; it < optimizationSettings->max_it; it++) {
+	for (it = 0; it < optimizationSettings->maximumIterations; it++) {
 		optimizationStatistics->it++;
 		if (optimizationSettings->isConstrainedProblem()) {
 			SPCASolver::distributed_thresholdings::perform_one_distributed_iteration_for_constrained_pca(
