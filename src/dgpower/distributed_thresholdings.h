@@ -155,7 +155,7 @@ void threshold_V_for_constrained(
 		SolverStructures::OptimizationStatisticsistics* optimizationStatistics) {
 	F zero = 0.0e+0, one = 1.0e+0, two = 2.0e+0, negone = -1.0e+0;
 	//================== Treshhold matrix V
-	optimizationDataInstance.init_data_for_constrained(optimizationSettings);
+	optimizationDataInstance.initializeDataForConstrainedMethod(optimizationSettings);
 	// obtain V from all cluster into V_constr_threshold for sorting and thresholding
 	pXgeadd(&transNo, &optimizationDataInstance.params.DIM_N,
 			&optimizationSettings->batch_size, &one, optimizationDataInstance.V, &i_one,

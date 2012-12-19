@@ -70,7 +70,7 @@ public:
 	int V_tr_nq; // number of starting points which will be processed on given node (constrained version  only)
 	int V_tr_mp; // number of rows == N
 	int nnz_v_tr; // total nonzero elements in V_constr_threshold
-	bool is_init_data_for_constrained; // local variable to hold info if the data were initialized
+	bool isDataForConstrainedMethodInitialized; // local variable to hold info if the data were initialized
 
 	// sizes of matrices V and Z
 	int z_nq;
@@ -90,13 +90,13 @@ public:
 	DistributedParameters params;
 
 	OptimizationData() {
-		is_init_data_for_constrained = false;
+		isDataForConstrainedMethodInitialized = false;
 	}
 
 	// allocate data for constrained versions
-	void init_data_for_constrained(
+	void initializeDataForConstrainedMethod(
 			SolverStructures::OptimizationSettings* optimizationSettings) {
-		if (!this->is_init_data_for_constrained) {
+		if (!this->isDataForConstrainedMethodInitialized) {
 			this->V_tr_mp = numroc_(&this->params.DIM_N, &this->params.DIM_N,
 					&this->params.myrow, &i_zero, &this->params.nprow);
 			this->V_tr_nq = numroc_(&optimizationSettings->batch_size, &i_one,
@@ -112,14 +112,14 @@ public:
 				std::vector<F> tmp(this->params.DIM_N);
 				V_constr_sort_buffer.resize(this->V_tr_nq, tmp);
 			}
-			this->is_init_data_for_constrained = true;
+			this->isDataForConstrainedMethodInitialized = true;
 		}
 	}
 
 	void free_extra_data() {
-		if (this->is_init_data_for_constrained) {
+		if (this->isDataForConstrainedMethodInitialized) {
 			free(this->V_constr_threshold);
-			this->is_init_data_for_constrained = false;
+			this->isDataForConstrainedMethodInitialized = false;
 		}
 	}
 };
