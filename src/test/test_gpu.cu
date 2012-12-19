@@ -98,10 +98,10 @@ int runTest() {
 	int nnz=0;
 	thrust::device_vector<F> d_B=h_B;
 
-	cublasoptimizationStatisticsus_t optimizationStatisticsus;
+	cublasStatust optimizationStatisticsus;
 	cublasHandle_t handle;
 	optimizationStatisticsus = cublasCreate(&handle);
-	if (optimizationStatisticsus != CUBLAS_optimizationStatisticsUS_SUCCESS) {
+	if (optimizationStatisticsus != CUBLAS_STATUS_SUCCESS) {
 		fprintf(stderr, "! CUBLAS initialization error\n");
 		return EXIT_FAILURE;
 	} else {
@@ -165,7 +165,7 @@ int runTest() {
 
 
 	optimizationStatisticsus = cublasDestroy(handle);
-	if (optimizationStatisticsus != CUBLAS_optimizationStatisticsUS_SUCCESS) {
+	if (optimizationStatisticsus != CUBLAS_STATUS_SUCCESS) {
 		fprintf(stderr, "!cublas shutdown error\n");
 		return EXIT_FAILURE;
 	}

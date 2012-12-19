@@ -70,10 +70,10 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 	// move data to DEVICE
 	thrust::device_vector<F> d_B = h_B;
 
-	cublasoptimizationStatisticsus_t optimizationStatisticsus;
+	cublasStatust optimizationStatisticsus;
 	cublasHandle_t handle;
 	optimizationStatisticsus = cublasCreate(&handle);
-	if (optimizationStatisticsus != CUBLAS_optimizationStatisticsUS_SUCCESS) {
+	if (optimizationStatisticsus != CUBLAS_STATUS_SUCCESS) {
 		fprintf(stderr, "! CUBLAS initialization error\n");
 		return EXIT_FAILURE;
 	} else {
@@ -105,7 +105,7 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 		}
 	}
 	optimizationStatisticsus = cublasDestroy(handle);
-	if (optimizationStatisticsus != CUBLAS_optimizationStatisticsUS_SUCCESS) {
+	if (optimizationStatisticsus != CUBLAS_STATUS_SUCCESS) {
 		fprintf(stderr, "!cublas shutdown error\n");
 		return EXIT_FAILURE;
 	}

@@ -35,10 +35,10 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings) {
 	ofstream fileOutCPU;
 	fileOutCPU.open("results/paper_experiment_gpu_speedup_cpu.txt");
 
-	cublasoptimizationStatisticsus_t optimizationStatisticsus;
+	cublasStatust optimizationStatisticsus;
 	cublasHandle_t handle;
 	optimizationStatisticsus = cublasCreate(&handle);
-	if (optimizationStatisticsus != CUBLAS_optimizationStatisticsUS_SUCCESS) {
+	if (optimizationStatisticsus != CUBLAS_STATUS_SUCCESS) {
 		fprintf(stderr, "! CUBLAS initialization error\n");
 		return EXIT_FAILURE;
 	} else {
@@ -110,7 +110,7 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings) {
 	fileOut.close();
 
 	optimizationStatisticsus = cublasDestroy(handle);
-	if (optimizationStatisticsus != CUBLAS_optimizationStatisticsUS_SUCCESS) {
+	if (optimizationStatisticsus != CUBLAS_STATUS_SUCCESS) {
 		fprintf(stderr, "!cublas shutdown error\n");
 		return EXIT_FAILURE;
 	}
