@@ -21,7 +21,9 @@ include various.mk
 
 #Choose CBLAS interface GSL/MKL
 #LIBS_BLAS= $(LIBS_GSL)
+#BLAS_LIB= $(GSL_LIB)
 LIBS_BLAS= $(LIBS_MKL)
+BLAS_LIB= $(MKL_MULTICORE_LIB)
 
 
 

@@ -13,6 +13,5 @@ INCLUDE= -I. -I./frontends  -I/usr/local/include $(GSL_INCLUDE)
 OBJFOL=objects/
 SRC = src
 
-BLAS_LIB= $(MKL_MULTICORE_LIB)
 LIBS_GSL = -lgsl  -lgslcblas
 LIBS_MKL =   -lgsl
