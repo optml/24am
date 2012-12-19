@@ -22,7 +22,7 @@
 #ifndef OPTIMIZATION_SETTINGS_H_
 #define OPTIMIZATION_SETTINGS_H_
 
-namespace solver_structures {
+namespace SolverStructures {
 
 enum SparsePCA_Algorithm // Formulation of PCA
 {
@@ -68,7 +68,7 @@ T& operator<<(T& stream, SparsePCA_Algorithm& algo) {
 }
 
 //class used to set settings to solver
-class optimization_settings {
+class OptimizationSettings {
 public:
 	int proccess_node; // used only for distributed solver. This is set automatically and contains rank of MPI process
 	int distributed_row_grid_file; // size of row-grid. used only for distributed solver. See documentation
@@ -93,7 +93,7 @@ public:
 	unsigned int number_of_batches; // number of bathes - is computer by solver
 	bool on_the_fly_generation; // on the fly generation - not applicable for distributed solver
 
-	optimization_settings() {
+	OptimizationSettings() {
 		distributed_row_grid_file = 0;
 		proccess_node = 0;
 		toll = 0.01;

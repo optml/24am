@@ -16,23 +16,23 @@
 
 #include "../class/optimization_settings.h"
 #include "../class/optimization_statistics.h"
-using namespace solver_structures;
+using namespace SolverStructures;
 #include "../gpower/sparse_PCA_solver.h"
 #include "../utils/file_reader.h"
 #include "../utils/option_console_parser.h"
 
 template<typename F>
-void load_data_and_run_solver(optimization_settings* settings) {
+void load_data_and_run_solver(OptimizationSettings* settings) {
 	double start_wall_time = gettime();
 	std::vector<F> B_mat;
 	unsigned int ldB, m, n;
 	// load data from CSV file
 	input_ouput_helper::read_csv_file(B_mat, ldB, m, n, settings->data_file);
-	optimization_statistics* stat = new optimization_statistics();
+	OptimizationStatistics* stat = new OptimizationStatistics();
 	stat->n = n;
 	std::vector<F> x_vec(n, 0);
 	// run SOLVER
-	PCA_solver::dense_PCA_solver(&B_mat[0], ldB, &x_vec[0], m, n, settings,
+	SPCASolver::dense_PCA_solver(&B_mat[0], ldB, &x_vec[0], m, n, settings,
 			stat);
 	double end_wall_time = gettime();
 	stat->total_elapsed_time = end_wall_time - start_wall_time;
@@ -43,8 +43,8 @@ void load_data_and_run_solver(optimization_settings* settings) {
 }
 
 int main(int argc, char *argv[]) {
-	optimization_settings* settings = new optimization_settings();
-	int status = parse_console_options(settings, argc, argv);
+	OptimizationSettings* settings = new OptimizationSettings();
+	int status = parseConsoleOptions(settings, argc, argv);
 	if (status > 0)
 		return status;
 	if (settings->double_precission) {

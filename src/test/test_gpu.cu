@@ -15,7 +15,7 @@
 
 #include "../class/optimization_settings.h"
 #include "../class/optimization_statistics.h"
-using namespace solver_structures;
+using namespace SolverStructures;
 //#include "../gpower/sparse_PCA_solver.h"
 #include "../utils/file_reader.h"
 #include "../utils/option_console_parser.h"
@@ -23,7 +23,7 @@ using namespace solver_structures;
 #include "../gpugpower/gpu_headers.h"
 
 template<typename F>
-void run_solver(optimization_settings* settings) {
+void run_solver(OptimizationSettings* settings) {
 //	double start_wall_time = gettime();
 //	std::vector<F> B_mat;
 //	unsigned int ldB;
@@ -44,8 +44,8 @@ void run_solver(optimization_settings* settings) {
 }
 
 int mainX(int argc, char *argv[]) {
-	optimization_settings* settings = new optimization_settings();
-	int status = parse_console_options(settings, argc, argv);
+	OptimizationSettings* settings = new OptimizationSettings();
+	int status = parseConsoleOptions(settings, argc, argv);
 	if (status > 0)
 		return status;
 	if (settings->double_precission) {
@@ -66,8 +66,8 @@ int mainX(int argc, char *argv[]) {
 
 template<typename F>
 int runTest() {
-	optimization_statistics* stat = new optimization_statistics();
-	optimization_settings* settings = new optimization_settings();
+	OptimizationStatistics* stat = new OptimizationStatistics();
+	OptimizationSettings* settings = new OptimizationSettings();
 	settings->max_it = 5;
 	settings->toll = 0.0001;
 	settings->starting_points = 1024;

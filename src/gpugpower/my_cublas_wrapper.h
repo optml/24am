@@ -412,7 +412,7 @@ struct generate_random_number {
 
 template<typename F>
 void perform_hard_and_soft_thresholdingNEW(thrust::device_vector<F> &d_V,
-		optimization_settings* settings, const unsigned int n,
+		OptimizationSettings* settings, const unsigned int n,
 		thrust::host_vector<F>& h_x, const unsigned int LDN,
 		thrust::device_vector<int> &d_IDX, thrust::device_vector<F> &dataToSort) {
 	cout << "ERROR IN TEMPLATES"<<endl;
@@ -420,7 +420,7 @@ void perform_hard_and_soft_thresholdingNEW(thrust::device_vector<F> &d_V,
 
 template<>
 void perform_hard_and_soft_thresholdingNEW(thrust::device_vector<float> &d_V,
-		optimization_settings* settings, const unsigned int n,
+		OptimizationSettings* settings, const unsigned int n,
 		thrust::host_vector<float>& h_x, const unsigned int LDN,
 		thrust::device_vector<int> &d_IDX,
 		thrust::device_vector<float> &dataToSort) {
@@ -463,7 +463,7 @@ void perform_hard_and_soft_thresholdingNEW(thrust::device_vector<float> &d_V,
 
 template<>
 void perform_hard_and_soft_thresholdingNEW(thrust::device_vector<double> &d_V,
-		optimization_settings* settings, const unsigned int n,
+		OptimizationSettings* settings, const unsigned int n,
 		thrust::host_vector<double>& h_x, const unsigned int LDN,
 		thrust::device_vector<int> &d_IDX,
 		thrust::device_vector<double> &dataToSort) {
@@ -506,7 +506,7 @@ void perform_hard_and_soft_thresholdingNEW(thrust::device_vector<double> &d_V,
 
 template<typename F>
 void perform_hard_and_soft_thresholding(thrust::device_vector<F> &d_V,
-		optimization_settings* settings, const unsigned int n,
+		OptimizationSettings* settings, const unsigned int n,
 		thrust::device_vector<F>& d_x_for_sort, thrust::host_vector<F>& h_x,
 		const unsigned int LDN) {
 
@@ -523,7 +523,7 @@ void perform_hard_and_soft_thresholding(thrust::device_vector<F> &d_V,
 //===========================================================================
 template<typename F>
 void perform_hard_thresholding_with_k_selection(thrust::device_vector<F> &d_V,
-		optimization_settings* settings, const unsigned int n,
+		OptimizationSettings* settings, const unsigned int n,
 		thrust::device_vector<F>& d_x_for_sort, thrust::host_vector<F>& h_x,
 		const unsigned int LDN) {
 
@@ -531,7 +531,7 @@ void perform_hard_thresholding_with_k_selection(thrust::device_vector<F> &d_V,
 
 template<>
 void perform_hard_thresholding_with_k_selection(
-		thrust::device_vector<float> &d_V, optimization_settings* settings,
+		thrust::device_vector<float> &d_V, OptimizationSettings* settings,
 		const unsigned int n, thrust::device_vector<float>& d_x_for_sort,
 		thrust::host_vector<float>& h_x, const unsigned int LDN) {
 	thrust::device_vector<float>::iterator it_begin = d_V.begin();
@@ -549,7 +549,7 @@ void perform_hard_thresholding_with_k_selection(
 
 template<>
 void perform_hard_thresholding_with_k_selection(
-		thrust::device_vector<double> &d_V, optimization_settings* settings,
+		thrust::device_vector<double> &d_V, OptimizationSettings* settings,
 		const unsigned int n, thrust::device_vector<double>& d_x_for_sort,
 		thrust::host_vector<double>& h_x, const unsigned int LDN) {
 	thrust::device_vector<double>::iterator it_begin = d_V.begin();
@@ -570,14 +570,14 @@ void perform_hard_thresholding_with_k_selection(
 //===========================================================================
 template<typename F>
 void perform_hard_and_soft_thresholding_with_sorting(
-		thrust::device_vector<F> &d_V, optimization_settings* settings,
+		thrust::device_vector<F> &d_V, OptimizationSettings* settings,
 		const unsigned int n, thrust::device_vector<F>& d_x_for_sort,
 		thrust::host_vector<F>& h_x, const unsigned int LDN) {
 }
 
 template<>
 void perform_hard_and_soft_thresholding_with_sorting(
-		thrust::device_vector<float> &d_V, optimization_settings* settings,
+		thrust::device_vector<float> &d_V, OptimizationSettings* settings,
 		const unsigned int n, thrust::device_vector<float>& d_x_for_sort,
 		thrust::host_vector<float>& h_x, const unsigned int LDN) {
 	thrust::device_vector<float>::iterator it_begin = d_V.begin();
@@ -606,7 +606,7 @@ void perform_hard_and_soft_thresholding_with_sorting(
 
 template<>
 void perform_hard_and_soft_thresholding_with_sorting(
-		thrust::device_vector<double> &d_V, optimization_settings* settings,
+		thrust::device_vector<double> &d_V, OptimizationSettings* settings,
 		const unsigned int n, thrust::device_vector<double>& d_x_for_sort,
 		thrust::host_vector<double>& h_x, const unsigned int LDN) {
 	thrust::device_vector<double>::iterator it_begin = d_V.begin();
@@ -635,14 +635,14 @@ void perform_hard_and_soft_thresholding_with_sorting(
 
 template<typename F>
 void perform_hard_and_soft_thresholding_for_penalized(
-		thrust::device_vector<F> &d_V, solver_structures::optimization_settings* settings,
+		thrust::device_vector<F> &d_V, SolverStructures::OptimizationSettings* settings,
 		const unsigned int n, value_coordinate_holder<F>* vals,
 		const unsigned int LDN) {
 }
 
 template<>
 void perform_hard_and_soft_thresholding_for_penalized(
-		thrust::device_vector<double> &d_V, solver_structures::optimization_settings* settings,
+		thrust::device_vector<double> &d_V, SolverStructures::OptimizationSettings* settings,
 		const unsigned int n, value_coordinate_holder<double>* vals,
 		const unsigned int LDN) {
 	thrust::device_vector<double>::iterator it_begin = d_V.begin();
@@ -677,7 +677,7 @@ void perform_hard_and_soft_thresholding_for_penalized(
 
 template<>
 void perform_hard_and_soft_thresholding_for_penalized(
-		thrust::device_vector<float> &d_V, optimization_settings* settings,
+		thrust::device_vector<float> &d_V, OptimizationSettings* settings,
 		const unsigned int n, value_coordinate_holder<float>* vals,
 		const unsigned int LDN) {
 	thrust::device_vector<float>::iterator it_begin = d_V.begin();

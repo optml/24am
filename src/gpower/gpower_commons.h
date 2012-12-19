@@ -20,7 +20,7 @@
 // this function generate initial points
 template<typename F>
 void getSignleStartingPoint(F* V, F* Z,
-		solver_structures::optimization_settings* settings,
+		SolverStructures::OptimizationSettings* settings,
 		const unsigned int n, const unsigned int m, int batchshift,
 		unsigned int j) {
 	if (settings->isConstrainedProblem()) {
@@ -49,8 +49,8 @@ void getSignleStartingPoint(F* V, F* Z,
 //initialize starting points
 template<typename F>
 void initialize_starting_points(F* V, F* Z,
-		solver_structures::optimization_settings* settings,
-		solver_structures::optimization_statistics* stat,
+		SolverStructures::OptimizationSettings* settings,
+		SolverStructures::OptimizationStatistics* stat,
 		const unsigned int number_of_experiments_per_batch,
 		const unsigned int n, const unsigned int m, const int ldB, const F* B,
 		int batchshift = 0) {
@@ -66,8 +66,8 @@ void initialize_starting_points(F* V, F* Z,
 // do one iteration for constrained PCA
 template<typename F>
 void perform_one_iteration_for_constrained_pca(F* V, F* Z,
-		solver_structures::optimization_settings* settings,
-		solver_structures::optimization_statistics* stat,
+		SolverStructures::OptimizationSettings* settings,
+		SolverStructures::OptimizationStatistics* stat,
 		const unsigned int number_of_experiments_per_batch,
 		const unsigned int n, const unsigned int m, const int ldB, const F* B,
 		F* max_errors, value_coordinate_holder<F>* vals, std::vector<F>* buffer,
@@ -75,9 +75,9 @@ void perform_one_iteration_for_constrained_pca(F* V, F* Z,
 	cblas_matrix_matrix_multiply(CblasColMajor, CblasNoTrans, CblasNoTrans, m,
 			number_of_experiments_per_batch, n, 1, B, ldB, V, n, 0, Z, m); // Multiply z = B*V
 	//set Z=sgn(Z)
-	if (settings->algorithm == solver_structures::L0_constrained_L1_PCA
+	if (settings->algorithm == SolverStructures::L0_constrained_L1_PCA
 			|| settings->algorithm
-					== solver_structures::L1_constrained_L1_PCA) {
+					== SolverStructures::L1_constrained_L1_PCA) {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
@@ -94,9 +94,9 @@ void perform_one_iteration_for_constrained_pca(F* V, F* Z,
 #endif
 	for (unsigned int j = 0; j < number_of_experiments_per_batch; j++) {
 		F fval_current = 0;
-		if (settings->algorithm == solver_structures::L0_constrained_L2_PCA
+		if (settings->algorithm == SolverStructures::L0_constrained_L2_PCA
 				|| settings->algorithm
-						== solver_structures::L1_constrained_L2_PCA) {
+						== SolverStructures::L1_constrained_L2_PCA) {
 			fval_current = cblas_l2_norm(m, &Z[m * j], 1);
 		}
 		F norm_of_x;
@@ -109,9 +109,9 @@ void perform_one_iteration_for_constrained_pca(F* V, F* Z,
 		}
 
 		cblas_vector_scale(n, &V[j * n], 1 / norm_of_x);
-		if (settings->algorithm == solver_structures::L0_constrained_L1_PCA
+		if (settings->algorithm == SolverStructures::L0_constrained_L1_PCA
 				|| settings->algorithm
-						== solver_structures::L1_constrained_L1_PCA) {
+						== SolverStructures::L1_constrained_L1_PCA) {
 			fval_current = vals[j].tmp;
 		}
 		F tmp_error = computeTheError(fval_current, vals[j].val, settings);
@@ -138,8 +138,8 @@ void perform_one_iteration_for_constrained_pca(F* V, F* Z,
 // do one iteration for penalize PCA
 template<typename F>
 void perform_one_iteration_for_penalized_pca(F* V, F* Z,
-		solver_structures::optimization_settings* settings,
-		solver_structures::optimization_statistics* stat,
+		SolverStructures::OptimizationSettings* settings,
+		SolverStructures::OptimizationStatistics* stat,
 		const unsigned int number_of_experiments_per_batch,
 		const unsigned int n, const unsigned int m, const int ldB, const F* B,
 		F* max_errors, value_coordinate_holder<F>* vals, unsigned int it,
@@ -147,8 +147,8 @@ void perform_one_iteration_for_penalized_pca(F* V, F* Z,
 	//scale Z
 	cblas_matrix_matrix_multiply(CblasColMajor, CblasNoTrans, CblasNoTrans, m,
 			number_of_experiments_per_batch, n, 1, B, ldB, V, n, 0, Z, m); // Multiply z = B*w
-	if (settings->algorithm == solver_structures::L0_penalized_L1_PCA
-			|| settings->algorithm == solver_structures::L1_penalized_L1_PCA) {
+	if (settings->algorithm == SolverStructures::L0_penalized_L1_PCA
+			|| settings->algorithm == SolverStructures::L1_penalized_L1_PCA) {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif

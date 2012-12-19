@@ -31,11 +31,11 @@
  * Matrix B is stored in column order (Fortran Based)
  */
 
-namespace PCA_solver {
+namespace SPCASolver {
 template<typename F>
 F dense_PCA_solver(const F * B, const int ldB, F * x, const unsigned int m,
-		const unsigned int n, solver_structures::optimization_settings* settings,
-		solver_structures::optimization_statistics* stat) {
+		const unsigned int n, SolverStructures::OptimizationSettings* settings,
+		SolverStructures::OptimizationStatistics* stat) {
 #ifdef _OPENMP
 #pragma omp parallel
 	{

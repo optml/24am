@@ -29,15 +29,15 @@
 #include "../utils/various.h"
 #include "distributed_classes.h"
 
-namespace PCA_solver {
+namespace SPCASolver {
 namespace distributed_thresholdings {
 
 // this function execute one iteration for penalized PCA
 template<typename F>
 void perform_one_distributed_iteration_for_penalized_pca(
-		PCA_solver::distributed_classes::optimization_data<F>& optimization_data_inst,
-		solver_structures::optimization_settings* settings,
-		solver_structures::optimization_statistics* stat) {
+		SPCASolver::DistributedClasses::OptimizationData<F>& optimization_data_inst,
+		SolverStructures::OptimizationSettings* settings,
+		SolverStructures::OptimizationStatistics* stat) {
 	F zero = 0.0e+0, one = 1.0e+0, two = 2.0e+0, negone = -1.0e+0;
 
 	// z= B*V
@@ -50,8 +50,8 @@ void perform_one_distributed_iteration_for_penalized_pca(
 			optimization_data_inst.descZ);
 	//================== normalize matrix Z
 	//scale Z
-	if (settings->algorithm == solver_structures::L0_penalized_L1_PCA
-			|| settings->algorithm == solver_structures::L1_penalized_L1_PCA) {
+	if (settings->algorithm == SolverStructures::L0_penalized_L1_PCA
+			|| settings->algorithm == SolverStructures::L1_penalized_L1_PCA) {
 		for (int j = 0; j < optimization_data_inst.nnz_z; j++) {
 			optimization_data_inst.Z[j] = sgn(optimization_data_inst.Z[j]);
 		}
@@ -105,8 +105,8 @@ void perform_one_distributed_iteration_for_penalized_pca(
 			optimization_data_inst.descV);
 	// perform thresh-holding operations and compute objective values
 	clear_local_vector(optimization_data_inst.norms, settings->starting_points); // we use NORMS to store objective values
-	if (settings->algorithm == solver_structures::L0_penalized_L1_PCA
-			|| settings->algorithm == solver_structures::L0_penalized_L2_PCA) {
+	if (settings->algorithm == SolverStructures::L0_penalized_L1_PCA
+			|| settings->algorithm == SolverStructures::L0_penalized_L2_PCA) {
 		for (int i = 0; i < optimization_data_inst.V_nq; i++) {
 			for (int j = 0; j < optimization_data_inst.V_mp; j++) {
 				const F tmp = optimization_data_inst.V[j
@@ -150,9 +150,9 @@ void perform_one_distributed_iteration_for_penalized_pca(
 // this function executes thresholding operations for constrained PCA
 template<typename F>
 void threshold_V_for_constrained(
-		PCA_solver::distributed_classes::optimization_data<F>& optimization_data_inst,
-		solver_structures::optimization_settings* settings,
-		solver_structures::optimization_statistics* stat) {
+		SPCASolver::DistributedClasses::OptimizationData<F>& optimization_data_inst,
+		SolverStructures::OptimizationSettings* settings,
+		SolverStructures::OptimizationStatistics* stat) {
 	F zero = 0.0e+0, one = 1.0e+0, two = 2.0e+0, negone = -1.0e+0;
 	//================== Treshhold matrix V
 	optimization_data_inst.init_data_for_constrained(settings);
@@ -203,9 +203,9 @@ void threshold_V_for_constrained(
 // this function perform one iteration of contrained PCA
 template<typename F>
 void perform_one_distributed_iteration_for_constrained_pca(
-		PCA_solver::distributed_classes::optimization_data<F>& optimization_data_inst,
-		solver_structures::optimization_settings* settings,
-		solver_structures::optimization_statistics* stat) {
+		SPCASolver::DistributedClasses::OptimizationData<F>& optimization_data_inst,
+		SolverStructures::OptimizationSettings* settings,
+		SolverStructures::OptimizationStatistics* stat) {
 	// standard constants used in MKL library
 	F zero = 0.0e+0, one = 1.0e+0, two = 2.0e+0, negone = -1.0e+0;
 	clear_local_vector(optimization_data_inst.norms, settings->batch_size); // we use NORMS to store objective values
@@ -222,9 +222,9 @@ void perform_one_distributed_iteration_for_constrained_pca(
 		F tmp = 0;
 		for (int j = 0; j < optimization_data_inst.z_mp; j++) {
 
-			if (settings->algorithm == solver_structures::L0_constrained_L1_PCA
+			if (settings->algorithm == SolverStructures::L0_constrained_L1_PCA
 					|| settings->algorithm
-							== solver_structures::L1_constrained_L1_PCA) {
+							== SolverStructures::L1_constrained_L1_PCA) {
 				tmp += abs(
 						optimization_data_inst.Z[j
 								+ i * optimization_data_inst.z_mp]);
@@ -242,9 +242,9 @@ void perform_one_distributed_iteration_for_constrained_pca(
 				optimization_data_inst.params.x_vector_blocking)] = tmp;
 	}
 	//set Z=sgn(Z)
-	if (settings->algorithm == solver_structures::L0_constrained_L1_PCA
+	if (settings->algorithm == SolverStructures::L0_constrained_L1_PCA
 			|| settings->algorithm
-					== solver_structures::L1_constrained_L1_PCA) {
+					== SolverStructures::L1_constrained_L1_PCA) {
 		vector_sgn(optimization_data_inst.Z, optimization_data_inst.nnz_z);	//y=sgn(y)
 	}
 	// Multiply V = B'*z

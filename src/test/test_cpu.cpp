@@ -21,7 +21,7 @@ using namespace std;
 #include "../utils/openmp_helper.h"
 #include "../class/optimization_settings.h"
 #include "../class/optimization_statistics.h"
-using namespace solver_structures ;
+using namespace SolverStructures ;
 #include "../utils/various.h"
 #include "../gpower/sparse_PCA_solver.h"
 #include "../problem_generators/gpower_problem_generator.h"
@@ -34,7 +34,7 @@ char final_file[1000];
 //
 //
 void logTime(const char* label, double fval, double fval2, int nnz,
-		mytimer* mt, optimization_statistics* stat, double refval) {
+		mytimer* mt, OptimizationStatistics* stat, double refval) {
 	printf("%s,%1.5f,%1.5f,%d,%f,%f,%d,%f\n", label, fval, fval2, nnz,
 			mt->getElapsedCPUTime(), mt->getElapsedWallClockTime(), stat->it,
 			refval);
@@ -79,9 +79,9 @@ int test() {
 			//		x = gsl_vector_alloc(n);
 		}
 
-		optimization_statistics* stat = new optimization_statistics();
+		OptimizationStatistics* stat = new OptimizationStatistics();
 
-		optimization_settings* settings = new optimization_settings();
+		OptimizationSettings* settings = new OptimizationSettings();
 
 		settings->max_it = 10;
 		settings->toll = 0.;
@@ -117,7 +117,7 @@ int test() {
 					<= 128 * 8*4; //
 			settings->starting_points = settings->starting_points * 2+1) {
 				mt->start();
-				stat->fval = PCA_solver::dense_PCA_solver(&h_B[0], m, &x[0], m, n,
+				stat->fval = SPCASolver::dense_PCA_solver(&h_B[0], m, &x[0], m, n,
 						settings, stat);
 				mt->end();
 				printf(

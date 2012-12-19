@@ -14,7 +14,7 @@
 
 #include "../class/optimization_settings.h"
 #include "../class/optimization_statistics.h"
-using namespace solver_structures;
+using namespace SolverStructures;
 #include "../gpower/sparse_PCA_solver.h"
 #include "../utils/file_reader.h"
 #include "../utils/option_console_parser.h"
@@ -23,8 +23,8 @@ using namespace solver_structures;
 #include "experiment_utils.h"
 
 template<typename F>
-void run_experiments(optimization_settings* settings) {
-	optimization_statistics* stat = new optimization_statistics();
+void run_experiments(OptimizationSettings* settings) {
+	OptimizationStatistics* stat = new OptimizationStatistics();
 	ofstream fileOut;
 	fileOut.open("results/paper_experiment_boxplots.txt");
 	mytimer* mt = new mytimer();
@@ -50,7 +50,7 @@ void run_experiments(optimization_settings* settings) {
 		omp_set_num_threads(1);
 		init_random_seeds();
 		mt->start();
-		PCA_solver::dense_PCA_solver(&h_B[0], m, &x[0], m, n, settings, stat);
+		SPCASolver::dense_PCA_solver(&h_B[0], m, &x[0], m, n, settings, stat);
 		mt->end();
 		fileOut << settings->constrain << ",";
 		for (int i = 0; i < stat->values.size(); i++) {
@@ -64,7 +64,7 @@ void run_experiments(optimization_settings* settings) {
 }
 
 int main(int argc, char *argv[]) {
-	optimization_settings* settings = new optimization_settings();
+	OptimizationSettings* settings = new OptimizationSettings();
 	run_experiments<double>(settings);
 	return 0;
 }

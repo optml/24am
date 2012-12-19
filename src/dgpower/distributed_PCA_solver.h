@@ -31,14 +31,14 @@
 #include "distributed_classes.h"
 #include "distributed_thresholdings.h"
 
-namespace PCA_solver {
-namespace distributed_solver {
+namespace SPCASolver {
+namespace DistributedSolver {
 
 template<typename F>
-void distributed_sparse_PCA_solver(
-		PCA_solver::distributed_classes::optimization_data<F>& optimization_data_inst,
-		solver_structures::optimization_settings* settings,
-		solver_structures::optimization_statistics* stat) {
+void denseDataSolver(
+		SPCASolver::DistributedClasses::OptimizationData<F>& optimization_data_inst,
+		SolverStructures::OptimizationSettings* settings,
+		SolverStructures::OptimizationStatistics* stat) {
 	F zero = 0.0e+0, one = 1.0e+0, two = 2.0e+0, negone = -1.0e+0;
 	MKL_INT myrow, mycol, nprow, npcol, info;
 	MKL_INT ictxt = optimization_data_inst.params.ictxt;
@@ -101,7 +101,7 @@ void distributed_sparse_PCA_solver(
 	}
 	// initial thresholding of matrix "V".....
 	if (settings->isConstrainedProblem()) {
-		PCA_solver::distributed_thresholdings::threshold_V_for_constrained(optimization_data_inst, settings, stat);
+		SPCASolver::distributed_thresholdings::threshold_V_for_constrained(optimization_data_inst, settings, stat);
 	}
 
 	//=============== Create description for "x"
@@ -124,10 +124,10 @@ void distributed_sparse_PCA_solver(
 	for (it = 0; it < settings->max_it; it++) {
 		stat->it++;
 		if (settings->isConstrainedProblem()) {
-			PCA_solver::distributed_thresholdings::perform_one_distributed_iteration_for_constrained_pca(
+			SPCASolver::distributed_thresholdings::perform_one_distributed_iteration_for_constrained_pca(
 					optimization_data_inst, settings, stat);
 		} else {
-			PCA_solver::distributed_thresholdings::perform_one_distributed_iteration_for_penalized_pca(
+			SPCASolver::distributed_thresholdings::perform_one_distributed_iteration_for_penalized_pca(
 					optimization_data_inst, settings, stat);
 		}
 		//Agregate FVAL
@@ -137,13 +137,13 @@ void distributed_sparse_PCA_solver(
 				&i_negone, &i_negone);
 		double max_error = 0;
 		for (i = 0; i < settings->starting_points; i++) {
-			if (settings->algorithm == solver_structures::L0_penalized_L1_PCA
+			if (settings->algorithm == SolverStructures::L0_penalized_L1_PCA
 					|| settings->algorithm
-							== solver_structures::L0_penalized_L2_PCA
+							== SolverStructures::L0_penalized_L2_PCA
 					|| settings->algorithm
-							== solver_structures::L0_constrained_L1_PCA
+							== SolverStructures::L0_constrained_L1_PCA
 					|| settings->algorithm
-							== solver_structures::L1_constrained_L1_PCA) {
+							== SolverStructures::L1_constrained_L1_PCA) {
 				values[i].val = optimization_data_inst.norms[i];
 			} else {
 				values[i].val = sqrt(optimization_data_inst.norms[i]);
@@ -190,10 +190,10 @@ void distributed_sparse_PCA_solver(
 }
 
 template<typename F>
-int load_data_from_2d_files_and_distribution(
-		PCA_solver::distributed_classes::optimization_data<F> &optimization_data_inst,
-		solver_structures::optimization_settings* settings,
-		solver_structures::optimization_statistics* stat) {
+int loadDataFrom2DFilesAndDistribute(
+		SPCASolver::DistributedClasses::OptimizationData<F> &optimization_data_inst,
+		SolverStructures::OptimizationSettings* settings,
+		SolverStructures::OptimizationStatistics* stat) {
 	F zero = 0.0e+0, one = 1.0e+0, two = 2.0e+0, negone = -1.0e+0;
 	MKL_INT X_VECTOR_BLOCKING = optimization_data_inst.params.x_vector_blocking;
 	MKL_INT ROW_BLOCKING = optimization_data_inst.params.row_blocking;
@@ -350,9 +350,9 @@ int load_data_from_2d_files_and_distribution(
 
 template<typename F>
 int gather_and_store_best_result_to_file(
-		PCA_solver::distributed_classes::optimization_data<F> &optimization_data_inst,
-		solver_structures::optimization_settings* settings,
-		solver_structures::optimization_statistics* stat) {
+		SPCASolver::DistributedClasses::OptimizationData<F> &optimization_data_inst,
+		SolverStructures::OptimizationSettings* settings,
+		SolverStructures::OptimizationStatistics* stat) {
 	F zero = 0.0e+0, one = 1.0e+0, two = 2.0e+0, negone = -1.0e+0;
 	/* =============================================================
 	 *          STORE RESULT

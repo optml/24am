@@ -19,16 +19,16 @@
 #include "../utils/file_reader.h"
 #include "../utils/option_console_parser.h"
 #include "../gpugpower/gpu_sparse_PCA_solver.h"
-using namespace solver_structures;
+using namespace SolverStructures;
 #include "../utils/file_reader.h"
 #include "../utils/option_console_parser.h"
 #include "experiment_utils.h"
 #include "../problem_generators/gpower_problem_generator.h"
 
 template<typename F>
-int test_solver(solver_structures::optimization_settings * settings) {
-	solver_structures::optimization_statistics* stat =
-			new optimization_statistics();
+int test_solver(SolverStructures::OptimizationSettings * settings) {
+	SolverStructures::OptimizationStatistics* stat =
+			new OptimizationStatistics();
 
 	ofstream fileOut;
 	fileOut.open("results/paper_experiment_gpu_speedup.txt");
@@ -88,7 +88,7 @@ int test_solver(solver_structures::optimization_settings * settings) {
 				settings->starting_points = settings->starting_points * 16) {
 		settings->batch_size = settings->starting_points;
 			mt->start();
-			PCA_solver::gpu_sparse_PCA_solver(handle, m, n, d_B, h_x, settings,
+			SPCASolver::gpu_sparse_PCA_solver(handle, m, n, d_B, h_x, settings,
 					stat, LD_M, LD_N);
 			mt->end();
 			std::vector<F> x(n, 0);
@@ -99,7 +99,7 @@ int test_solver(solver_structures::optimization_settings * settings) {
 
 			// CPU
 			mt->start();
-			PCA_solver::dense_PCA_solver(&h_B[0], LD_M, &x[0], m, n, settings,
+			SPCASolver::dense_PCA_solver(&h_B[0], LD_M, &x[0], m, n, settings,
 								stat);
 			mt->end();
 			logTime(fileOutCPU, mt, stat, settings, x, m, n);
@@ -118,8 +118,8 @@ int test_solver(solver_structures::optimization_settings * settings) {
 }
 
 int main(int argc, char *argv[]) {
-	solver_structures::optimization_settings* settings =
-			new optimization_settings();
+	SolverStructures::OptimizationSettings* settings =
+			new OptimizationSettings();
 	settings->result_file = "results/gpu_unittest.txt";
 	settings->verbose = false;
 	settings->starting_points = 1024;

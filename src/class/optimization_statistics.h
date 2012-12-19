@@ -23,8 +23,8 @@
 #define OPTIMIZATION_STATISTICS_H_
 
 #include <vector>
-namespace solver_structures {
-class optimization_statistics {
+namespace SolverStructures {
+class OptimizationStatistics {
 
 public:
 	unsigned int it; // total iterations solver did
@@ -39,7 +39,7 @@ public:
 	std::vector<int> cardinalities; // cardinalities for given starting point. For L0 constrained method doesn't make sense as
 	                                // it's value has to be constrain parameter from settings
 	int total_threads_used;
-	optimization_statistics() {
+	OptimizationStatistics() {
 		it = 0;
 		total_threads_used=1;
 	}

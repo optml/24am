@@ -97,8 +97,8 @@ char* get_file_modified_name(const char* base, string suffix) {
 }
 
 
-void save_statistics(solver_structures::optimization_statistics* stat,
-		solver_structures::optimization_settings * settings){
+void save_statistics(SolverStructures::OptimizationStatistics* stat,
+		SolverStructures::OptimizationSettings * settings){
 	ofstream stat_file;
 		stat_file.open(get_file_modified_name(settings->result_file, "stat"));
 		stat_file << "Solver options " << '\n';
@@ -133,8 +133,8 @@ void save_statistics(solver_structures::optimization_statistics* stat,
 
 
 template<typename F>
-void save_results(solver_structures::optimization_statistics* stat,
-		solver_structures::optimization_settings * settings, const F* x, unsigned int lenght) {
+void save_results(SolverStructures::OptimizationStatistics* stat,
+		SolverStructures::OptimizationSettings * settings, const F* x, unsigned int lenght) {
 	ofstream result_file;
 	result_file.open(get_file_modified_name(settings->result_file, "x"));
 	for (unsigned int i = 0; i < lenght; i++) {

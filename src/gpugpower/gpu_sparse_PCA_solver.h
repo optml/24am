@@ -21,7 +21,7 @@
 #include "../utils/termination_criteria.h"
 #include "gpu_headers.h"
 
-namespace PCA_solver {
+namespace SPCASolver {
 
 /*
  * POPIS TODO
@@ -30,8 +30,8 @@ template<typename F>
 int gpu_sparse_PCA_solver(cublasHandle_t &handle, const unsigned int m,
 		const unsigned int n, thrust::device_vector<F> &d_B,
 		thrust::host_vector<F>& h_x,
-		solver_structures::optimization_settings* settings,
-		solver_structures::optimization_statistics* stat,
+		SolverStructures::OptimizationSettings* settings,
+		SolverStructures::OptimizationStatistics* stat,
 		const unsigned int LD_M, const unsigned int LD_N) {
 	bool low_memory = false;
 	double total_memory = LD_N * LD_M + LD_N * settings->starting_points * 2

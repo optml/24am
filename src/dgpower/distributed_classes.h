@@ -21,8 +21,8 @@
 #include "mkl_constants_and_headers.h"
 
 
-namespace PCA_solver {
-namespace distributed_classes {
+namespace SPCASolver {
+namespace DistributedClasses {
 
 /*
  * this class is used to hold all parameters for distributed computing
@@ -58,7 +58,7 @@ public:
  * This class holds all optimization data needed by the algorithm
  */
 template<typename F>
-class optimization_data {
+class OptimizationData {
 public:
 	std::vector<F> x; // final solution will be stored here
 	std::vector<F> B; // data for matrix
@@ -89,13 +89,13 @@ public:
 	F* norms;
 	distributed_parameters params;
 
-	optimization_data() {
+	OptimizationData() {
 		is_init_data_for_constrained = false;
 	}
 
 	// allocate data for constrained versions
 	void init_data_for_constrained(
-			solver_structures::optimization_settings* settings) {
+			SolverStructures::OptimizationSettings* settings) {
 		if (!this->is_init_data_for_constrained) {
 			this->V_tr_mp = numroc_(&this->params.DIM_N, &this->params.DIM_N,
 					&this->params.myrow, &i_zero, &this->params.nprow);

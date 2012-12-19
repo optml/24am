@@ -14,7 +14,7 @@
 
 #include "../class/optimization_settings.h"
 #include "../class/optimization_statistics.h"
-using namespace solver_structures;
+using namespace SolverStructures;
 #include "../gpower/sparse_PCA_solver.h"
 #include "../utils/file_reader.h"
 #include "../utils/option_console_parser.h"
@@ -26,9 +26,9 @@ using namespace solver_structures;
 #include "../gpower/sparse_PCA_solver_for_CSC.h"
 
 template<typename F>
-void run_experiments(optimization_settings* settings, const char* filename,
+void run_experiments(OptimizationSettings* settings, const char* filename,
 		const char* description, const char* logfilename) {
-	optimization_statistics* stat = new optimization_statistics();
+	OptimizationStatistics* stat = new OptimizationStatistics();
 	ofstream fileOut;
 	fileOut.open(logfilename);
 	mytimer* mt = new mytimer();
@@ -45,7 +45,7 @@ void run_experiments(optimization_settings* settings, const char* filename,
 	x.resize(n);
 
 	for (int i = 0; i < 10; i++) {
-		PCA_solver::sparse_PCA_solver_CSC(&B_CSC_Vals[0], &B_CSC_Row_Id[0],
+		SPCASolver::sparse_PCA_solver_CSC(&B_CSC_Vals[0], &B_CSC_Row_Id[0],
 				&B_CSC_Col_Ptr[0], &x[0], m, n, settings, stat, doMean,
 				&means[0]);
 		printDescriptions(&x[0], n, description, stat, fileOut);
@@ -64,7 +64,7 @@ void run_experiments(optimization_settings* settings, const char* filename,
 }
 
 int main(int argc, char *argv[]) {
-	optimization_settings* settings = new optimization_settings();
+	OptimizationSettings* settings = new OptimizationSettings();
 
 	settings->max_it = 50;
 	settings->toll = 0.0001;

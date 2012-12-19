@@ -28,7 +28,7 @@
 
 template<typename F>
 void printDescriptions(F* x, int length, const char* description,
-		solver_structures::optimization_statistics* stat, ofstream& stream) {
+		SolverStructures::OptimizationStatistics* stat, ofstream& stream) {
 	FILE * fin = fopen(description, "r");
 	char buffer[1000];
 	if (fin == NULL) {
@@ -50,15 +50,15 @@ void printDescriptions(F* x, int length, const char* description,
 	}
 }
 
-namespace PCA_solver {
+namespace SPCASolver {
 
 /*
  * Matrix B is stored in column order (Fortran Based)
  */
 template<typename F>
 F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
-		F * x, int m, int n, solver_structures::optimization_settings* settings,
-		solver_structures::optimization_statistics* stat, bool doMean,
+		F * x, int m, int n, SolverStructures::OptimizationSettings* settings,
+		SolverStructures::OptimizationStatistics* stat, bool doMean,
 		F * means) {
 	int number_of_experiments = settings->starting_points;
 	value_coordinate_holder<F>* vals = (value_coordinate_holder<F>*) calloc(
@@ -161,9 +161,9 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 
 			}
 			//set Z=sgn(Z)
-			if (settings->algorithm == solver_structures::L0_constrained_L1_PCA
+			if (settings->algorithm == SolverStructures::L0_constrained_L1_PCA
 					|| settings->algorithm
-							== solver_structures::L1_constrained_L1_PCA) {
+							== SolverStructures::L1_constrained_L1_PCA) {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
@@ -198,9 +198,9 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 			for (unsigned int j = 0; j < number_of_experiments; j++) {
 				F fval_current = 0;
 				if (settings->algorithm
-						== solver_structures::L0_constrained_L2_PCA
+						== SolverStructures::L0_constrained_L2_PCA
 						|| settings->algorithm
-								== solver_structures::L1_constrained_L2_PCA) {
+								== SolverStructures::L1_constrained_L2_PCA) {
 					fval_current = cblas_l2_norm(m, &Z[m * j], 1);
 				}
 				F norm_of_x;
@@ -214,9 +214,9 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 
 				cblas_vector_scale(n, &V[j * n], 1 / norm_of_x);
 				if (settings->algorithm
-						== solver_structures::L0_constrained_L1_PCA
+						== SolverStructures::L0_constrained_L1_PCA
 						|| settings->algorithm
-								== solver_structures::L1_constrained_L1_PCA) {
+								== SolverStructures::L1_constrained_L1_PCA) {
 					fval_current = vals[j].tmp;
 				}
 				F tmp_error = computeTheError(fval_current, vals[j].val,
@@ -238,9 +238,9 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 			}
 		} else {
 			//scale Z
-			if (settings->algorithm == solver_structures::L0_penalized_L1_PCA
+			if (settings->algorithm == SolverStructures::L0_penalized_L1_PCA
 					|| settings->algorithm
-							== solver_structures::L1_penalized_L1_PCA) {
+							== SolverStructures::L1_penalized_L1_PCA) {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif

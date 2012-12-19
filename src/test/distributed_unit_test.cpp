@@ -20,21 +20,21 @@
 #include "../utils/file_reader.h"
 #include "../utils/option_console_parser.h"
 
-using namespace solver_structures;
+using namespace SolverStructures;
 #include "../gpower/sparse_PCA_solver.h"
 #include "../utils/file_reader.h"
 #include "../utils/option_console_parser.h"
 
 template<typename F>
-void test_solver(solver_structures::optimization_settings * settings,
+void test_solver(SolverStructures::OptimizationSettings * settings,
 		char* multicoreDataset, char* multicoreResult) {
-	solver_structures::optimization_statistics* stat =
-			new optimization_statistics();
+	SolverStructures::OptimizationStatistics* stat =
+			new OptimizationStatistics();
 	MKL_INT iam, nprocs;
 	blacs_pinfo_(&iam, &nprocs);
 	double start_all = gettime();
-	PCA_solver::distributed_classes::optimization_data<F> optimization_data_inst;
-	PCA_solver::distributed_solver::load_data_from_2d_files_and_distribution<F>(
+	SPCASolver::DistributedClasses::OptimizationData<F> optimization_data_inst;
+	SPCASolver::DistributedSolver::loadDataFrom2DFilesAndDistribute<F>(
 			optimization_data_inst, settings, stat);
 
 	std::vector<F> B_mat;
@@ -42,28 +42,28 @@ void test_solver(solver_structures::optimization_settings * settings,
 	unsigned int m;
 	unsigned int n;
 	input_ouput_helper::read_csv_file(B_mat, ldB, m, n, multicoreDataset);
-	optimization_statistics* stat2 = new optimization_statistics();
+	OptimizationStatistics* stat2 = new OptimizationStatistics();
 	stat2->n = n;
 	const F * B = &B_mat[0];
 	std::vector<F> x_vec(n, 0);
 	F * x = &x_vec[0];
 
-	std::vector<solver_structures::SparsePCA_Algorithm> algorithms(8);
-	algorithms[0] = solver_structures::L0_penalized_L1_PCA;
-	algorithms[1] = solver_structures::L0_penalized_L2_PCA;
-	algorithms[2] = solver_structures::L1_penalized_L1_PCA;
-	algorithms[3] = solver_structures::L1_penalized_L2_PCA;
-	algorithms[4] = solver_structures::L0_constrained_L1_PCA;
-	algorithms[5] = solver_structures::L0_constrained_L2_PCA;
-	algorithms[6] = solver_structures::L1_constrained_L1_PCA;
-	algorithms[7] = solver_structures::L1_constrained_L2_PCA;
+	std::vector<SolverStructures::SparsePCA_Algorithm> algorithms(8);
+	algorithms[0] = SolverStructures::L0_penalized_L1_PCA;
+	algorithms[1] = SolverStructures::L0_penalized_L2_PCA;
+	algorithms[2] = SolverStructures::L1_penalized_L1_PCA;
+	algorithms[3] = SolverStructures::L1_penalized_L2_PCA;
+	algorithms[4] = SolverStructures::L0_constrained_L1_PCA;
+	algorithms[5] = SolverStructures::L0_constrained_L2_PCA;
+	algorithms[6] = SolverStructures::L1_constrained_L1_PCA;
+	algorithms[7] = SolverStructures::L1_constrained_L2_PCA;
 	char* resultDistributed = settings->result_file;
 	for (int al = 0; al < 8; al++) {
 		settings->algorithm = algorithms[al];
-		PCA_solver::distributed_solver::distributed_sparse_PCA_solver(
+		SPCASolver::DistributedSolver::denseDataSolver(
 				optimization_data_inst, settings, stat);
 		if (settings->proccess_node == 0) {
-			PCA_solver::dense_PCA_solver(B, ldB, x, m, n, settings, stat2);
+			SPCASolver::dense_PCA_solver(B, ldB, x, m, n, settings, stat2);
 			settings->result_file=multicoreResult;
 			input_ouput_helper::save_results(stat, settings, x, n);
 			cout << "Test " << al << " " << settings->algorithm << " "
@@ -75,7 +75,7 @@ void test_solver(solver_structures::optimization_settings * settings,
 	 * STORE RESULT INTO FILE
 	 */
 	settings->result_file=resultDistributed;
-	PCA_solver::distributed_solver::gather_and_store_best_result_to_file(
+	SPCASolver::DistributedSolver::gather_and_store_best_result_to_file(
 			optimization_data_inst, settings, stat);
 	if (iam == 0) {
 		stat->total_elapsed_time = gettime() - start_all;
@@ -86,8 +86,8 @@ void test_solver(solver_structures::optimization_settings * settings,
 }
 
 int main(int argc, char *argv[]) {
-	solver_structures::optimization_settings* settings =
-			new optimization_settings();
+	SolverStructures::OptimizationSettings* settings =
+			new OptimizationSettings();
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &settings->proccess_node);
 

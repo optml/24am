@@ -23,11 +23,11 @@
 
 
 template<typename F>
-int load_data_and_run_solver(solver_structures::optimization_settings* settings) {
+int load_data_and_run_solver(SolverStructures::OptimizationSettings* settings) {
 	mytimer* mt = new mytimer();
 	mt->start();
-	solver_structures::optimization_statistics* stat =
-			new optimization_statistics();
+	SolverStructures::OptimizationStatistics* stat =
+			new OptimizationStatistics();
 	cudaDeviceProp dp;
 	cudaGetDeviceProperties(&dp, 0);
 	settings->gpu_sm_count = dp.multiProcessorCount;
@@ -73,7 +73,7 @@ int load_data_and_run_solver(solver_structures::optimization_settings* settings)
 //FIXME
 	settings->gpu_use_k_selection_algorithm = true;
 	settings->gpu_use_k_selection_algorithm = false;
-	PCA_solver::gpu_sparse_PCA_solver(handle, m, n, d_B, h_x, settings, stat,
+	SPCASolver::gpu_sparse_PCA_solver(handle, m, n, d_B, h_x, settings, stat,
 			LD_M, LD_N);
 	mt->end();
 	stat->total_elapsed_time = mt->getElapsedWallClockTime();
@@ -88,9 +88,9 @@ int load_data_and_run_solver(solver_structures::optimization_settings* settings)
 }
 
 int main(int argc, char *argv[]) {
-	solver_structures::optimization_settings* settings =
-			new optimization_settings();
-	int status = parse_console_options(settings, argc, argv);
+	SolverStructures::OptimizationSettings* settings =
+			new OptimizationSettings();
+	int status = parseConsoleOptions(settings, argc, argv);
 	if (status > 0)
 		return status;
 	if (settings->double_precission) {

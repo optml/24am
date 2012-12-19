@@ -27,28 +27,28 @@
 #include "../utils/option_console_parser.h"
 
 template<typename F>
-void run_solver(solver_structures::optimization_settings * settings) {
-	solver_structures::optimization_statistics* stat =
-			new optimization_statistics();
+void runSolver(SolverStructures::OptimizationSettings * settings) {
+	SolverStructures::OptimizationStatistics* stat =
+			new OptimizationStatistics();
 	MKL_INT iam, nprocs;
 	blacs_pinfo_(&iam, &nprocs);
 	double start_all = gettime();
-	PCA_solver::distributed_classes::optimization_data<F> optimization_data_inst;
-	PCA_solver::distributed_solver::load_data_from_2d_files_and_distribution<F>(
+	SPCASolver::DistributedClasses::OptimizationData<F> optimization_data_inst;
+	SPCASolver::DistributedSolver::loadDataFrom2DFilesAndDistribute<F>(
 			optimization_data_inst, settings, stat);
 
 	/*
 	 *  RUN SOLVER
 	 */
 	double start_time = gettime();
-	PCA_solver::distributed_solver::distributed_sparse_PCA_solver(
+	SPCASolver::DistributedSolver::denseDataSolver(
 			optimization_data_inst, settings, stat);
 	double end_time = gettime();
 	stat->true_computation_time = end_time - start_time;
 	/*
 	 * STORE RESULT INTO FILE
 	 */
-	PCA_solver::distributed_solver::gather_and_store_best_result_to_file(
+	SPCASolver::DistributedSolver::gather_and_store_best_result_to_file(
 			optimization_data_inst, settings, stat);
 	if (iam == 0) {
 		stat->total_elapsed_time = gettime() - start_all;
@@ -60,19 +60,19 @@ void run_solver(solver_structures::optimization_settings * settings) {
 
 
 int main(int argc, char *argv[]) {
-	solver_structures::optimization_settings* settings =
-			new optimization_settings();
+	SolverStructures::OptimizationSettings* settings =
+			new OptimizationSettings();
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &settings->proccess_node);
-	int status = parse_console_options(settings, argc, argv);
+	int status = parseConsoleOptions(settings, argc, argv);
 	if (status > 0) {
 		MPI_Finalize();
 		return status;
 	}
 	if (settings->double_precission) {
-		run_solver<double>(settings);
+		runSolver<double>(settings);
 	} else {
-		run_solver<float>(settings);
+		runSolver<float>(settings);
 	}
 	MPI_Finalize();
 	return 0;

@@ -20,22 +20,22 @@
 #include "../utils/file_reader.h"
 #include "../utils/option_console_parser.h"
 #include "../gpugpower/gpu_sparse_PCA_solver.h"
-using namespace solver_structures;
+using namespace SolverStructures;
 #include "../utils/file_reader.h"
 #include "../utils/option_console_parser.h"
 
 
 template<typename F>
-int test_solver(solver_structures::optimization_settings * settings,
+int test_solver(SolverStructures::OptimizationSettings * settings,
 		char* multicoreDataset, char* multicoreResult) {
-	solver_structures::optimization_statistics* stat =
-			new optimization_statistics();
+	SolverStructures::OptimizationStatistics* stat =
+			new OptimizationStatistics();
 	std::vector<F> B_mat;
 	unsigned int ldB;
 	unsigned int m;
 	unsigned int n;
 	input_ouput_helper::read_csv_file(B_mat, ldB, m, n, multicoreDataset);
-	optimization_statistics* stat2 = new optimization_statistics();
+	OptimizationStatistics* stat2 = new OptimizationStatistics();
 	stat2->n = n;
 	const F * B = &B_mat[0];
 	std::vector<F> x_vec(n, 0);
@@ -80,24 +80,24 @@ int test_solver(solver_structures::optimization_settings * settings,
 		printf("CUBLAS initialized.\n");
 	}
 	settings->gpu_use_k_selection_algorithm = false;
-	std::vector<solver_structures::SparsePCA_Algorithm> algorithms(8);
-	algorithms[0] = solver_structures::L0_penalized_L1_PCA;
-	algorithms[1] = solver_structures::L0_penalized_L2_PCA;
-	algorithms[2] = solver_structures::L1_penalized_L1_PCA;
-	algorithms[3] = solver_structures::L1_penalized_L2_PCA;
-	algorithms[4] = solver_structures::L0_constrained_L1_PCA;
-	algorithms[5] = solver_structures::L0_constrained_L2_PCA;
-	algorithms[6] = solver_structures::L1_constrained_L1_PCA;
-	algorithms[7] = solver_structures::L1_constrained_L2_PCA;
+	std::vector<SolverStructures::SparsePCA_Algorithm> algorithms(8);
+	algorithms[0] = SolverStructures::L0_penalized_L1_PCA;
+	algorithms[1] = SolverStructures::L0_penalized_L2_PCA;
+	algorithms[2] = SolverStructures::L1_penalized_L1_PCA;
+	algorithms[3] = SolverStructures::L1_penalized_L2_PCA;
+	algorithms[4] = SolverStructures::L0_constrained_L1_PCA;
+	algorithms[5] = SolverStructures::L0_constrained_L2_PCA;
+	algorithms[6] = SolverStructures::L1_constrained_L1_PCA;
+	algorithms[7] = SolverStructures::L1_constrained_L2_PCA;
 	char* resultGPU = settings->result_file;
 	for (int al = 0; al < 8; al++) {
 		settings->algorithm = algorithms[al];
-		PCA_solver::gpu_sparse_PCA_solver(handle, m, n, d_B, h_x, settings,
+		SPCASolver::gpu_sparse_PCA_solver(handle, m, n, d_B, h_x, settings,
 				stat, LD_M, LD_N);
 		settings->result_file=resultGPU;
 		input_ouput_helper::save_results(stat, settings, &h_x[0], n);
 		if (settings->proccess_node == 0) {
-			PCA_solver::dense_PCA_solver(B, ldB, x, m, n, settings, stat2);
+			SPCASolver::dense_PCA_solver(B, ldB, x, m, n, settings, stat2);
 			settings->result_file = multicoreResult;
 			input_ouput_helper::save_results(stat2, settings, x, n);
 			cout << "Test " << al << " " << settings->algorithm << " "
@@ -113,8 +113,8 @@ int test_solver(solver_structures::optimization_settings * settings,
 }
 
 int main(int argc, char *argv[]) {
-	solver_structures::optimization_settings* settings =
-			new optimization_settings();
+	SolverStructures::OptimizationSettings* settings =
+			new OptimizationSettings();
 	settings->result_file = "results/gpu_unittest.txt";
 	char* multicoreDataset = "datasets/distributed.dat.all";
 	settings->data_file = multicoreDataset;

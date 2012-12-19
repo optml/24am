@@ -120,7 +120,7 @@ F find_hard_treshHolding_parameter_without_sorting(F * x,
 template<typename F>
 F k_hard_thresholding(F * x, const unsigned int length, const unsigned int k,
 		std::vector<F>& myvector,
-		solver_structures::optimization_settings* settings) {
+		SolverStructures::OptimizationSettings* settings) {
 	F treshHold;
 	if (settings->hard_thresholding_using_sort) {
 		treshHold = find_hard_treshHolding_parameter_with_sorting(x, length, k,
@@ -161,7 +161,7 @@ F compute_V_value(F*x, const unsigned int length, F lambda,
 template<typename F>
 F soft_thresholding(F * x, const unsigned int length,
 		const unsigned int constrain, std::vector<F>& myvector,
-		solver_structures::optimization_settings* settings) {
+		SolverStructures::OptimizationSettings* settings) {
 	F sq_constr = sqrt(constrain + 0.0);
 	mySort(x, length, myvector);
 	F lambda_Low = 0;

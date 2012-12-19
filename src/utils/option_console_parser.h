@@ -28,7 +28,7 @@
 
 #include "../class/optimization_settings.h"
 using namespace std;
-using namespace solver_structures;
+using namespace SolverStructures;
 
 void print_usage(){
 	cout << "Usage:"<<endl;
@@ -40,7 +40,7 @@ void print_usage(){
 
 }
 
-int parse_console_options(solver_structures::optimization_settings* settings,
+int parseConsoleOptions(SolverStructures::OptimizationSettings* settings,
 		int argc, char *argv[]) {
 
 	char c;
