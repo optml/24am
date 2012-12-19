@@ -12,8 +12,8 @@
  * 
  */
 
-#ifndef GPU_SPARSE_PCA_SOLVER_H_
-#define GPU_SPARSE_PCA_SOLVER_H_
+#ifndef denseDataSolver_H_
+#define denseDataSolver_H_
 
 #define MEMORY_ALIGNMENT 128
 
@@ -22,7 +22,7 @@
 #include "gpu_headers.h"
 
 namespace SPCASolver {
-
+namespace GPUSolver{
 /*
  * POPIS TODO
  */
@@ -209,6 +209,6 @@ int denseDataSolver(cublasHandle_t &handle, const unsigned int m,
 	thrust::copy(d_x.begin(), d_x.end(), h_x.begin());
 	return 0;
 }
-
 }
-#endif /* GPU_SPARSE_PCA_SOLVER_H__ */
+}
+#endif /* denseDataSolver_H__ */

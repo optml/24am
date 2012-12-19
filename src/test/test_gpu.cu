@@ -39,7 +39,7 @@ void run_solver(OptimizationSettings* optimizationSettings) {
 //	PCA_solver::denseDataSolver(B, ldB, x, m, n, optimizationSettings, optimizationStatistics);
 //	double end_wall_time = gettime();
 //	optimizationStatistics->totalElapsedTime=end_wall_time-start_wall_time;
-//	input_ouput_helper::save_OptimizationStatistics_and_results(optimizationStatistics, optimizationSettings,x_vec);
+//	input_ouput_helper::saveSolverStatistics_and_results(optimizationStatistics, optimizationSettings,x_vec);
 
 }
 
@@ -113,25 +113,25 @@ int runTest() {
 	//	//==================  PENALIZED
 
 	optimizationSettings->algorithm = L0_penalized_L2_PCA;
-	mt->start(); gpu_sparse_PCA_solver(handle,m, n, d_B, h_x, optimizationSettings, optimizationStatistics,LD_M,LD_N);mt->end();
+	mt->start(); denseDataSolver(handle,m, n, d_B, h_x, optimizationSettings, optimizationStatistics,LD_M,LD_N);mt->end();
 	nnz = vector_get_nnz(&h_x[0],n);
 	printf("FVAL:%f,nnz:%d,%f\n",optimizationStatistics->fval,nnz,mt->getElapsedWallClockTime());
 
 	//-----------------------
 	//	optimizationSettings->algorithm = L1_penalized_L2_PCA;
-	//	gpu_sparse_PCA_solver(m, n, h_B, h_x, optimizationSettings, optimizationStatistics);
+	//	denseDataSolver(m, n, h_B, h_x, optimizationSettings, optimizationStatistics);
 	//	nnz = vector_get_nnz(&h_x[0],n);
 	//	printf("FVAL:%f,nnz:%d\n",optimizationStatistics->fval,nnz);
 	//
 	//	//-----------------------
 	//	optimizationSettings->algorithm = L0_penalized_L1_PCA;
-	//	gpu_sparse_PCA_solver(m, n, h_B, h_x, optimizationSettings, optimizationStatistics);
+	//	denseDataSolver(m, n, h_B, h_x, optimizationSettings, optimizationStatistics);
 	//	nnz = vector_get_nnz(&h_x[0],n);
 	//	printf("FVAL:%f,nnz:%d\n",optimizationStatistics->fval,nnz);
 	//
 	//	//-----------------------
 	//	optimizationSettings->algorithm = L1_penalized_L1_PCA;
-	//	gpu_sparse_PCA_solver(m, n, h_B, h_x, optimizationSettings, optimizationStatistics);
+	//	denseDataSolver(m, n, h_B, h_x, optimizationSettings, optimizationStatistics);
 	//	nnz = vector_get_nnz(&h_x[0],n);
 	//	printf("FVAL:%f,nnz:%d\n",optimizationStatistics->fval,nnz);
 
@@ -139,27 +139,27 @@ int runTest() {
 	optimizationSettings->algorithm = L0_constrained_L1_PCA;
 
 	optimizationSettings->useKSelectionAlgorithmGPU=false;
-	mt->start(); gpu_sparse_PCA_solver(handle,m, n, d_B, h_x, optimizationSettings, optimizationStatistics,LD_M,LD_N);mt->end();
+	mt->start(); denseDataSolver(handle,m, n, d_B, h_x, optimizationSettings, optimizationStatistics,LD_M,LD_N);mt->end();
 	nnz = vector_get_nnz(&h_x[0],n);
 	printf("FVAL:%f,nnz:%d,%f\n",optimizationStatistics->fval,nnz,mt->getElapsedWallClockTime());
 
 	optimizationSettings->useKSelectionAlgorithmGPU=true;
-	mt->start(); gpu_sparse_PCA_solver(handle,m, n, d_B, h_x, optimizationSettings, optimizationStatistics,LD_M,LD_N);mt->end();
+	mt->start(); denseDataSolver(handle,m, n, d_B, h_x, optimizationSettings, optimizationStatistics,LD_M,LD_N);mt->end();
 	nnz = vector_get_nnz(&h_x[0],n);
 	printf("FVAL:%f,nnz:%d,%f\n",optimizationStatistics->fval,nnz,mt->getElapsedWallClockTime());
 
 	//	optimizationSettings->algorithm = L0_constrained_L2_PCA;
-	//	gpu_sparse_PCA_solver(m, n, h_B, h_x, optimizationSettings, optimizationStatistics);
+	//	denseDataSolver(m, n, h_B, h_x, optimizationSettings, optimizationStatistics);
 	//	nnz = vector_get_nnz(&h_x[0],n);
 	//	printf("FVAL:%f,nnz:%d\n",optimizationStatistics->fval,nnz);
 	//
 	//	optimizationSettings->algorithm = L1_constrained_L1_PCA;
-	//	gpu_sparse_PCA_solver(m, n, h_B, h_x, optimizationSettings, optimizationStatistics);
+	//	denseDataSolver(m, n, h_B, h_x, optimizationSettings, optimizationStatistics);
 	//	nnz = vector_get_nnz(&h_x[0],n);
 	//	printf("FVAL:%f,nnz:%d\n",optimizationStatistics->fval,nnz);
 	//
 	//	optimizationSettings->algorithm = L1_constrained_L2_PCA;
-	//	gpu_sparse_PCA_solver(m, n, h_B, h_x, optimizationSettings, optimizationStatistics);
+	//	denseDataSolver(m, n, h_B, h_x, optimizationSettings, optimizationStatistics);
 	//	nnz = vector_get_nnz(&h_x[0],n);
 	//	printf("FVAL:%f,nnz:%d\n",optimizationStatistics->fval,nnz);
 

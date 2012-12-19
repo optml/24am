@@ -26,7 +26,7 @@
 
 #include "thrust_headers.h"
 #include "my_cublas_wrapper.h"
-#include "gpu_sparse_PCA_solver.h"
+#include "denseDataSolver.h"
 #include "../problem_generators/gpower_problem_generator.h"
 
 #define IDX2C(i,j,ld) (((j)*(ld))+(i))

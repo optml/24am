@@ -19,7 +19,7 @@
 #include "../gpower/sparse_PCA_solver.h"
 #include "../utils/file_reader.h"
 #include "../utils/option_console_parser.h"
-#include "../gpugpower/gpu_sparse_PCA_solver.h"
+#include "../gpugpower/denseDataSolver.h"
 using namespace SolverStructures;
 #include "../utils/file_reader.h"
 #include "../utils/option_console_parser.h"
@@ -92,7 +92,7 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 	char* resultGPU = optimizationSettings->resultFilePath;
 	for (int al = 0; al < 8; al++) {
 		optimizationSettings->algorithm = algorithms[al];
-		SPCASolver::GPUSolver::gpu_sparse_PCA_solver(handle, m, n, d_B, h_x, optimizationSettings,
+		SPCASolver::GPUSolver::denseDataSolver(handle, m, n, d_B, h_x, optimizationSettings,
 				optimizationStatistics, LD_M, LD_N);
 		optimizationSettings->resultFilePath=resultGPU;
 		InputOuputHelper::save_results(optimizationStatistics, optimizationSettings, &h_x[0], n);

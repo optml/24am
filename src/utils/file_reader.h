@@ -97,7 +97,7 @@ char* get_file_modified_name(const char* base, string suffix) {
 }
 
 
-void save_OptimizationStatistics(SolverStructures::OptimizationStatistics* optimizationStatistics,
+void saveSolverStatistics(SolverStructures::OptimizationStatistics* optimizationStatistics,
 		SolverStructures::OptimizationSettings * optimizationSettings){
 	ofstream statFile;
 		statFile.open(get_file_modified_name(optimizationSettings->resultFilePath, "optimizationStatistics"));

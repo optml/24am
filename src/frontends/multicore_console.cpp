@@ -39,7 +39,7 @@ void load_data_and_run_solver(OptimizationSettings* optimizationSettings) {
     // store result into file
 	InputOuputHelper::save_results(optimizationStatistics, optimizationSettings, &x_vec[0], n);
 	// store OptimizationStatistics into optimizationStatistics file
-	InputOuputHelper::save_OptimizationStatistics(optimizationStatistics, optimizationSettings);
+	InputOuputHelper::saveSolverStatistics(optimizationStatistics, optimizationSettings);
 }
 
 int main(int argc, char *argv[]) {

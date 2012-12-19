@@ -73,12 +73,12 @@ int load_data_and_run_solver(SolverStructures::OptimizationSettings* optimizatio
 //FIXME
 	optimizationSettings->useKSelectionAlgorithmGPU = true;
 	optimizationSettings->useKSelectionAlgorithmGPU = false;
-	SPCASolver::GPUSolver::gpu_sparse_PCA_solver(handle, m, n, d_B, h_x, optimizationSettings, optimizationStatistics,
+	SPCASolver::GPUSolver::denseDataSolver(handle, m, n, d_B, h_x, optimizationSettings, optimizationStatistics,
 			LD_M, LD_N);
 	mt->end();
 	optimizationStatistics->totalElapsedTime = mt->getElapsedWallClockTime();
 	InputOuputHelper::save_results(optimizationStatistics, optimizationSettings, &h_x[0], n);
-	InputOuputHelper::save_OptimizationStatistics(optimizationStatistics, optimizationSettings);
+	InputOuputHelper::saveSolverStatistics(optimizationStatistics, optimizationSettings);
 	optimizationStatisticsus = cublasDestroy(handle);
 	if (optimizationStatisticsus != CUBLAS_optimizationStatisticsUS_SUCCESS) {
 		fprintf(stderr, "!cublas shutdown error\n");
