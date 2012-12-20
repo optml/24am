@@ -101,6 +101,7 @@ public:
 		penalty = 0;
 		verbose = false;
 		totalStartingPoints = 64;
+		batchSize = 64;
 		useSortForHardThresholding = false;
 		onTheFlyMethod = false;
 		maximumIterations = 100;
