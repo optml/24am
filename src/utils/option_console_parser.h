@@ -97,7 +97,7 @@ int parseConsoleOptions(SolverStructures::OptimizationSettings* optimizationSett
 			optimizationSettings->toll = atof(optarg);
 			break;
 		case 'p':
-			optimizationSettings->double_precission = true;
+			optimizationSettings->useDoublePrecission = true;
 			break;
 		case 'v':
 			optimizationSettings->verbose = true;

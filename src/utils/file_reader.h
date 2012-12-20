@@ -112,7 +112,7 @@ void saveSolverStatistics(SolverStructures::OptimizationStatistics* optimization
 		statFile << "Starting points: " << optimizationSettings->totalStartingPoints<< '\n';
 		statFile << "Batch size: " << optimizationSettings->batchSize<< '\n';
 		statFile << "Batching strategy (OTF): " << optimizationSettings->onTheFlyMethod<< '\n';
-		statFile << "Double precision: " << optimizationSettings->double_precission<< '\n';
+		statFile << "Double precision: " << optimizationSettings->useDoublePrecission<< '\n';
 		statFile << "Toll: " << optimizationSettings->toll<< '\n';
 	#ifdef DEBUG
 		statFile << "DEBUG MODE: " << 1<< '\n';

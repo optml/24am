@@ -77,7 +77,7 @@ public:
 	bool useSortForHardThresholding; // determines if hardthresholding should be done by sorting (better for large constrain value)
 									  // or by using an sorted map (better for small constrain parameter)
 	bool useKSelectionAlgorithmGPU; // use approximate k-selection algorithm (Russel Steinbach, Jeffrey Blanchard, Bradley Gordon, and Toluwaloju Alabi)
-	bool double_precission; // determines if one should use "double" or "float"
+	bool useDoublePrecission; // determines if one should use "double" or "float"
 	double penalty; // value of penalty parameter
 	unsigned int constrain; //value of constrain parameter
 	char* dataFilePath; //   path to source data file
@@ -107,7 +107,7 @@ public:
 		getValuesForAllStartingPoints = true;
 		useKSelectionAlgorithmGPU = true;
 		storeIterationsForAllPoints = true;
-		double_precission = false;
+		useDoublePrecission = false;
 	}
 
 	bool isConstrainedProblem() {
