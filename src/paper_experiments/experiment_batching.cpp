@@ -46,7 +46,7 @@ void run_experiments(OptimizationSettings* optimizationSettings) {
 		optimizationSettings->penalty = 0.02;
 		optimizationSettings->formulation = L0_penalized_L2_PCA;
 //		optimizationSettings->formulation = L0_constrained_L2_PCA;
-		optimizationSettings->onTheFlyMethod = false;
+		optimizationSettings->useOTF = false;
 		for (int strategy = 0; strategy < 5; strategy++) {
 			switch (strategy) {
 			case 0:

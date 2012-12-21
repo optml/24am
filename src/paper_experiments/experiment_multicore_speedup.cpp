@@ -46,7 +46,7 @@ void run_experiments(OptimizationSettings* optimizationSettings) {
 		optimizationSettings->constrain = n / 100;
 		optimizationSettings->formulation = L0_penalized_L2_PCA;
 		optimizationSettings->batchSize = optimizationSettings->totalStartingPoints;
-		optimizationSettings->onTheFlyMethod = false;
+		optimizationSettings->useOTF = false;
 		for (int i = 1; i <= 8; i=i*2) {
 			omp_set_num_threads(i);
 			init_random_seeds();

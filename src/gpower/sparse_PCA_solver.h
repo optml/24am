@@ -76,7 +76,7 @@ F denseDataSolver(const F * B, const int ldB, F * x, const unsigned int m,
 	F the_best_solution_value = -1;
 	unsigned int total_iterations = 0;
 	optimizationStatistics->it = 0;
-	if (optimizationSettings->onTheFlyMethod) {
+	if (optimizationSettings->useOTF) {
 		optimizationSettings->storeIterationsForAllPoints = false;
 		cblas_vector_scale(n * number_of_experiments_per_batch, V,
 				FLOATING_ZERO);

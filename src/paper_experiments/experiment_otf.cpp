@@ -49,15 +49,15 @@ void run_experiments(OptimizationSettings* optimizationSettings) {
 			switch (strategy) {
 			case 0:
 				optimizationSettings->batchSize = 64;
-				optimizationSettings->onTheFlyMethod = false;
+				optimizationSettings->useOTF = false;
 				break;
 			case 1:
 				optimizationSettings->batchSize = 64;
-				optimizationSettings->onTheFlyMethod = true;
+				optimizationSettings->useOTF = true;
 				break;
 			case 2:
 				optimizationSettings->batchSize = optimizationSettings->totalStartingPoints;
-				optimizationSettings->onTheFlyMethod = false;
+				optimizationSettings->useOTF = false;
 				break;
 			default:
 				break;

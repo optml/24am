@@ -91,7 +91,7 @@ public:
 	int totalStartingPoints; // number of starting points which algorithm should use
 	int batchSize; // size of batch
 	unsigned int totalBatches; // number of bathes - is computer by solver
-	bool onTheFlyMethod; // on the fly generation - not applicable for distributed solver
+	bool useOTF; // on the fly generation - not applicable for distributed solver
 
 	OptimizationSettings() {
 		distributedRowGridFile = 0;
@@ -103,7 +103,7 @@ public:
 		totalStartingPoints = 64;
 		batchSize = 64;
 		useSortForHardThresholding = false;
-		onTheFlyMethod = false;
+		useOTF = false;
 		maximumIterations = 100;
 		getValuesForAllStartingPoints = true;
 		useKSelectionAlgorithmGPU = true;

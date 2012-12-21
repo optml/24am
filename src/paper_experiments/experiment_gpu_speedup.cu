@@ -76,7 +76,7 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings) {
 		optimizationSettings->penalty = 0.02;
 		optimizationSettings->constrain = n / 100;
 		optimizationSettings->formulation = L1_penalized_L1_PCA;
-		optimizationSettings->onTheFlyMethod = false;
+		optimizationSettings->useOTF = false;
 		optimizationSettings->useKSelectionAlgorithmGPU = false;
 		optimizationStatistics->n = n;
 		// move data to DEVICE
@@ -124,7 +124,7 @@ int main(int argc, char *argv[]) {
 	optimizationSettings->verbose = false;
 	optimizationSettings->totalStartingPoints = 1024;
 	optimizationSettings->batchSize = optimizationSettings->totalStartingPoints;
-	optimizationSettings->onTheFlyMethod = false;
+	optimizationSettings->useOTF = false;
 	optimizationSettings->useKSelectionAlgorithmGPU = false;
 	optimizationSettings->constrain = 20;
 	optimizationSettings->toll = 0.0001;

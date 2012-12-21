@@ -91,7 +91,7 @@ int parseConsoleOptions(SolverStructures::OptimizationSettings* optimizationSett
 			resultFilePath = true;
 			break;
 		case 'u':
-			optimizationSettings->onTheFlyMethod= atoi(optarg);
+			optimizationSettings->useOTF= atoi(optarg);
 			break;
 		case 't':
 			optimizationSettings->toll = atof(optarg);

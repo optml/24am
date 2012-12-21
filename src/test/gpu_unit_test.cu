@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
 	optimizationSettings->verbose = false;
 	optimizationSettings->totalStartingPoints = 1024;
 	optimizationSettings->batchSize = optimizationSettings->totalStartingPoints;
-	optimizationSettings->onTheFlyMethod=false;
+	optimizationSettings->useOTF=false;
 	optimizationSettings->useKSelectionAlgorithmGPU=false;
 	optimizationSettings->constrain = 20;
 	optimizationSettings->toll = 0.0001;
