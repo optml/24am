@@ -24,7 +24,7 @@
 
 namespace SolverStructures {
 
-enum SPCA_Algorithm // Formulation of PCA
+enum SPCA_Formulation // Formulation of PCA
 {
 	L0_penalized_L1_PCA = 0,
 	L0_penalized_L2_PCA,
@@ -37,8 +37,8 @@ enum SPCA_Algorithm // Formulation of PCA
 };
 
 template<typename T> // NOTE: We use typename T instead of std::ostream to make this header-only
-T& operator<<(T& stream, SPCA_Algorithm& algo) {
-	switch (algo) {
+T& operator<<(T& stream, SPCA_Formulation& formulation) {
+	switch (formulation) {
 	case L0_penalized_L1_PCA:
 		stream << "L0_penalized_L1_PCA";
 		break;
@@ -77,14 +77,14 @@ public:
 	bool useSortForHardThresholding; // determines if hardthresholding should be done by sorting (better for large constrain value)
 									  // or by using an sorted map (better for small constrain parameter)
 	bool useKSelectionAlgorithmGPU; // use approximate k-selection algorithm (Russel Steinbach, Jeffrey Blanchard, Bradley Gordon, and Toluwaloju Alabi)
-	bool useDoublePrecission; // determines if one should use "double" or "float"
+	bool useDoublePrecision; // determines if one should use "double" or "float"
 	double penalty; // value of penalty parameter
 	unsigned int constrain; //value of constrain parameter
 	char* dataFilePath; //   path to source data file
 	char* resultFilePath; // path to file where result and OptimizationStatistics will be used
 	int gpu_sm_count; // gpu number of Streaming Processors
 	int gpu_max_threads; // gpu - max number of threads
-	enum SPCA_Algorithm algorithm; // algorithm which should be used
+	enum SPCA_Formulation algorithm; // algorithm which should be used
 	bool getValuesForAllStartingPoints; // determines if algorithm should store values for all starting points
 	bool storeIterationsForAllPoints; // determines if algorithm should store elapsed iterations for all starting points
 	int maximumIterations; //max iteration which one starting point can consume
@@ -108,7 +108,7 @@ public:
 		getValuesForAllStartingPoints = true;
 		useKSelectionAlgorithmGPU = true;
 		storeIterationsForAllPoints = true;
-		useDoublePrecission = false;
+		useDoublePrecision = false;
 	}
 
 	bool isConstrainedProblem() {

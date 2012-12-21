@@ -80,7 +80,7 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 		printf("CUBLAS initialized.\n");
 	}
 	optimizationSettings->useKSelectionAlgorithmGPU = false;
-	std::vector<SolverStructures::SPCA_Algorithm> algorithms(8);
+	std::vector<SolverStructures::SPCA_Formulation> algorithms(8);
 	algorithms[0] = SolverStructures::L0_penalized_L1_PCA;
 	algorithms[1] = SolverStructures::L0_penalized_L2_PCA;
 	algorithms[2] = SolverStructures::L1_penalized_L1_PCA;

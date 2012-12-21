@@ -48,7 +48,7 @@ void test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 	std::vector<F> x_vec(n, 0);
 	F * x = &x_vec[0];
 
-	std::vector<SolverStructures::SPCA_Algorithm> algorithms(8);
+	std::vector<SolverStructures::SPCA_Formulation> algorithms(8);
 	algorithms[0] = SolverStructures::L0_penalized_L1_PCA;
 	algorithms[1] = SolverStructures::L0_penalized_L2_PCA;
 	algorithms[2] = SolverStructures::L1_penalized_L1_PCA;

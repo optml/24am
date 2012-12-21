@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
 	int optimizationStatisticsus = parseConsoleOptions(optimizationSettings, argc, argv);
 	if (optimizationStatisticsus > 0)
 		return optimizationStatisticsus;
-	if (optimizationSettings->useDoublePrecission) {
+	if (optimizationSettings->useDoublePrecision) {
 		load_data_and_run_solver<double>(optimizationSettings);
 	} else {
 		load_data_and_run_solver<float>(optimizationSettings);

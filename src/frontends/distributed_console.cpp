@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
 		MPI_Finalize();
 		return optimizationStatisticsus;
 	}
-	if (optimizationSettings->useDoublePrecission) {
+	if (optimizationSettings->useDoublePrecision) {
 		runSolver<double>(optimizationSettings);
 	} else {
 		runSolver<float>(optimizationSettings);
