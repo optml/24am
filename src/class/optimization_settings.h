@@ -72,7 +72,7 @@ class OptimizationSettings {
 public:
 	int proccessNode; // used only for distributed solver. This is set automatically and contains rank of MPI process
 	int distributedRowGridFile; // size of row-grid. used only for distributed solver. See documentation
-	double toll; // final tollerance for solver
+	double tolerance; // final toleranceerance for solver
 	bool verbose;
 	bool useSortForHardThresholding; // determines if hardthresholding should be done by sorting (better for large constrain value)
 									 // or by using an sorted map (better for small constrain parameter)
@@ -96,7 +96,7 @@ public:
 	OptimizationSettings() {
 		distributedRowGridFile = 0;
 		proccessNode = 0;
-		toll = 0.01;
+		tolerance = 0.01;
 		constrain = 10;
 		penalty = 0;
 		verbose = false;

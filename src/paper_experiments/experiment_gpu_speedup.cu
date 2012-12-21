@@ -72,7 +72,7 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings) {
 		thrust::host_vector<F> h_B(LD_M * n, 0);
 		generateProblem(n, m, &h_B[0], m, n, false);
 		optimizationSettings->max_it = 100;
-		optimizationSettings->toll = 0;
+		optimizationSettings->tolerance = 0;
 		optimizationSettings->penalty = 0.02;
 		optimizationSettings->constrain = n / 100;
 		optimizationSettings->formulation = L1_penalized_L1_PCA;
@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
 	optimizationSettings->useOTF = false;
 	optimizationSettings->useKSelectionAlgorithmGPU = false;
 	optimizationSettings->constrain = 20;
-	optimizationSettings->toll = 0.0001;
+	optimizationSettings->tolerance = 0.0001;
 	optimizationSettings->max_it = 100;
 	cout << "Double test" << endl;
 	test_solver<double>(optimizationSettings);

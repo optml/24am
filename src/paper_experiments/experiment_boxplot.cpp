@@ -41,7 +41,7 @@ void run_experiments(OptimizationSettings* optimizationSettings) {
 	for (optimizationSettings->constrain = 1; optimizationSettings->constrain <= n;
 			optimizationSettings->constrain = optimizationSettings->constrain * 2) {
 		optimizationSettings->maximumIterations = 20;
-		optimizationSettings->toll = 0.000001;
+		optimizationSettings->tolerance = 0.000001;
 		optimizationSettings->totalStartingPoints = 1000;
 		optimizationSettings->batchSize = optimizationSettings->totalStartingPoints;
 		optimizationSettings->formulation = L0_constrained_L2_PCA;
@@ -244,7 +244,7 @@ int main(int argc, char *argv[]) {
 //		optimization_settings* optimizationSettings = new optimization_settings();
 //
 //		optimizationSettings->max_it = 200;
-//		optimizationSettings->toll = 0.000001;
+//		optimizationSettings->tolerance = 0.000001;
 //		optimizationSettings->totalStartingPoints = 1000;
 //				optimizationSettings->batchSize=optimizationSettings->totalStartingPoints;
 //

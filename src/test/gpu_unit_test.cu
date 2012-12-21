@@ -125,7 +125,7 @@ int main(int argc, char *argv[]) {
 	optimizationSettings->useOTF=false;
 	optimizationSettings->useKSelectionAlgorithmGPU=false;
 	optimizationSettings->constrain = 20;
-	optimizationSettings->toll = 0.0001;
+	optimizationSettings->tolerance = 0.0001;
 	optimizationSettings->maximumIterations = 100;
 	cout << "Double test" << endl;
 	test_solver<double>(optimizationSettings, multicoreDataset, multicoreResult);

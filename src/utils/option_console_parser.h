@@ -94,7 +94,7 @@ int parseConsoleOptions(SolverStructures::OptimizationSettings* optimizationSett
 			optimizationSettings->useOTF= atoi(optarg);
 			break;
 		case 't':
-			optimizationSettings->toll = atof(optarg);
+			optimizationSettings->tolerance = atof(optarg);
 			break;
 		case 'p':
 			optimizationSettings->useDoublePrecision = true;

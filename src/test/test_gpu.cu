@@ -69,7 +69,7 @@ int runTest() {
 	OptimizationStatistics* optimizationStatistics = new OptimizationStatistics();
 	OptimizationSettings* optimizationSettings = new OptimizationSettings();
 	optimizationSettings->maximumIterations = 5;
-	optimizationSettings->toll = 0.0001;
+	optimizationSettings->tolerance = 0.0001;
 	optimizationSettings->totalStartingPoints = 1024;
 
 	mytimer* mt = new mytimer();

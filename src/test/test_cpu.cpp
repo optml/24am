@@ -84,7 +84,7 @@ int test() {
 		OptimizationSettings* optimizationSettings = new OptimizationSettings();
 
 		optimizationSettings->maximumIterations = 10;
-		optimizationSettings->toll = 0.;
+		optimizationSettings->tolerance = 0.;
 		optimizationSettings->totalStartingPoints = 1;
 
 		F fval = 0;

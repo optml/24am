@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
 	optimizationSettings->batchSize = 64;
 	optimizationSettings->totalStartingPoints = 64;
 	optimizationSettings->constrain = 20;
-	optimizationSettings->toll = 0.001;
+	optimizationSettings->tolerance = 0.001;
 	optimizationSettings->maximumIterations = 100;
 	if (optimizationSettings->proccessNode == 0)
 		cout << "Double test" << endl;

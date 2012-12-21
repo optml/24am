@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
 	OptimizationSettings* optimizationSettings = new OptimizationSettings();
 
 	optimizationSettings->maximumIterations = 50;
-	optimizationSettings->toll = 0.0001;
+	optimizationSettings->tolerance = 0.0001;
 	optimizationSettings->totalStartingPoints = 1024;
 	optimizationSettings->constrain = 5;
 	optimizationSettings->formulation = L0_constrained_L2_PCA;

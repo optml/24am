@@ -38,7 +38,7 @@ F computeTheError(const F fval, const F fval_prev,const SolverStructures::Optimi
 template<typename F>
 bool termination_criteria(const F error, int it,
 		const SolverStructures::OptimizationSettings* optimizationSettings) {
-	if (it > 0 && error < optimizationSettings->toll)
+	if (it > 0 && error < optimizationSettings->tolerance)
 		return true;
 	return false;
 }
@@ -46,7 +46,7 @@ bool termination_criteria(const F error, int it,
 template<typename F>
 bool termination_criteria(const F fval, const F fval_prev, int it,
 		const SolverStructures::OptimizationSettings* optimizationSettings) {
-	if (it > 0 && computeTheError(fval, fval_prev) < optimizationSettings->toll)
+	if (it > 0 && computeTheError(fval, fval_prev) < optimizationSettings->tolerance)
 		return true;
 	return false;
 }
