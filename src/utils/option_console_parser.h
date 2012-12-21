@@ -105,35 +105,35 @@ int parseConsoleOptions(SolverStructures::OptimizationSettings* optimizationSett
 		case 'a':
 			switch (atoi(optarg)) {
 			case 1:
-				optimizationSettings->algorithm=L0_constrained_L1_PCA;
+				optimizationSettings->formulation=L0_constrained_L1_PCA;
 				algorithm=true;
 				break;
 			case 2:
-				optimizationSettings->algorithm=L0_constrained_L2_PCA;
+				optimizationSettings->formulation=L0_constrained_L2_PCA;
 				algorithm=true;
 				break;
 			case 3:
-				optimizationSettings->algorithm=L1_constrained_L1_PCA;
+				optimizationSettings->formulation=L1_constrained_L1_PCA;
 				algorithm=true;
 				break;
 			case 4:
-				optimizationSettings->algorithm=L1_constrained_L2_PCA;
+				optimizationSettings->formulation=L1_constrained_L2_PCA;
 				algorithm=true;
 				break;
 			case 5:
-				optimizationSettings->algorithm=L0_penalized_L1_PCA;
+				optimizationSettings->formulation=L0_penalized_L1_PCA;
 				algorithm=true;
 				break;
 			case 6:
-				optimizationSettings->algorithm=L0_penalized_L2_PCA;
+				optimizationSettings->formulation=L0_penalized_L2_PCA;
 				algorithm=true;
 				break;
 			case 7:
-				optimizationSettings->algorithm=L1_penalized_L1_PCA;
+				optimizationSettings->formulation=L1_penalized_L1_PCA;
 				algorithm=true;
 				break;
 			case 8:
-				optimizationSettings->algorithm=L1_penalized_L2_PCA;
+				optimizationSettings->formulation=L1_penalized_L2_PCA;
 				algorithm=true;
 				break;
 

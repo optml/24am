@@ -44,8 +44,8 @@ void run_experiments(OptimizationSettings* optimizationSettings) {
 		optimizationSettings->totalStartingPoints = 256;
 		optimizationSettings->constrain = n / 100;
 		optimizationSettings->penalty = 0.02;
-		optimizationSettings->algorithm = L0_penalized_L2_PCA;
-//		optimizationSettings->algorithm = L0_constrained_L2_PCA;
+		optimizationSettings->formulation = L0_penalized_L2_PCA;
+//		optimizationSettings->formulation = L0_constrained_L2_PCA;
 		optimizationSettings->onTheFlyMethod = false;
 		for (int strategy = 0; strategy < 5; strategy++) {
 			switch (strategy) {
@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
 //
 //
 //			//----------------- CPU L1 Penalized L1 PCA
-//			optimizationSettings->algorithm = L1_penalized_L1_PCA;
+//			optimizationSettings->formulation = L1_penalized_L1_PCA;
 //			mt->start();
 //			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, optimizationSettings, optimizationStatistics);
 //			mt->end();
@@ -155,7 +155,7 @@ int main(int argc, char *argv[]) {
 //			logTime("L1-Pen-L1   ", fval, fval2, nnz, mt, optimizationStatistics, optimizationSettings, m, n,
 //					computeReferentialValue(&h_B[0], &x[0], &y[0], m, n));
 //			//----------------- CPU L1 Penalized L2 PCA
-//			optimizationSettings->algorithm = L1_penalized_L2_PCA;
+//			optimizationSettings->formulation = L1_penalized_L2_PCA;
 //			mt->start();
 //			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, optimizationSettings, optimizationStatistics);
 //			mt->end();
@@ -169,7 +169,7 @@ int main(int argc, char *argv[]) {
 //					computeReferentialValue(&h_B[0], &x[0], &y[0], m, n));
 //
 //			//----------------- CPU L0 Penalized L1 PCA
-//			optimizationSettings->algorithm = L0_penalized_L1_PCA;
+//			optimizationSettings->formulation = L0_penalized_L1_PCA;
 //			mt->start();
 //			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, optimizationSettings, optimizationStatistics);
 //			mt->end();
@@ -183,7 +183,7 @@ int main(int argc, char *argv[]) {
 //					computeReferentialValue(&h_B[0], &x[0], &y[0], m, n));
 //
 //			//============= L0 Pen L2
-//			optimizationSettings->algorithm = L0_penalized_L2_PCA;
+//			optimizationSettings->formulation = L0_penalized_L2_PCA;
 //			mt->start();
 //			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, optimizationSettings, optimizationStatistics);
 //			mt->end();
@@ -197,7 +197,7 @@ int main(int argc, char *argv[]) {
 //					computeReferentialValue(&h_B[0], &x[0], &y[0], m, n));
 //
 //			//----------------- CPU L0 Constrained L2 PCA
-//			optimizationSettings->algorithm = L0_constrained_L2_PCA;
+//			optimizationSettings->formulation = L0_constrained_L2_PCA;
 //			mt->start();
 //			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, optimizationSettings, optimizationStatistics);
 //			mt->end();
@@ -210,7 +210,7 @@ int main(int argc, char *argv[]) {
 //					computeReferentialValue(&h_B[0], &x[0], &y[0], m, n));
 //
 //			//----------------- CPU L1 Constrained L2 PCA
-//			optimizationSettings->algorithm = L1_constrained_L2_PCA;
+//			optimizationSettings->formulation = L1_constrained_L2_PCA;
 //			mt->start();
 //			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, optimizationSettings, optimizationStatistics);
 //			mt->end();
@@ -225,7 +225,7 @@ int main(int argc, char *argv[]) {
 //			printf("Sanity check on l1 constrain %f==%f\n", l1_norm,
 //					sqrt(constrain));
 //			//----------------- CPU L0 Constrained L1 PCA
-//			optimizationSettings->algorithm = L0_constrained_L1_PCA;
+//			optimizationSettings->formulation = L0_constrained_L1_PCA;
 //
 //			optimizationSettings->hard_tresholding_using_sort = false;
 //			mt->start();
@@ -252,7 +252,7 @@ int main(int argc, char *argv[]) {
 //					computeReferentialValue(&h_B[0], &x[0], &y[0], m, n));
 //
 //			//----------------- CPU L1 Constrained L1 PCA
-//			optimizationSettings->algorithm = L1_constrained_L1_PCA;
+//			optimizationSettings->formulation = L1_constrained_L1_PCA;
 //			mt->start();
 //			fval = sparse_PCA_solver(&h_B[0], m, &x[0], m, n, optimizationSettings, optimizationStatistics);
 //			mt->end();

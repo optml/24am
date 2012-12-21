@@ -26,14 +26,14 @@ namespace SolverStructures {
 
 enum SPCA_Formulation // Formulation of PCA
 {
-	L0_penalized_L1_PCA = 0,
-	L0_penalized_L2_PCA,
-	L1_penalized_L1_PCA,
-	L1_penalized_L2_PCA,
+	L0_constrained_L2_PCA = 0,
 	L0_constrained_L1_PCA,
-	L0_constrained_L2_PCA,
+	L1_constrained_L2_PCA,
 	L1_constrained_L1_PCA,
-	L1_constrained_L2_PCA
+	L0_penalized_L2_PCA,
+	L0_penalized_L1_PCA,
+	L1_penalized_L2_PCA,
+	L1_penalized_L1_PCA
 };
 
 template<typename T> // NOTE: We use typename T instead of std::ostream to make this header-only
@@ -75,7 +75,7 @@ public:
 	double toll; // final tollerance for solver
 	bool verbose;
 	bool useSortForHardThresholding; // determines if hardthresholding should be done by sorting (better for large constrain value)
-									  // or by using an sorted map (better for small constrain parameter)
+									 // or by using an sorted map (better for small constrain parameter)
 	bool useKSelectionAlgorithmGPU; // use approximate k-selection algorithm (Russel Steinbach, Jeffrey Blanchard, Bradley Gordon, and Toluwaloju Alabi)
 	bool useDoublePrecision; // determines if one should use "double" or "float"
 	double penalty; // value of penalty parameter
@@ -84,7 +84,7 @@ public:
 	char* resultFilePath; // path to file where result and OptimizationStatistics will be used
 	int gpu_sm_count; // gpu number of Streaming Processors
 	int gpu_max_threads; // gpu - max number of threads
-	enum SPCA_Formulation algorithm; // algorithm which should be used
+	enum SPCA_Formulation formulation; // formulation which should be used
 	bool getValuesForAllStartingPoints; // determines if algorithm should store values for all starting points
 	bool storeIterationsForAllPoints; // determines if algorithm should store elapsed iterations for all starting points
 	int maximumIterations; //max iteration which one starting point can consume
@@ -112,9 +112,9 @@ public:
 	}
 
 	bool isConstrainedProblem() {
-		if (algorithm == L0_penalized_L1_PCA || algorithm == L0_penalized_L2_PCA
-				|| algorithm == L1_penalized_L1_PCA
-				|| algorithm == L1_penalized_L2_PCA) {
+		if (this->formulation == L0_penalized_L1_PCA || this->formulation== L0_penalized_L2_PCA
+				|| this->formulation == L1_penalized_L1_PCA
+				|| this->formulation == L1_penalized_L2_PCA) {
 			return false;
 		} else {
 			return true;
@@ -122,8 +122,8 @@ public:
 	}
 
 	bool isL1ConstrainedProblem() {
-		if (algorithm == L0_constrained_L1_PCA
-				|| algorithm == L0_constrained_L2_PCA) {
+		if (this->formulation == L0_constrained_L1_PCA
+				|| this->formulation== L0_constrained_L2_PCA) {
 			return false;
 		} else {
 			return true;
@@ -131,8 +131,8 @@ public:
 	}
 
 	bool isL1PenalizedProblem() {
-		if (algorithm == L0_penalized_L1_PCA
-				|| algorithm == L0_penalized_L2_PCA) {
+		if (this->formulation == L0_penalized_L1_PCA
+				|| this->formulation == L0_penalized_L2_PCA) {
 			return false;
 		} else {
 			return true;

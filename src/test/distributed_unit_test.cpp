@@ -59,14 +59,14 @@ void test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 	algorithms[7] = SolverStructures::L1_constrained_L2_PCA;
 	char* resultDistributed = optimizationSettings->resultFilePath;
 	for (int al = 0; al < 8; al++) {
-		optimizationSettings->algorithm = algorithms[al];
+		optimizationSettings->formulation = algorithms[al];
 		SPCASolver::DistributedSolver::denseDataSolver(
 				optimizationDataInstance, optimizationSettings, optimizationStatistics);
 		if (optimizationSettings->proccessNode == 0) {
 			SPCASolver::MulticoreSolver::denseDataSolver(B, ldB, x, m, n, optimizationSettings, optimizationStatistics2);
 			optimizationSettings->resultFilePath=multicoreResult;
 			InputOuputHelper::save_results(optimizationStatistics, optimizationSettings, x, n);
-			cout << "Test " << al << " " << optimizationSettings->algorithm << " "
+			cout << "Test " << al << " " << optimizationSettings->formulation << " "
 					<< optimizationStatistics->fval << "  " << optimizationStatistics2->fval << endl;
 		}
 	}

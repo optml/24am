@@ -91,7 +91,7 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 	algorithms[7] = SolverStructures::L1_constrained_L2_PCA;
 	char* resultGPU = optimizationSettings->resultFilePath;
 	for (int al = 0; al < 8; al++) {
-		optimizationSettings->algorithm = algorithms[al];
+		optimizationSettings->formulation = algorithms[al];
 		SPCASolver::GPUSolver::denseDataSolver(handle, m, n, d_B, h_x, optimizationSettings,
 				optimizationStatistics, LD_M, LD_N);
 		optimizationSettings->resultFilePath=resultGPU;
@@ -100,7 +100,7 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 			SPCASolver::MulticoreSolver::denseDataSolver(B, ldB, x, m, n, optimizationSettings, optimizationStatistics2);
 			optimizationSettings->resultFilePath = multicoreResult;
 			InputOuputHelper::save_results(optimizationStatistics2, optimizationSettings, x, n);
-			cout << "Test " << al << " " << optimizationSettings->algorithm << " "
+			cout << "Test " << al << " " << optimizationSettings->formulation << " "
 					<< optimizationStatistics->fval << "  " << optimizationStatistics2->fval << endl;
 		}
 	}

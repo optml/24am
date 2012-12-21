@@ -112,7 +112,7 @@ int test() {
 		algorithms[7] = L1_constrained_L2_PCA;
 
 		for (int alg = 0; alg < 8; alg++) {
-			optimizationSettings->algorithm = algorithms[alg];
+			optimizationSettings->formulation = algorithms[alg];
 			for (optimizationSettings->totalStartingPoints = 1; optimizationSettings->totalStartingPoints
 					<= 128 * 8*4; //
 			optimizationSettings->totalStartingPoints = optimizationSettings->totalStartingPoints * 2+1) {
@@ -141,7 +141,7 @@ int test() {
 			}
 		}
 		/*	//----------------- CPU L1 Penalized L1 PCA
-		 optimizationSettings->algorithm = L1_penalized_L1_PCA;
+		 optimizationSettings->formulation = L1_penalized_L1_PCA;
 		 mt->start();
 		 fval = sparse_PCA_solver(h_B, m, x->data, B->size1, B->size2,
 		 optimizationSettings, optimizationStatistics);
@@ -153,7 +153,7 @@ int test() {
 		 computeReferentialValue(B, x, y));
 
 		 //----------------- CPU L1 Penalized L2 PCA
-		 optimizationSettings->algorithm = L1_penalized_L2_PCA;
+		 optimizationSettings->formulation = L1_penalized_L2_PCA;
 		 mt->start();
 		 fval = sparse_PCA_solver(BT->data, BT->tda, x->data, B->size1, B->size2,
 		 optimizationSettings, optimizationStatistics);
@@ -165,7 +165,7 @@ int test() {
 		 computeReferentialValue(B, x, y));
 
 		 //----------------- CPU L0 Penalized L1 PCA
-		 optimizationSettings->algorithm = L0_penalized_L1_PCA;
+		 optimizationSettings->formulation = L0_penalized_L1_PCA;
 		 mt->start();
 		 fval = sparse_PCA_solver(BT->data, BT->tda, x->data, B->size1, B->size2,
 		 optimizationSettings, optimizationStatistics);
@@ -178,7 +178,7 @@ int test() {
 		 computeReferentialValue(B, x, y));
 
 		 //============= L0 Pen L2
-		 optimizationSettings->algorithm = L0_penalized_L2_PCA;
+		 optimizationSettings->formulation = L0_penalized_L2_PCA;
 		 mt->start();
 		 fval = sparse_PCA_solver(BT->data, BT->tda, x->data, B->size1, B->size2,
 		 optimizationSettings, optimizationStatistics);
@@ -191,7 +191,7 @@ int test() {
 		 computeReferentialValue(B, x, y));
 
 		 //----------------- CPU L0 Constrained L2 PCA
-		 optimizationSettings->algorithm = L0_constrained_L2_PCA;
+		 optimizationSettings->formulation = L0_constrained_L2_PCA;
 		 mt->start();
 		 fval = sparse_PCA_solver(BT->data, BT->tda, x->data, B->size1, B->size2,
 		 optimizationSettings, optimizationStatistics);
@@ -203,7 +203,7 @@ int test() {
 		 computeReferentialValue(B, x, y));
 
 		 //----------------- CPU L1 Constrained L2 PCA
-		 optimizationSettings->algorithm = L1_constrained_L2_PCA;
+		 optimizationSettings->formulation = L1_constrained_L2_PCA;
 		 mt->start();
 		 fval = sparse_PCA_solver(BT->data, BT->tda, x->data, B->size1, B->size2,
 		 optimizationSettings, optimizationStatistics);
@@ -216,7 +216,7 @@ int test() {
 		 computeReferentialValue(B, x, y));
 		 printf("Sanity check on l1 constrain %f==%f\n", l1_norm, sqrt(constrain));
 		 //----------------- CPU L0 Constrained L1 PCA
-		 optimizationSettings->algorithm = L0_constrained_L1_PCA;
+		 optimizationSettings->formulation = L0_constrained_L1_PCA;
 		 mt->start();
 		 fval = sparse_PCA_solver(BT->data, BT->tda, x->data, B->size1, B->size2,
 		 optimizationSettings, optimizationStatistics);
@@ -228,7 +228,7 @@ int test() {
 		 computeReferentialValue(B, x, y));
 
 		 //----------------- CPU L1 Constrained L1 PCA
-		 optimizationSettings->algorithm = L1_constrained_L1_PCA;
+		 optimizationSettings->formulation = L1_constrained_L1_PCA;
 		 mt->start();
 		 fval = sparse_PCA_solver(BT->data, BT->tda, x->data, B->size1, B->size2,
 		 optimizationSettings, optimizationStatistics);

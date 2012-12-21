@@ -44,7 +44,7 @@ void run_experiments(OptimizationSettings* optimizationSettings) {
 		optimizationSettings->totalStartingPoints = 1024;
 		optimizationSettings->penalty = 0.02;
 		optimizationSettings->constrain = n / 100;
-		optimizationSettings->algorithm = L0_penalized_L2_PCA;
+		optimizationSettings->formulation = L0_penalized_L2_PCA;
 		optimizationSettings->batchSize = optimizationSettings->totalStartingPoints;
 		optimizationSettings->onTheFlyMethod = false;
 		for (int i = 1; i <= 8; i=i*2) {

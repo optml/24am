@@ -13,7 +13,7 @@ template<typename F>
 void logTime(ofstream &stream, mytimer* mt, optimization_Statisticsistics* optimizationStatistics,
 		optimization_settings* optimizationSettings, std::vector<F>& x, int m, int n) {
 	int nnz = vector_get_nnz(&x[0], n);
-	cout << optimizationSettings->algorithm << "," << nnz << "," << m << "," << n << ","
+	cout << optimizationSettings->formulation << "," << nnz << "," << m << "," << n << ","
 			<< mt->getElapsedWallClockTime() << ","
 			<< optimizationStatistics->totalTrueComputationTime << "," << optimizationSettings->batchSize << ","
 			<< optimizationSettings->on_the_fly_generation
@@ -21,7 +21,7 @@ void logTime(ofstream &stream, mytimer* mt, optimization_Statisticsistics* optim
 			<< ","<<optimizationSettings->totalStartingPoints
 			<< ","<<optimizationStatistics->it
 			<< endl;
-	stream<< optimizationSettings->algorithm << "," << nnz << "," << m << "," << n << ","
+	stream<< optimizationSettings->formulation << "," << nnz << "," << m << "," << n << ","
 			<< mt->getElapsedWallClockTime() << ","
 			<< optimizationStatistics->totalTrueComputationTime << "," << optimizationSettings->batchSize << ","
 			<< optimizationSettings->on_the_fly_generation

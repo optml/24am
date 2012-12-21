@@ -102,7 +102,7 @@ void saveSolverStatistics(SolverStructures::OptimizationStatistics* optimization
 	ofstream statFile;
 		statFile.open(get_file_modified_name(optimizationSettings->resultFilePath, "optimizationStatistics"));
 		statFile << "Solver options " << '\n';
-		statFile << "Algorithm: " << optimizationSettings->algorithm << '\n';
+		statFile << "Formulation: " << optimizationSettings->formulation << '\n';
 		if (optimizationSettings->isConstrainedProblem()){
 			statFile << "Constraint parameter: " << optimizationSettings->constrain << '\n';
 		}else{

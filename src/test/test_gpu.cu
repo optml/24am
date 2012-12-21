@@ -112,31 +112,31 @@ int runTest() {
 	optimizationSettings->constrain=10;
 	//	//==================  PENALIZED
 
-	optimizationSettings->algorithm = L0_penalized_L2_PCA;
+	optimizationSettings->formulation = L0_penalized_L2_PCA;
 	mt->start(); denseDataSolver(handle,m, n, d_B, h_x, optimizationSettings, optimizationStatistics,LD_M,LD_N);mt->end();
 	nnz = vector_get_nnz(&h_x[0],n);
 	printf("FVAL:%f,nnz:%d,%f\n",optimizationStatistics->fval,nnz,mt->getElapsedWallClockTime());
 
 	//-----------------------
-	//	optimizationSettings->algorithm = L1_penalized_L2_PCA;
+	//	optimizationSettings->formulation = L1_penalized_L2_PCA;
 	//	denseDataSolver(m, n, h_B, h_x, optimizationSettings, optimizationStatistics);
 	//	nnz = vector_get_nnz(&h_x[0],n);
 	//	printf("FVAL:%f,nnz:%d\n",optimizationStatistics->fval,nnz);
 	//
 	//	//-----------------------
-	//	optimizationSettings->algorithm = L0_penalized_L1_PCA;
+	//	optimizationSettings->formulation = L0_penalized_L1_PCA;
 	//	denseDataSolver(m, n, h_B, h_x, optimizationSettings, optimizationStatistics);
 	//	nnz = vector_get_nnz(&h_x[0],n);
 	//	printf("FVAL:%f,nnz:%d\n",optimizationStatistics->fval,nnz);
 	//
 	//	//-----------------------
-	//	optimizationSettings->algorithm = L1_penalized_L1_PCA;
+	//	optimizationSettings->formulation = L1_penalized_L1_PCA;
 	//	denseDataSolver(m, n, h_B, h_x, optimizationSettings, optimizationStatistics);
 	//	nnz = vector_get_nnz(&h_x[0],n);
 	//	printf("FVAL:%f,nnz:%d\n",optimizationStatistics->fval,nnz);
 
 	//==================  CONSTRAINED
-	optimizationSettings->algorithm = L0_constrained_L1_PCA;
+	optimizationSettings->formulation = L0_constrained_L1_PCA;
 
 	optimizationSettings->useKSelectionAlgorithmGPU=false;
 	mt->start(); denseDataSolver(handle,m, n, d_B, h_x, optimizationSettings, optimizationStatistics,LD_M,LD_N);mt->end();
@@ -148,17 +148,17 @@ int runTest() {
 	nnz = vector_get_nnz(&h_x[0],n);
 	printf("FVAL:%f,nnz:%d,%f\n",optimizationStatistics->fval,nnz,mt->getElapsedWallClockTime());
 
-	//	optimizationSettings->algorithm = L0_constrained_L2_PCA;
+	//	optimizationSettings->formulation = L0_constrained_L2_PCA;
 	//	denseDataSolver(m, n, h_B, h_x, optimizationSettings, optimizationStatistics);
 	//	nnz = vector_get_nnz(&h_x[0],n);
 	//	printf("FVAL:%f,nnz:%d\n",optimizationStatistics->fval,nnz);
 	//
-	//	optimizationSettings->algorithm = L1_constrained_L1_PCA;
+	//	optimizationSettings->formulation = L1_constrained_L1_PCA;
 	//	denseDataSolver(m, n, h_B, h_x, optimizationSettings, optimizationStatistics);
 	//	nnz = vector_get_nnz(&h_x[0],n);
 	//	printf("FVAL:%f,nnz:%d\n",optimizationStatistics->fval,nnz);
 	//
-	//	optimizationSettings->algorithm = L1_constrained_L2_PCA;
+	//	optimizationSettings->formulation = L1_constrained_L2_PCA;
 	//	denseDataSolver(m, n, h_B, h_x, optimizationSettings, optimizationStatistics);
 	//	nnz = vector_get_nnz(&h_x[0],n);
 	//	printf("FVAL:%f,nnz:%d\n",optimizationStatistics->fval,nnz);

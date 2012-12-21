@@ -137,12 +137,12 @@ void denseDataSolver(
 				&i_negone, &i_negone);
 		double max_error = 0;
 		for (i = 0; i < optimizationSettings->totalStartingPoints; i++) {
-			if (optimizationSettings->algorithm == SolverStructures::L0_penalized_L1_PCA
-					|| optimizationSettings->algorithm
+			if (optimizationSettings->formulation == SolverStructures::L0_penalized_L1_PCA
+					|| optimizationSettings->formulation
 							== SolverStructures::L0_penalized_L2_PCA
-					|| optimizationSettings->algorithm
+					|| optimizationSettings->formulation
 							== SolverStructures::L0_constrained_L1_PCA
-					|| optimizationSettings->algorithm
+					|| optimizationSettings->formulation
 							== SolverStructures::L1_constrained_L1_PCA) {
 				values[i].val = optimizationDataInstance.norms[i];
 			} else {

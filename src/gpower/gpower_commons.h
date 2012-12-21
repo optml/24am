@@ -75,8 +75,8 @@ void perform_one_iteration_for_constrained_pca(F* V, F* Z,
 	cblas_matrix_matrix_multiply(CblasColMajor, CblasNoTrans, CblasNoTrans, m,
 			number_of_experiments_per_batch, n, 1, B, ldB, V, n, 0, Z, m); // Multiply z = B*V
 	//set Z=sgn(Z)
-	if (optimizationSettings->algorithm == SolverStructures::L0_constrained_L1_PCA
-			|| optimizationSettings->algorithm
+	if (optimizationSettings->formulation == SolverStructures::L0_constrained_L1_PCA
+			|| optimizationSettings->formulation
 					== SolverStructures::L1_constrained_L1_PCA) {
 #ifdef _OPENMP
 #pragma omp parallel for
@@ -94,8 +94,8 @@ void perform_one_iteration_for_constrained_pca(F* V, F* Z,
 #endif
 	for (unsigned int j = 0; j < number_of_experiments_per_batch; j++) {
 		F fval_current = 0;
-		if (optimizationSettings->algorithm == SolverStructures::L0_constrained_L2_PCA
-				|| optimizationSettings->algorithm
+		if (optimizationSettings->formulation == SolverStructures::L0_constrained_L2_PCA
+				|| optimizationSettings->formulation
 						== SolverStructures::L1_constrained_L2_PCA) {
 			fval_current = cblas_l2_norm(m, &Z[m * j], 1);
 		}
@@ -109,8 +109,8 @@ void perform_one_iteration_for_constrained_pca(F* V, F* Z,
 		}
 
 		cblas_vector_scale(n, &V[j * n], 1 / norm_of_x);
-		if (optimizationSettings->algorithm == SolverStructures::L0_constrained_L1_PCA
-				|| optimizationSettings->algorithm
+		if (optimizationSettings->formulation == SolverStructures::L0_constrained_L1_PCA
+				|| optimizationSettings->formulation
 						== SolverStructures::L1_constrained_L1_PCA) {
 			fval_current = vals[j].tmp;
 		}
@@ -147,8 +147,8 @@ void perform_one_iteration_for_penalized_pca(F* V, F* Z,
 	//scale Z
 	cblas_matrix_matrix_multiply(CblasColMajor, CblasNoTrans, CblasNoTrans, m,
 			number_of_experiments_per_batch, n, 1, B, ldB, V, n, 0, Z, m); // Multiply z = B*w
-	if (optimizationSettings->algorithm == SolverStructures::L0_penalized_L1_PCA
-			|| optimizationSettings->algorithm == SolverStructures::L1_penalized_L1_PCA) {
+	if (optimizationSettings->formulation == SolverStructures::L0_penalized_L1_PCA
+			|| optimizationSettings->formulation == SolverStructures::L1_penalized_L1_PCA) {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif

@@ -50,8 +50,8 @@ void perform_one_distributed_iteration_for_penalized_pca(
 			optimizationDataInstance.descZ);
 	//================== normalize matrix Z
 	//scale Z
-	if (optimizationSettings->algorithm == SolverStructures::L0_penalized_L1_PCA
-			|| optimizationSettings->algorithm == SolverStructures::L1_penalized_L1_PCA) {
+	if (optimizationSettings->formulation == SolverStructures::L0_penalized_L1_PCA
+			|| optimizationSettings->formulation == SolverStructures::L1_penalized_L1_PCA) {
 		for (int j = 0; j < optimizationDataInstance.nnz_z; j++) {
 			optimizationDataInstance.Z[j] = sgn(optimizationDataInstance.Z[j]);
 		}
@@ -105,8 +105,8 @@ void perform_one_distributed_iteration_for_penalized_pca(
 			optimizationDataInstance.descV);
 	// perform thresh-holding operations and compute objective values
 	clear_local_vector(optimizationDataInstance.norms, optimizationSettings->totalStartingPoints); // we use NORMS to store objective values
-	if (optimizationSettings->algorithm == SolverStructures::L0_penalized_L1_PCA
-			|| optimizationSettings->algorithm == SolverStructures::L0_penalized_L2_PCA) {
+	if (optimizationSettings->formulation == SolverStructures::L0_penalized_L1_PCA
+			|| optimizationSettings->formulation == SolverStructures::L0_penalized_L2_PCA) {
 		for (int i = 0; i < optimizationDataInstance.V_nq; i++) {
 			for (int j = 0; j < optimizationDataInstance.V_mp; j++) {
 				const F tmp = optimizationDataInstance.V[j
@@ -222,8 +222,8 @@ void perform_one_distributed_iteration_for_constrained_pca(
 		F tmp = 0;
 		for (int j = 0; j < optimizationDataInstance.z_mp; j++) {
 
-			if (optimizationSettings->algorithm == SolverStructures::L0_constrained_L1_PCA
-					|| optimizationSettings->algorithm
+			if (optimizationSettings->formulation == SolverStructures::L0_constrained_L1_PCA
+					|| optimizationSettings->formulation
 							== SolverStructures::L1_constrained_L1_PCA) {
 				tmp += abs(
 						optimizationDataInstance.Z[j
@@ -242,8 +242,8 @@ void perform_one_distributed_iteration_for_constrained_pca(
 				optimizationDataInstance.params.x_vector_blocking)] = tmp;
 	}
 	//set Z=sgn(Z)
-	if (optimizationSettings->algorithm == SolverStructures::L0_constrained_L1_PCA
-			|| optimizationSettings->algorithm
+	if (optimizationSettings->formulation == SolverStructures::L0_constrained_L1_PCA
+			|| optimizationSettings->formulation
 					== SolverStructures::L1_constrained_L1_PCA) {
 		vector_sgn(optimizationDataInstance.Z, optimizationDataInstance.nnz_z);	//y=sgn(y)
 	}

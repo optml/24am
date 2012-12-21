@@ -75,7 +75,7 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings) {
 		optimizationSettings->toll = 0;
 		optimizationSettings->penalty = 0.02;
 		optimizationSettings->constrain = n / 100;
-		optimizationSettings->algorithm = L1_penalized_L1_PCA;
+		optimizationSettings->formulation = L1_penalized_L1_PCA;
 		optimizationSettings->onTheFlyMethod = false;
 		optimizationSettings->useKSelectionAlgorithmGPU = false;
 		optimizationStatistics->n = n;

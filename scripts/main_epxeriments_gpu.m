@@ -4,7 +4,7 @@ clear all
  
 
 Data = importdata('gpu_test2.log'); 
-% printf("%d,%d,%1.5f,%d,%f,%f,%d,%d,%d,%d,%d\n", optimizationSettings->algorithm, GPU,
+% printf("%d,%d,%1.5f,%d,%f,%f,%d,%d,%d,%d,%d\n", optimizationSettings->formulation, GPU,
 %			optimizationStatistics->fval, nnz, mt->getElapsedCPUTime(),
 %			mt->getElapsedWallClockTime(), optimizationStatistics->it, n, m,
 %			optimizationSettings->totalStartingPoints,sizeofvariable);

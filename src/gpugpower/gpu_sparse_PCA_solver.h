@@ -112,8 +112,8 @@ int denseDataSolver(cublasHandle_t &handle, const unsigned int m,
 					optimizationSettings->totalStartingPoints, LD_M, LD_N);
 
 			//set Z=sgn(Z)
-			if (optimizationSettings->algorithm == L0_constrained_L1_PCA
-					|| optimizationSettings->algorithm == L1_constrained_L1_PCA) {
+			if (optimizationSettings->formulation == L0_constrained_L1_PCA
+					|| optimizationSettings->formulation == L1_constrained_L1_PCA) {
 				for (unsigned int i = 0; i < optimizationSettings->totalStartingPoints; i++) {
 					gpu_compute_l1_Norm(handle, &z[LD_M * i], m, vals[i].val);
 				}
@@ -125,8 +125,8 @@ int denseDataSolver(cublasHandle_t &handle, const unsigned int m,
 			gpu_matrix_matrix_multiply(handle, CUBLAS_OP_T, ONE, m, n, B, z, V,
 					optimizationSettings->totalStartingPoints, LD_M, LD_N);
 
-			if (optimizationSettings->algorithm == L0_constrained_L2_PCA
-					|| optimizationSettings->algorithm == L1_constrained_L2_PCA) {
+			if (optimizationSettings->formulation == L0_constrained_L2_PCA
+					|| optimizationSettings->formulation == L1_constrained_L2_PCA) {
 				for (unsigned int i = 0; i < optimizationSettings->totalStartingPoints; i++) {
 					gpu_computeNorm(handle, &z[LD_M * i], m, vals[i].val);
 				}
@@ -152,8 +152,8 @@ int denseDataSolver(cublasHandle_t &handle, const unsigned int m,
 			//								printf("thresholign %f\n", time2);
 		} else {
 			//=================PENALIZED METHODS
-			if (optimizationSettings->algorithm == L0_penalized_L1_PCA
-					|| optimizationSettings->algorithm == L1_penalized_L1_PCA) {
+			if (optimizationSettings->formulation == L0_penalized_L1_PCA
+					|| optimizationSettings->formulation == L1_penalized_L1_PCA) {
 				//z=sgn(z)
 				thrust::transform(d_z.begin(), d_z.end(), d_z.begin(),
 						gpu_sgn_transformator<F>());

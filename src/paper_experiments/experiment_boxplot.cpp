@@ -44,7 +44,7 @@ void run_experiments(OptimizationSettings* optimizationSettings) {
 		optimizationSettings->toll = 0.000001;
 		optimizationSettings->totalStartingPoints = 1000;
 		optimizationSettings->batchSize = optimizationSettings->totalStartingPoints;
-		optimizationSettings->algorithm = L0_constrained_L2_PCA;
+		optimizationSettings->formulation = L0_constrained_L2_PCA;
 		optimizationSettings->getValuesForAllStartingPoints = true;
 
 		omp_set_num_threads(1);
@@ -294,7 +294,7 @@ int main(int argc, char *argv[]) {
 //			for (int alg =5; alg < 6; alg++) {
 //
 //
-//				optimizationSettings->algorithm = algorithms[alg];
+//				optimizationSettings->formulation = algorithms[alg];
 //				mt->start();
 //
 //
@@ -330,7 +330,7 @@ int main(int argc, char *argv[]) {
 //	}
 //
 //	/*	//----------------- CPU L1 Penalized L1 PCA
-//	 optimizationSettings->algorithm = L1_penalized_L1_PCA;
+//	 optimizationSettings->formulation = L1_penalized_L1_PCA;
 //	 mt->start();
 //	 fval = sparse_PCA_solver(h_B, m, x->data, B->size1, B->size2,
 //	 optimizationSettings, optimizationStatistics);
@@ -342,7 +342,7 @@ int main(int argc, char *argv[]) {
 //	 computeReferentialValue(B, x, y));
 //
 //	 //----------------- CPU L1 Penalized L2 PCA
-//	 optimizationSettings->algorithm = L1_penalized_L2_PCA;
+//	 optimizationSettings->formulation = L1_penalized_L2_PCA;
 //	 mt->start();
 //	 fval = sparse_PCA_solver(BT->data, BT->tda, x->data, B->size1, B->size2,
 //	 optimizationSettings, optimizationStatistics);
@@ -354,7 +354,7 @@ int main(int argc, char *argv[]) {
 //	 computeReferentialValue(B, x, y));
 //
 //	 //----------------- CPU L0 Penalized L1 PCA
-//	 optimizationSettings->algorithm = L0_penalized_L1_PCA;
+//	 optimizationSettings->formulation = L0_penalized_L1_PCA;
 //	 mt->start();
 //	 fval = sparse_PCA_solver(BT->data, BT->tda, x->data, B->size1, B->size2,
 //	 optimizationSettings, optimizationStatistics);
@@ -367,7 +367,7 @@ int main(int argc, char *argv[]) {
 //	 computeReferentialValue(B, x, y));
 //
 //	 //============= L0 Pen L2
-//	 optimizationSettings->algorithm = L0_penalized_L2_PCA;
+//	 optimizationSettings->formulation = L0_penalized_L2_PCA;
 //	 mt->start();
 //	 fval = sparse_PCA_solver(BT->data, BT->tda, x->data, B->size1, B->size2,
 //	 optimizationSettings, optimizationStatistics);
@@ -380,7 +380,7 @@ int main(int argc, char *argv[]) {
 //	 computeReferentialValue(B, x, y));
 //
 //	 //----------------- CPU L0 Constrained L2 PCA
-//	 optimizationSettings->algorithm = L0_constrained_L2_PCA;
+//	 optimizationSettings->formulation = L0_constrained_L2_PCA;
 //	 mt->start();
 //	 fval = sparse_PCA_solver(BT->data, BT->tda, x->data, B->size1, B->size2,
 //	 optimizationSettings, optimizationStatistics);
@@ -392,7 +392,7 @@ int main(int argc, char *argv[]) {
 //	 computeReferentialValue(B, x, y));
 //
 //	 //----------------- CPU L1 Constrained L2 PCA
-//	 optimizationSettings->algorithm = L1_constrained_L2_PCA;
+//	 optimizationSettings->formulation = L1_constrained_L2_PCA;
 //	 mt->start();
 //	 fval = sparse_PCA_solver(BT->data, BT->tda, x->data, B->size1, B->size2,
 //	 optimizationSettings, optimizationStatistics);
@@ -405,7 +405,7 @@ int main(int argc, char *argv[]) {
 //	 computeReferentialValue(B, x, y));
 //	 printf("Sanity check on l1 constrain %f==%f\n", l1_norm, sqrt(constrain));
 //	 //----------------- CPU L0 Constrained L1 PCA
-//	 optimizationSettings->algorithm = L0_constrained_L1_PCA;
+//	 optimizationSettings->formulation = L0_constrained_L1_PCA;
 //	 mt->start();
 //	 fval = sparse_PCA_solver(BT->data, BT->tda, x->data, B->size1, B->size2,
 //	 optimizationSettings, optimizationStatistics);
@@ -417,7 +417,7 @@ int main(int argc, char *argv[]) {
 //	 computeReferentialValue(B, x, y));
 //
 //	 //----------------- CPU L1 Constrained L1 PCA
-//	 optimizationSettings->algorithm = L1_constrained_L1_PCA;
+//	 optimizationSettings->formulation = L1_constrained_L1_PCA;
 //	 mt->start();
 //	 fval = sparse_PCA_solver(BT->data, BT->tda, x->data, B->size1, B->size2,
 //	 optimizationSettings, optimizationStatistics);
