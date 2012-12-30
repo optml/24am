@@ -111,7 +111,7 @@ void perform_one_distributed_iteration_for_penalized_pca(
 			for (int j = 0; j < optimizationDataInstance.V_mp; j++) {
 				const F tmp = optimizationDataInstance.V[j
 						+ i * optimizationDataInstance.V_mp];
-				F tmp2 = (tmp * tmp - optimizationSettings->penalty);
+				F tmp2 = (tmp * tmp - optimizationSettings->penaltyParameter);
 				if (tmp2 > 0) {
 					optimizationDataInstance.norms[get_column_coordinate(i,
 							optimizationDataInstance.params.mycol,
@@ -129,7 +129,7 @@ void perform_one_distributed_iteration_for_penalized_pca(
 			for (int j = 0; j < optimizationDataInstance.V_mp; j++) {
 				const F tmp = optimizationDataInstance.V[j
 						+ i * optimizationDataInstance.V_mp];
-				F tmp2 = myabs(tmp) - optimizationSettings->penalty;
+				F tmp2 = myabs(tmp) - optimizationSettings->penaltyParameter;
 				if (tmp2 > 0) {
 					optimizationDataInstance.norms[get_column_coordinate(i,
 							optimizationDataInstance.params.mycol,
@@ -172,7 +172,7 @@ void threshold_V_for_constrained(
 								&optimizationDataInstance.V_constr_threshold[optimizationDataInstance.params.DIM_N
 										* j],
 								optimizationDataInstance.params.DIM_N,
-								optimizationSettings->constrain,
+								optimizationSettings->constraintParameter,
 								optimizationDataInstance.V_constr_sort_buffer[j],
 								optimizationSettings); // x = S_w(x)
 			} else {
@@ -182,7 +182,7 @@ void threshold_V_for_constrained(
 								&optimizationDataInstance.V_constr_threshold[optimizationDataInstance.params.DIM_N
 										* j],
 								optimizationDataInstance.params.DIM_N,
-								optimizationSettings->constrain,
+								optimizationSettings->constraintParameter,
 								optimizationDataInstance.V_constr_sort_buffer[j],
 								optimizationSettings); // x = T_k(x)
 			}

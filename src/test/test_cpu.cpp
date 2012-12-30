@@ -95,10 +95,10 @@ int test() {
 		cout << "Problem generation took " << mt->getElapsedCPUTime() << " "
 				<< mt->getElapsedWallClockTime() << endl;
 		//============================
-		optimizationSettings->constrain = 10;
-		optimizationSettings->penalty = 0.01;
-		const F penalty = optimizationSettings->penalty;
-		const unsigned int constrain = optimizationSettings->constrain;
+		optimizationSettings->constraintParameter = 10;
+		optimizationSettings->penaltyParameter = 0.01;
+		const F penaltyParameter = optimizationSettings->penaltyParameter;
+		const unsigned int constrain = optimizationSettings->constraintParameter;
 
 		SparsePCA_Algorithm algorithms[8];
 
@@ -148,7 +148,7 @@ int test() {
 		 mt->end();
 		 gsl_blas_dgemv(CblasNoTrans, 1, B, x, 0.0, y); // Multiply y = B*x
 		 nnz = vector_get_nnz(x);
-		 fval2 = gsl_blas_dasum(y) - penalty * gsl_blas_dasum(x);
+		 fval2 = gsl_blas_dasum(y) - penaltyParameter * gsl_blas_dasum(x);
 		 logTime("L1-Pen-L1   ", fval, fval2, nnz, mt, optimizationStatistics,
 		 computeReferentialValue(B, x, y));
 
@@ -160,7 +160,7 @@ int test() {
 		 mt->end();
 		 gsl_blas_dgemv(CblasNoTrans, 1, B, x, 0.0, y); // Multiply y = B*x
 		 nnz = vector_get_nnz(x);
-		 fval2 = gsl_blas_dnrm2(y) - penalty * gsl_blas_dasum(x);
+		 fval2 = gsl_blas_dnrm2(y) - penaltyParameter * gsl_blas_dasum(x);
 		 logTime("L1-Pen-L2 BT", fval, fval2, nnz, mt, optimizationStatistics,
 		 computeReferentialValue(B, x, y));
 
@@ -173,7 +173,7 @@ int test() {
 		 gsl_blas_dgemv(CblasNoTrans, 1, B, x, 0.0, y); // Multiply y = B*x
 		 nnz = vector_get_nnz(x);
 		 fval2 = gsl_blas_dasum(y);
-		 fval2 = fval2 * fval2 - penalty * nnz;
+		 fval2 = fval2 * fval2 - penaltyParameter * nnz;
 		 logTime("L0-Pen-L1   ", fval, fval2, nnz, mt, optimizationStatistics,
 		 computeReferentialValue(B, x, y));
 
@@ -186,7 +186,7 @@ int test() {
 		 gsl_blas_dgemv(CblasNoTrans, 1, B, x, 0.0, y); // Multiply y = B*x
 		 nnz = vector_get_nnz(x);
 		 fval2 = gsl_blas_dnrm2(y);
-		 fval2 = fval2 * fval2 - penalty * nnz;
+		 fval2 = fval2 * fval2 - penaltyParameter * nnz;
 		 logTime("L0-Pen-L2 M1", fval, fval2, nnz, mt, optimizationStatistics,
 		 computeReferentialValue(B, x, y));
 

@@ -94,7 +94,7 @@ int runTest() {
 
 	thrust::host_vector<F> h_x(n,0);
 
-	F penalty=0.0001;
+	F penaltyParameter=0.0001;
 	int nnz=0;
 	thrust::device_vector<F> d_B=h_B;
 
@@ -108,8 +108,8 @@ int runTest() {
 		printf("CUBLAS initialized.\n");
 	}
 
-	optimizationSettings->penalty=penalty;
-	optimizationSettings->constrain=10;
+	optimizationSettings->penaltyParameter=penaltyParameter;
+	optimizationSettings->constraintParameter=10;
 	//	//==================  PENALIZED
 
 	optimizationSettings->formulation = L0_penalized_L2_PCA;

@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
 	optimizationSettings->maximumIterations = 50;
 	optimizationSettings->tolerance = 0.0001;
 	optimizationSettings->totalStartingPoints = 1024;
-	optimizationSettings->constrain = 5;
+	optimizationSettings->constraintParameter = 5;
 	optimizationSettings->formulation = L0_constrained_L2_PCA;
 
 //	char* filename = "datasets/docword.nips.txt";

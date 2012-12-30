@@ -82,7 +82,7 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 		for (unsigned int j = 0; j < number_of_experiments; j++) {
 			myseed = rand();
 			F tmp_norm = 0;
-			//			for (unsigned int i = 0; i < n;i++){//optimizationSettings->constrain; i++) {
+			//			for (unsigned int i = 0; i < n;i++){//optimizationSettings->constraintParameter; i++) {
 			//				unsigned int idx = i;
 
 			for (unsigned int i = 0; i < n; i++) {
@@ -206,10 +206,10 @@ F sparse_PCA_solver_CSC(F * B_CSC_Vals, int* B_CSC_Row_Id, int* B_CSC_Col_Ptr,
 				F norm_of_x;
 				if (optimizationSettings->isL1ConstrainedProblem()) {
 					norm_of_x = soft_thresholding(&V[n * j], n,
-							optimizationSettings->constrain, buffer[j], optimizationSettings); // x = S_w(x)
+							optimizationSettings->constraintParameter, buffer[j], optimizationSettings); // x = S_w(x)
 				} else {
 					norm_of_x = k_hard_thresholding(&V[n * j], n,
-							optimizationSettings->constrain, buffer[j], optimizationSettings); // x = T_k(x)
+							optimizationSettings->constraintParameter, buffer[j], optimizationSettings); // x = T_k(x)
 				}
 
 				cblas_vector_scale(n, &V[j * n], 1 / norm_of_x);

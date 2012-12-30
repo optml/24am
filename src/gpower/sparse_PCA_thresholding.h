@@ -34,7 +34,7 @@ void L1_penalized_thresholding(const unsigned int number_of_experiments,
 		F fval_current = 0;
 		for (unsigned i = 0; i < n; i++) {
 			F const tmp = V[n * j + i];
-			F tmp2 = abs(tmp) - optimizationSettings->penalty;
+			F tmp2 = abs(tmp) - optimizationSettings->penaltyParameter;
 			if (tmp2 > 0) {
 				fval_current += tmp2 * tmp2;
 				V[n * j + i] = tmp2 * sgn(tmp);
@@ -74,7 +74,7 @@ void L0_penalized_thresholding(const unsigned int number_of_experiments,
 		F fval_current = 0;
 		for (unsigned i = 0; i < n; i++) {
 			F const tmp = V[n * j + i];
-			F tmp2 = (tmp * tmp - optimizationSettings->penalty);
+			F tmp2 = (tmp * tmp - optimizationSettings->penaltyParameter);
 			if (tmp2 > 0) {
 				fval_current += tmp2;
 			} else {

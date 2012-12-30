@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
 	optimizationSettings->verbose = false;
 	optimizationSettings->batchSize = 64;
 	optimizationSettings->totalStartingPoints = 64;
-	optimizationSettings->constrain = 20;
+	optimizationSettings->constraintParameter = 20;
 	optimizationSettings->tolerance = 0.001;
 	optimizationSettings->maximumIterations = 100;
 	if (optimizationSettings->proccessNode == 0)

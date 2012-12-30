@@ -56,7 +56,7 @@ int parseConsoleOptions(SolverStructures::OptimizationSettings* optimizationSett
 	 * p - use DOUBLE precission (*optional*)
 	 * a - algorithm
 	 * n - constrain parameter
-	 * m - penalty parameter
+	 * m - penaltyParameter parameter
 	 * x - x-dimension of distributed files (FOR DISTRIBUTED METHOD ONLY)
 	 */
 	bool dataFilePath = false;
@@ -74,10 +74,10 @@ int parseConsoleOptions(SolverStructures::OptimizationSettings* optimizationSett
 			optimizationSettings->batchSize = atoi(optarg);
 			break;
 		case 'n':
-			optimizationSettings->constrain = atoi(optarg);
+			optimizationSettings->constraintParameter = atoi(optarg);
 			break;
 		case 'm':
-			optimizationSettings->penalty= atof(optarg);
+			optimizationSettings->penaltyParameter= atof(optarg);
 			break;
 		case 'i':
 			optimizationSettings->maximumIterations = atoi(optarg);

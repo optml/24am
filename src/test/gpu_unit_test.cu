@@ -124,7 +124,7 @@ int main(int argc, char *argv[]) {
 	optimizationSettings->batchSize = optimizationSettings->totalStartingPoints;
 	optimizationSettings->useOTF=false;
 	optimizationSettings->useKSelectionAlgorithmGPU=false;
-	optimizationSettings->constrain = 20;
+	optimizationSettings->constraintParameter = 20;
 	optimizationSettings->tolerance = 0.0001;
 	optimizationSettings->maximumIterations = 100;
 	cout << "Double test" << endl;

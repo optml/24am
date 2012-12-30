@@ -26,7 +26,7 @@ void getSignleStartingPoint(F* V, F* Z,
 	if (optimizationSettings->isConstrainedProblem()) {
 		myseed = j + batchshift;
 		F tmp_norm = 0;
-		for (unsigned int i = 0; i < optimizationSettings->constrain; i++) {
+		for (unsigned int i = 0; i < optimizationSettings->constraintParameter; i++) {
 			unsigned int idx = (int) (n * (F) rand_r(&myseed) / (RAND_MAX));
 			if (idx == n)
 				idx--;
@@ -101,10 +101,10 @@ void perform_one_iteration_for_constrained_pca(F* V, F* Z,
 		}
 		F norm_of_x;
 		if (optimizationSettings->isL1ConstrainedProblem()) {
-			norm_of_x = soft_thresholding(&V[n * j], n, optimizationSettings->constrain,
+			norm_of_x = soft_thresholding(&V[n * j], n, optimizationSettings->constraintParameter,
 					buffer[j], optimizationSettings); // x = S_w(x)
 		} else {
-			norm_of_x = k_hard_thresholding(&V[n * j], n, optimizationSettings->constrain,
+			norm_of_x = k_hard_thresholding(&V[n * j], n, optimizationSettings->constraintParameter,
 					buffer[j], optimizationSettings); // x = T_k(x)
 		}
 

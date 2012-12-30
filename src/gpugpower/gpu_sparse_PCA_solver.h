@@ -72,7 +72,7 @@ int denseDataSolver(cublasHandle_t &handle, const unsigned int m,
 					init_sequence_with_LDN(LD_N));
 			dataToSort.resize(LD_N * optimizationSettings->totalStartingPoints);
 		}
-		for (int i = 0; i < optimizationSettings->constrain; i++) {
+		for (int i = 0; i < optimizationSettings->constraintParameter; i++) {
 			for (int j = 0; j < optimizationSettings->totalStartingPoints; j++) {
 				int tmp_idx = n * (rand() / (RAND_MAX + 0.0));
 				tmp_idx = (tmp_idx == n ? tmp_idx-- : tmp_idx);

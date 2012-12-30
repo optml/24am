@@ -169,14 +169,14 @@ void gpu_vector_copy(cublasHandle_t &handle, float* from, const unsigned int n,
 
 template<typename F>
 struct gpu_l0_penalized_tresholing {
-	F penalty;
-	gpu_l0_penalized_tresholing(F _penalty) {
-		penalty = _penalty;
+	F penaltyParameter;
+	gpu_l0_penalized_tresholing(F _penaltyParameter) {
+		penaltyParameter = _penaltyParameter;
 	}
 
 	__host__                                          __device__
 	F operator()(F x) {
-		if (x * x - penalty <= 0) {
+		if (x * x - penaltyParameter <= 0) {
 			return 0;
 		} else {
 			return x;
@@ -186,14 +186,14 @@ struct gpu_l0_penalized_tresholing {
 
 template<typename F>
 struct gpu_l0_penalized_objval {
-	F penalty;
-	gpu_l0_penalized_objval(F _penalty) {
-		penalty = _penalty;
+	F penaltyParameter;
+	gpu_l0_penalized_objval(F _penaltyParameter) {
+		penaltyParameter = _penaltyParameter;
 	}
 
 	__host__                                          __device__
 	F operator()(F x) {
-		F tmp = x * x - penalty;
+		F tmp = x * x - penaltyParameter;
 		if (tmp <= 0) {
 			return 0;
 		} else {
@@ -204,13 +204,13 @@ struct gpu_l0_penalized_objval {
 
 template<typename F>
 struct gpu_l1_penalized_tresholing {
-	F penalty;
-	gpu_l1_penalized_tresholing(F _penalty) {
-		penalty = _penalty;
+	F penaltyParameter;
+	gpu_l1_penalized_tresholing(F _penaltyParameter) {
+		penaltyParameter = _penaltyParameter;
 	}
 	__host__                                          __device__
 	F operator()(F x) {
-		F tmp = abs(x) - penalty;
+		F tmp = abs(x) - penaltyParameter;
 		if (tmp > 0) {
 			return tmp * gpu_sgn(x);
 		} else {
@@ -221,14 +221,14 @@ struct gpu_l1_penalized_tresholing {
 
 template<typename F>
 struct gpu_l1_penalized_objval {
-	F penalty;
-	gpu_l1_penalized_objval(F _penalty) {
-		penalty = _penalty;
+	F penaltyParameter;
+	gpu_l1_penalized_objval(F _penaltyParameter) {
+		penaltyParameter = _penaltyParameter;
 	}
 
 	__host__                                          __device__
 	F operator()(F x) {
-		F tmp = abs(x) - penalty;
+		F tmp = abs(x) - penaltyParameter;
 		if (tmp >= 0) {
 			return tmp * tmp;
 		} else {
@@ -449,12 +449,12 @@ void perform_hard_and_soft_thresholdingNEW(thrust::device_vector<float> &d_V,
 			thrust::advance(it_sorted, LDN * i);
 			thrust::copy(it_sorted, it_sorted + n, h_x.begin());
 			float tresh_hold = compute_soft_thresholding_parameter(&h_x[0], n,
-					optimizationSettings->constrain);
+					optimizationSettings->constraintParameter);
 			thrust::transform(it_begin, it_end, it_begin,
 					gpu_soft_treshholding<float> (tresh_hold));
 		} else {
 			float tresh_hold = abs(
-					dataToSort[i * LDN + optimizationSettings->constrain - 1]);
+					dataToSort[i * LDN + optimizationSettings->constraintParameter - 1]);
 			thrust::transform(it_begin, it_end, it_begin,
 					gpu_hard_treshholding<float> (tresh_hold));
 		}
@@ -492,12 +492,12 @@ void perform_hard_and_soft_thresholdingNEW(thrust::device_vector<double> &d_V,
 			thrust::advance(it_sorted, LDN * i);
 			thrust::copy(it_sorted, it_sorted + n, h_x.begin());
 			double tresh_hold = compute_soft_thresholding_parameter(&h_x[0], n,
-					optimizationSettings->constrain);
+					optimizationSettings->constraintParameter);
 			thrust::transform(it_begin, it_end, it_begin,
 					gpu_soft_treshholding<double> (tresh_hold));
 		} else {
 			double tresh_hold = abs(
-					dataToSort[i * LDN + optimizationSettings->constrain - 1]);
+					dataToSort[i * LDN + optimizationSettings->constraintParameter - 1]);
 			thrust::transform(it_begin, it_end, it_begin,
 					gpu_hard_treshholding<double> (tresh_hold));
 		}
@@ -540,7 +540,7 @@ void perform_hard_thresholding_with_k_selection(
 		if (i > 0)
 			thrust::advance(it_begin, LDN);
 		thrust::device_vector<float>::iterator it_end = it_begin + n;
-		float tresh_hold = BucketSelect::bucketSelectWrapper(&V[i*LDN], n, optimizationSettings->constrain,
+		float tresh_hold = BucketSelect::bucketSelectWrapper(&V[i*LDN], n, optimizationSettings->constraintParameter,
 				optimizationSettings->gpu_sm_count, optimizationSettings->gpu_max_threads);
 		thrust::transform(it_begin, it_end, it_begin,
 				gpu_hard_treshholding<float> (tresh_hold));
@@ -558,7 +558,7 @@ void perform_hard_thresholding_with_k_selection(
 		if (i > 0)
 			thrust::advance(it_begin, LDN);
 		thrust::device_vector<double>::iterator it_end = it_begin + n;
-		double tresh_hold = BucketSelect::bucketSelectWrapper(&V[i*LDN], n, optimizationSettings->constrain,
+		double tresh_hold = BucketSelect::bucketSelectWrapper(&V[i*LDN], n, optimizationSettings->constraintParameter,
 				optimizationSettings->gpu_sm_count, optimizationSettings->gpu_max_threads);
 		thrust::transform(it_begin, it_end, it_begin,
 				gpu_hard_treshholding<double> (tresh_hold));
@@ -593,11 +593,11 @@ void perform_hard_and_soft_thresholding_with_sorting(
 		if (optimizationSettings->isL1ConstrainedProblem()) {
 			thrust::copy(d_x_for_sort.begin(), d_x_for_sort.end(), h_x.begin());
 			float tresh_hold = compute_soft_thresholding_parameter(&h_x[0], n,
-					optimizationSettings->constrain);
+					optimizationSettings->constraintParameter);
 			thrust::transform(it_begin, it_end, it_begin,
 					gpu_soft_treshholding<float> (tresh_hold));
 		} else {
-			float tresh_hold = abs(d_x_for_sort[optimizationSettings->constrain - 1]);
+			float tresh_hold = abs(d_x_for_sort[optimizationSettings->constraintParameter - 1]);
 			thrust::transform(it_begin, it_end, it_begin,
 					gpu_hard_treshholding<float> (tresh_hold));
 		}
@@ -622,11 +622,11 @@ void perform_hard_and_soft_thresholding_with_sorting(
 		if (optimizationSettings->isL1ConstrainedProblem()) {
 			thrust::copy(d_x_for_sort.begin(), d_x_for_sort.end(), h_x.begin());
 			double tresh_hold = compute_soft_thresholding_parameter(&h_x[0], n,
-					optimizationSettings->constrain);
+					optimizationSettings->constraintParameter);
 			thrust::transform(it_begin, it_end, it_begin,
 					gpu_soft_treshholding<double> (tresh_hold));
 		} else {
-			double tresh_hold = abs(d_x_for_sort[optimizationSettings->constrain - 1]);
+			double tresh_hold = abs(d_x_for_sort[optimizationSettings->constraintParameter - 1]);
 			thrust::transform(it_begin, it_end, it_begin,
 					gpu_hard_treshholding<double> (tresh_hold));
 		}
@@ -654,12 +654,12 @@ void perform_hard_and_soft_thresholding_for_penalized(
 
 			thrust::device_vector<double>::iterator it_end = it_begin + n;
 			vals[i].val = thrust::transform_reduce(it_begin, it_end,
-					gpu_l1_penalized_objval<double> (optimizationSettings->penalty), 0.0f,
+					gpu_l1_penalized_objval<double> (optimizationSettings->penaltyParameter), 0.0f,
 					thrust::plus<double>());
 			vals[i].val = std::sqrt(vals[i].val);
 		}
 		thrust::transform(d_V.begin(), d_V.end(), d_V.begin(),
-				gpu_l1_penalized_tresholing<double> (optimizationSettings->penalty));
+				gpu_l1_penalized_tresholing<double> (optimizationSettings->penaltyParameter));
 	} else {
 		//------------L0 PENALIZED
 		for (unsigned int i = 0; i < optimizationSettings->totalStartingPoints; i++) {
@@ -667,11 +667,11 @@ void perform_hard_and_soft_thresholding_for_penalized(
 				thrust::advance(it_begin, LDN);
 			thrust::device_vector<double>::iterator it_end = it_begin + n;
 			vals[i].val = thrust::transform_reduce(it_begin, it_end,
-					gpu_l0_penalized_objval<double> (optimizationSettings->penalty), 0.0f,
+					gpu_l0_penalized_objval<double> (optimizationSettings->penaltyParameter), 0.0f,
 					thrust::plus<double>());
 		}
 		thrust::transform(d_V.begin(), d_V.end(), d_V.begin(),
-				gpu_l0_penalized_tresholing<double> (optimizationSettings->penalty));
+				gpu_l0_penalized_tresholing<double> (optimizationSettings->penaltyParameter));
 	}
 }
 
@@ -688,12 +688,12 @@ void perform_hard_and_soft_thresholding_for_penalized(
 				thrust::advance(it_begin, LDN);
 			thrust::device_vector<float>::iterator it_end = it_begin + n;
 			vals[i].val = thrust::transform_reduce(it_begin, it_end,
-					gpu_l1_penalized_objval<float> (optimizationSettings->penalty), 0.0f,
+					gpu_l1_penalized_objval<float> (optimizationSettings->penaltyParameter), 0.0f,
 					thrust::plus<float>());
 			vals[i].val = std::sqrt(vals[i].val);
 		}
 		thrust::transform(d_V.begin(), d_V.end(), d_V.begin(),
-				gpu_l1_penalized_tresholing<float> (optimizationSettings->penalty));
+				gpu_l1_penalized_tresholing<float> (optimizationSettings->penaltyParameter));
 	} else {
 		//------------L0 PENALIZED
 		for (unsigned int i = 0; i < optimizationSettings->totalStartingPoints; i++) {
@@ -701,11 +701,11 @@ void perform_hard_and_soft_thresholding_for_penalized(
 				thrust::advance(it_begin, LDN);
 			thrust::device_vector<float>::iterator it_end = it_begin + n;
 			vals[i].val = thrust::transform_reduce(it_begin, it_end,
-					gpu_l0_penalized_objval<float> (optimizationSettings->penalty), 0.0f,
+					gpu_l0_penalized_objval<float> (optimizationSettings->penaltyParameter), 0.0f,
 					thrust::plus<float>());
 		}
 		thrust::transform(d_V.begin(), d_V.end(), d_V.begin(),
-				gpu_l0_penalized_tresholing<float> (optimizationSettings->penalty));
+				gpu_l0_penalized_tresholing<float> (optimizationSettings->penaltyParameter));
 	}
 }
 

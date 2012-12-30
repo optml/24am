@@ -78,8 +78,8 @@ public:
 									 // or by using an sorted map (better for small constrain parameter)
 	bool useKSelectionAlgorithmGPU; // use approximate k-selection algorithm (Russel Steinbach, Jeffrey Blanchard, Bradley Gordon, and Toluwaloju Alabi)
 	bool useDoublePrecision; // determines if one should use "double" or "float"
-	double penalty; // value of penalty parameter
-	unsigned int constrain; //value of constrain parameter
+	double penaltyParameter; // value of penaltyParameter parameter
+	unsigned int constraintParameter; //value of constrain parameter
 	char* dataFilePath; //   path to source data file
 	char* resultFilePath; // path to file where result and OptimizationStatistics will be used
 	int gpu_sm_count; // gpu number of Streaming Processors
@@ -97,8 +97,8 @@ public:
 		distributedRowGridFile = 0;
 		proccessNode = 0;
 		tolerance = 0.01;
-		constrain = 10;
-		penalty = 0;
+		constraintParameter = 10;
+		penaltyParameter = 0;
 		verbose = false;
 		totalStartingPoints = 64;
 		batchSize = 64;
@@ -142,8 +142,8 @@ public:
 
 	// check input optimizationSettings
 	void chceckInputAndModifyIt(unsigned int n) {
-		if (this->constrain > n) {
-			this->constrain = n;
+		if (this->constraintParameter > n) {
+			this->constraintParameter = n;
 		}
 		if (this->batchSize == 0) {
 			this->batchSize = this->totalStartingPoints;

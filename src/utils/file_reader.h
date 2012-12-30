@@ -104,9 +104,9 @@ void saveSolverStatistics(SolverStructures::OptimizationStatistics* optimization
 		statFile << "Solver options " << '\n';
 		statFile << "Formulation: " << optimizationSettings->formulation << '\n';
 		if (optimizationSettings->isConstrainedProblem()){
-			statFile << "Constraint parameter: " << optimizationSettings->constrain << '\n';
+			statFile << "Constraint parameter: " << optimizationSettings->constraintParameter << '\n';
 		}else{
-			statFile << "Penalty parameter: " << optimizationSettings->penalty<< '\n';
+			statFile << "penaltyParameter parameter: " << optimizationSettings->penaltyParameter<< '\n';
 		}
 		statFile << "Max iterations per starting point: " << optimizationSettings->maximumIterations<< '\n';
 		statFile << "Starting points: " << optimizationSettings->totalStartingPoints<< '\n';

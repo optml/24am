@@ -42,8 +42,8 @@ void run_experiments(OptimizationSettings* optimizationSettings) {
 		optimizationSettings->maximumIterations = 10;
 		optimizationSettings->tolerance = 0;
 		optimizationSettings->totalStartingPoints = 256;
-		optimizationSettings->constrain = n / 100;
-		optimizationSettings->penalty = 0.02;
+		optimizationSettings->constraintParameter = n / 100;
+		optimizationSettings->penaltyParameter = 0.02;
 		optimizationSettings->formulation = L0_penalized_L2_PCA;
 //		optimizationSettings->formulation = L0_constrained_L2_PCA;
 		optimizationSettings->useOTF = false;
@@ -132,10 +132,10 @@ int main(int argc, char *argv[]) {
 //		cout << "Problem generation took " << mt->getElapsedCPUTime() << " "
 //				<< mt->getElapsedWallClockTime() << endl;
 //		//============================
-//		optimizationSettings->constrain = 10;
-//		optimizationSettings->penalty = 0.01;
-//		const F penalty = optimizationSettings->penalty;
-//		const unsigned int constrain = optimizationSettings->constrain;
+//		optimizationSettings->constraintParameter = 10;
+//		optimizationSettings->penaltyParameter = 0.01;
+//		const F penaltyParameter = optimizationSettings->penaltyParameter;
+//		const unsigned int constrain = optimizationSettings->constraintParameter;
 //
 //
 //
@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
 //					m);
 //			nnz = vector_get_nnz(&x[0], n);
 //			fval2 = cblas_l1_norm(m, &y[0], 1)
-//					- penalty * cblas_l1_norm(n, &x[0], 1);
+//					- penaltyParameter * cblas_l1_norm(n, &x[0], 1);
 //			logTime("L1-Pen-L1   ", fval, fval2, nnz, mt, optimizationStatistics, optimizationSettings, m, n,
 //					computeReferentialValue(&h_B[0], &x[0], &y[0], m, n));
 //			//----------------- CPU L1 Penalized L2 PCA
@@ -164,7 +164,7 @@ int main(int argc, char *argv[]) {
 //					m);
 //			nnz = vector_get_nnz(&x[0], n);
 //			fval2 = cblas_l2_norm(m, &y[0], 1)
-//					- penalty * cblas_l1_norm(n, &x[0], 1);
+//					- penaltyParameter * cblas_l1_norm(n, &x[0], 1);
 //			logTime("L1-Pen-L2 BT", fval, fval2, nnz, mt, optimizationStatistics, optimizationSettings, m, n,
 //					computeReferentialValue(&h_B[0], &x[0], &y[0], m, n));
 //
@@ -178,7 +178,7 @@ int main(int argc, char *argv[]) {
 //					m);
 //			nnz = vector_get_nnz(&x[0], n);
 //			fval2 = cblas_l1_norm(m, &y[0], 1);
-//			fval2 = fval2 * fval2 - penalty * nnz;
+//			fval2 = fval2 * fval2 - penaltyParameter * nnz;
 //			logTime("L0-Pen-L1   ", fval, fval2, nnz, mt, optimizationStatistics, optimizationSettings, m, n,
 //					computeReferentialValue(&h_B[0], &x[0], &y[0], m, n));
 //
@@ -192,7 +192,7 @@ int main(int argc, char *argv[]) {
 //					m);
 //			nnz = vector_get_nnz(&x[0], n);
 //			fval2 = cblas_l2_norm(m, &y[0], 1);
-//			fval2 = fval2 * fval2 - penalty * nnz;
+//			fval2 = fval2 * fval2 - penaltyParameter * nnz;
 //			logTime("L0-Pen-L2 M1", fval, fval2, nnz, mt, optimizationStatistics, optimizationSettings, m, n,
 //					computeReferentialValue(&h_B[0], &x[0], &y[0], m, n));
 //

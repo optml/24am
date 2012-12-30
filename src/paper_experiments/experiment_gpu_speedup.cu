@@ -73,8 +73,8 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings) {
 		generateProblem(n, m, &h_B[0], m, n, false);
 		optimizationSettings->max_it = 100;
 		optimizationSettings->tolerance = 0;
-		optimizationSettings->penalty = 0.02;
-		optimizationSettings->constrain = n / 100;
+		optimizationSettings->penaltyParameter = 0.02;
+		optimizationSettings->constraintParameter = n / 100;
 		optimizationSettings->formulation = L1_penalized_L1_PCA;
 		optimizationSettings->useOTF = false;
 		optimizationSettings->useKSelectionAlgorithmGPU = false;
@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
 	optimizationSettings->batchSize = optimizationSettings->totalStartingPoints;
 	optimizationSettings->useOTF = false;
 	optimizationSettings->useKSelectionAlgorithmGPU = false;
-	optimizationSettings->constrain = 20;
+	optimizationSettings->constraintParameter = 20;
 	optimizationSettings->tolerance = 0.0001;
 	optimizationSettings->max_it = 100;
 	cout << "Double test" << endl;
