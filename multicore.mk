@@ -16,9 +16,9 @@ test_pc:
 	./$(BUILD_FOLDER)test_cpu
 
 test_multicore:
-	./$(BUILD_FOLDER)multicore_console -d datasets/small.csv  -r results/small.txt -v true -p double -a 1 -n 3
-	./$(BUILD_FOLDER)multicore_console -d datasets/small.csv  -r results/small_2.txt -v true -p double -s 1000 -b 64  -a 1 -n 2
-	./$(BUILD_FOLDER)multicore_console -d datasets/small.csv  -r results/small_3.txt -v true -p double -s 1000 -b 64 -u 1 -a 1 -n 2
+	./$(BUILD_FOLDER)multicore_console -i datasets/small.csv  -o results/small.txt -v true -p double -a 1 -n 3
+	./$(BUILD_FOLDER)multicore_console -i datasets/small.csv  -o results/small_2.txt -v true -p double -s 1000 -b 64  -a 1 -n 2
+	./$(BUILD_FOLDER)multicore_console -i datasets/small.csv  -o results/small_3.txt -v true -p double -s 1000 -b 64 -u 1 -a 1 -n 2
 
 multicore: multicore_console test_multicore
 

@@ -37,7 +37,7 @@ int load_data_and_run_solver(SolverStructures::OptimizationSettings* optimizatio
 	unsigned int m;
 	unsigned int n;
 	std::vector<F> B_mat;
-	InputOuputHelper::readCSVFile(B_mat, ldB, m, n, optimizationSettings->dataFilePath);
+	InputOuputHelper::readCSVFile(B_mat, ldB, m, n, optimizationSettings->inputFilePath);
 	optimizationStatistics->n = n;
 
 	const int MEMORY_BANK_FLOAT_SIZE = MEMORY_ALIGNMENT / sizeof(F);

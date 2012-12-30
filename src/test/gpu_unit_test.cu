@@ -46,7 +46,7 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 	optimizationSettings->gpu_sm_count = dp.multiProcessorCount;
 	optimizationSettings->gpu_max_threads = dp.maxThreadsPerBlock;
 
-	InputOuputHelper::readCSVFile(B_mat, ldB, m, n, optimizationSettings->dataFilePath);
+	InputOuputHelper::readCSVFile(B_mat, ldB, m, n, optimizationSettings->inputFilePath);
 	optimizationStatistics->n = n;
 
 	const int MEMORY_BANK_FLOAT_SIZE = MEMORY_ALIGNMENT / sizeof(F);
@@ -89,16 +89,16 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 	algorithms[5] = SolverStructures::L0_constrained_L2_PCA;
 	algorithms[6] = SolverStructures::L1_constrained_L1_PCA;
 	algorithms[7] = SolverStructures::L1_constrained_L2_PCA;
-	char* resultGPU = optimizationSettings->resultFilePath;
+	char* resultGPU = optimizationSettings->outputFilePath;
 	for (int al = 0; al < 8; al++) {
 		optimizationSettings->formulation = algorithms[al];
 		SPCASolver::GPUSolver::denseDataSolver(handle, m, n, d_B, h_x, optimizationSettings,
 				optimizationStatistics, LD_M, LD_N);
-		optimizationSettings->resultFilePath=resultGPU;
+		optimizationSettings->outputFilePath=resultGPU;
 		InputOuputHelper::save_results(optimizationStatistics, optimizationSettings, &h_x[0], n);
 		if (optimizationSettings->proccessNode == 0) {
 			SPCASolver::MulticoreSolver::denseDataSolver(B, ldB, x, m, n, optimizationSettings, optimizationStatistics2);
-			optimizationSettings->resultFilePath = multicoreResult;
+			optimizationSettings->outputFilePath = multicoreResult;
 			InputOuputHelper::save_results(optimizationStatistics2, optimizationSettings, x, n);
 			cout << "Test " << al << " " << optimizationSettings->formulation << " "
 					<< optimizationStatistics->fval << "  " << optimizationStatistics2->fval << endl;
@@ -115,9 +115,9 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 int main(int argc, char *argv[]) {
 	SolverStructures::OptimizationSettings* optimizationSettings =
 			new OptimizationSettings();
-	optimizationSettings->resultFilePath = "results/gpu_unittest.txt";
+	optimizationSettings->outputFilePath = "results/gpu_unittest.txt";
 	char* multicoreDataset = "datasets/distributed.dat.all";
-	optimizationSettings->dataFilePath = multicoreDataset;
+	optimizationSettings->inputFilePath = multicoreDataset;
 	char* multicoreResult = "results/gpu_unittest_multicore.txt";
 	optimizationSettings->verbose = false;
 	optimizationSettings->totalStartingPoints = 1024;

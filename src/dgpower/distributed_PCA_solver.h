@@ -198,8 +198,8 @@ int loadDataFrom2DFilesAndDistribute(
 	MKL_INT X_VECTOR_BLOCKING = optimizationDataInstance.params.x_vector_blocking;
 	MKL_INT ROW_BLOCKING = optimizationDataInstance.params.row_blocking;
 	MKL_INT COL_BLOCKING = optimizationDataInstance.params.col_blocking;
-	char* filename = optimizationSettings->dataFilePath;
-	char* outputfile = optimizationSettings->resultFilePath;
+	char* filename = optimizationSettings->inputFilePath;
+	char* outputfile = optimizationSettings->outputFilePath;
 	MKL_INT iam, nprocs, ictxt, ictxt2, myrow, mycol, nprow, npcol;
 	MKL_INT info;
 	MKL_INT m, n, nb, mb, mp, nq, lld, lld_local;
@@ -382,7 +382,7 @@ int gatherAndStoreBestResultToOutputFile(
 			&i_one, &i_one, optimizationDataInstance.descx, &zero, x_local,
 			&i_one, &i_one, desc_x_local);
 	if (iam == 0) {
-		FILE * fin = fopen(optimizationSettings->resultFilePath, "w");
+		FILE * fin = fopen(optimizationSettings->outputFilePath, "w");
 		for (int i = 0; i < DIM_N; i++) {
 			fprintf(fin, "%f;", x_local[i]);
 		}

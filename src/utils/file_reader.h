@@ -100,7 +100,7 @@ char* get_file_modified_name(const char* base, string suffix) {
 void saveSolverStatistics(SolverStructures::OptimizationStatistics* optimizationStatistics,
 		SolverStructures::OptimizationSettings * optimizationSettings){
 	ofstream statFile;
-		statFile.open(get_file_modified_name(optimizationSettings->resultFilePath, "optimizationStatistics"));
+		statFile.open(get_file_modified_name(optimizationSettings->outputFilePath, "optimizationStatistics"));
 		statFile << "Solver options " << '\n';
 		statFile << "Formulation: " << optimizationSettings->formulation << '\n';
 		if (optimizationSettings->isConstrainedProblem()){
@@ -135,14 +135,14 @@ void saveSolverStatistics(SolverStructures::OptimizationStatistics* optimization
 template<typename F>
 void save_results(SolverStructures::OptimizationStatistics* optimizationStatistics,
 		SolverStructures::OptimizationSettings * optimizationSettings, const F* x, unsigned int lenght) {
-	ofstream resultFilePath;
-	resultFilePath.open(get_file_modified_name(optimizationSettings->resultFilePath, "x"));
+	ofstream outputFilePath;
+	outputFilePath.open(get_file_modified_name(optimizationSettings->outputFilePath, "x"));
 	for (unsigned int i = 0; i < lenght; i++) {
 		if (x[i] != 0) {
-			resultFilePath << i << "," << setprecision(16) << x[i] << '\n';
+			outputFilePath << i << "," << setprecision(16) << x[i] << '\n';
 		}
 	}
-	resultFilePath.close();
+	outputFilePath.close();
 }
 
 }

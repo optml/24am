@@ -29,7 +29,7 @@ void run_solver(OptimizationSettings* optimizationSettings) {
 //	unsigned int ldB;
 //	unsigned int m;
 //	unsigned int n;
-//	input_ouput_helper::read_csv_file(B_mat, ldB, m, n, optimizationSettings->dataFilePath);
+//	input_ouput_helper::read_csv_file(B_mat, ldB, m, n, optimizationSettings->inputFilePath);
 //	optimization_Statisticsistics* optimizationStatistics = new optimization_Statisticsistics();
 //	optimizationStatistics->n = n;
 //	const F * B = &B_mat[0];

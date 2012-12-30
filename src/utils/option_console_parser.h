@@ -59,10 +59,10 @@ int parseConsoleOptions(SolverStructures::OptimizationSettings* optimizationSett
 	 * m - penaltyParameter parameter
 	 * x - x-dimension of distributed files (FOR DISTRIBUTED METHOD ONLY)
 	 */
-	bool dataFilePath = false;
-	bool resultFilePath = false;
+	bool inputFilePath = false;
+	bool outputFilePath = false;
 	bool algorithm = false;
-	while ((c = getopt(argc, argv, "d:f:r:i:t:s:b:u:v:p:a:n:m:x:")) != -1) {
+	while ((c = getopt(argc, argv, "i:f:o:m:t:s:b:u:v:p:a:n:g:x:")) != -1) {
 		switch (c) {
 		case 'x':
 			optimizationSettings->distributedRowGridFile = atoi(optarg);
@@ -76,19 +76,19 @@ int parseConsoleOptions(SolverStructures::OptimizationSettings* optimizationSett
 		case 'n':
 			optimizationSettings->constraintParameter = atoi(optarg);
 			break;
-		case 'm':
+		case 'g':
 			optimizationSettings->penaltyParameter= atof(optarg);
 			break;
-		case 'i':
+		case 'm':
 			optimizationSettings->maximumIterations = atoi(optarg);
 			break;
-		case 'd':
-			optimizationSettings->dataFilePath = optarg;
-			dataFilePath = true;
+		case 'i':
+			optimizationSettings->inputFilePath = optarg;
+			inputFilePath = true;
 			break;
-		case 'r':
-			optimizationSettings->resultFilePath = optarg;
-			resultFilePath = true;
+		case 'o':
+			optimizationSettings->outputFilePath = optarg;
+			outputFilePath = true;
 			break;
 		case 'u':
 			optimizationSettings->useOTF= atoi(optarg);
@@ -143,7 +143,7 @@ int parseConsoleOptions(SolverStructures::OptimizationSettings* optimizationSett
 		}
 	}
 
-	if (!dataFilePath || !resultFilePath || !algorithm) {
+	if (!inputFilePath || !outputFilePath || !algorithm) {
 		if (optimizationSettings->proccessNode==0)
 			print_usage();
 		return 1;

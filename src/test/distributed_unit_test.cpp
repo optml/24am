@@ -57,14 +57,14 @@ void test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 	algorithms[5] = SolverStructures::L0_constrained_L2_PCA;
 	algorithms[6] = SolverStructures::L1_constrained_L1_PCA;
 	algorithms[7] = SolverStructures::L1_constrained_L2_PCA;
-	char* resultDistributed = optimizationSettings->resultFilePath;
+	char* resultDistributed = optimizationSettings->outputFilePath;
 	for (int al = 0; al < 8; al++) {
 		optimizationSettings->formulation = algorithms[al];
 		SPCASolver::DistributedSolver::denseDataSolver(
 				optimizationDataInstance, optimizationSettings, optimizationStatistics);
 		if (optimizationSettings->proccessNode == 0) {
 			SPCASolver::MulticoreSolver::denseDataSolver(B, ldB, x, m, n, optimizationSettings, optimizationStatistics2);
-			optimizationSettings->resultFilePath=multicoreResult;
+			optimizationSettings->outputFilePath=multicoreResult;
 			InputOuputHelper::save_results(optimizationStatistics, optimizationSettings, x, n);
 			cout << "Test " << al << " " << optimizationSettings->formulation << " "
 					<< optimizationStatistics->fval << "  " << optimizationStatistics2->fval << endl;
@@ -74,7 +74,7 @@ void test_solver(SolverStructures::OptimizationSettings * optimizationSettings,
 	/*
 	 * STORE RESULT INTO FILE
 	 */
-	optimizationSettings->resultFilePath=resultDistributed;
+	optimizationSettings->outputFilePath=resultDistributed;
 	SPCASolver::DistributedSolver::gatherAndStoreBestResultToOutputFile(
 			optimizationDataInstance, optimizationSettings, optimizationStatistics);
 	if (iam == 0) {
@@ -91,8 +91,8 @@ int main(int argc, char *argv[]) {
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &optimizationSettings->proccessNode);
 
-	optimizationSettings->dataFilePath = "datasets/distributed.dat.";
-	optimizationSettings->resultFilePath = "results/distributed_unittest.txt";
+	optimizationSettings->inputFilePath = "datasets/distributed.dat.";
+	optimizationSettings->outputFilePath = "results/distributed_unittest.txt";
 	char* multicoreDataset = "datasets/distributed.dat.all";
 	char* multicoreResult = "results/distributed_unittest_multicore.txt";
 	optimizationSettings->distributedRowGridFile = 2;

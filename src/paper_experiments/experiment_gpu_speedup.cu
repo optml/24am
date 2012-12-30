@@ -120,7 +120,7 @@ int test_solver(SolverStructures::OptimizationSettings * optimizationSettings) {
 int main(int argc, char *argv[]) {
 	SolverStructures::OptimizationSettings* optimizationSettings =
 			new OptimizationSettings();
-	optimizationSettings->resultFilePath = "results/gpu_unittest.txt";
+	optimizationSettings->outputFilePath = "results/gpu_unittest.txt";
 	optimizationSettings->verbose = false;
 	optimizationSettings->totalStartingPoints = 1024;
 	optimizationSettings->batchSize = optimizationSettings->totalStartingPoints;

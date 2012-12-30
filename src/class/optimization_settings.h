@@ -80,8 +80,8 @@ public:
 	bool useDoublePrecision; // determines if one should use "double" or "float"
 	double penaltyParameter; // value of penaltyParameter parameter
 	unsigned int constraintParameter; //value of constrain parameter
-	char* dataFilePath; //   path to source data file
-	char* resultFilePath; // path to file where result and OptimizationStatistics will be used
+	char* inputFilePath; //   path to input data file
+	char* outputFilePath; // path to file where result and OptimizationStatistics will be used
 	int gpu_sm_count; // gpu number of Streaming Processors
 	int gpu_max_threads; // gpu - max number of threads
 	enum SPCA_Formulation formulation; // formulation which should be used
