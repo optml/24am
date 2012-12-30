@@ -29,7 +29,7 @@ BLAS_LIB= $(GSL_LIB)
 
 LIBS = -L./ $(BLAS_LIB) -L../objects $(OPENMP_FLAG)   $(LIBS_BLAS)
 include multicore.mk
-include distributed.mk
+include cluster.mk
 include gpu.mk
 
 
