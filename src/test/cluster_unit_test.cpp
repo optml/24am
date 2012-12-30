@@ -21,6 +21,7 @@
 #include "../utils/option_console_parser.h"
 
 using namespace SolverStructures;
+
 #include "../gpower/sparse_PCA_solver.h"
 #include "../utils/file_reader.h"
 #include "../utils/option_console_parser.h"
