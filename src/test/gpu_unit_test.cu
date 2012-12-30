@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
 	SolverStructures::OptimizationSettings* optimizationSettings =
 			new OptimizationSettings();
 	optimizationSettings->outputFilePath = "results/gpu_unittest.txt";
-	char* multicoreDataset = "datasets/distributed.dat.all";
+	char* multicoreDataset = "datasets/cluster.dat.all";
 	optimizationSettings->inputFilePath = multicoreDataset;
 	char* multicoreResult = "results/gpu_unittest_multicore.txt";
 	optimizationSettings->verbose = false;
