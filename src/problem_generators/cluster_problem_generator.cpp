@@ -19,7 +19,7 @@ using namespace std;
 #include <math.h>
 #include <stdlib.h>
 int main() {
-	const char* filename = "datasets/distributed.dat.";
+	const char* filename = "datasets/cluster.dat.";
 	const int numOfFiles = 6;
 	const int n = 100;
 //	const int m =  500*1024 * 1024 / 8 / n;
