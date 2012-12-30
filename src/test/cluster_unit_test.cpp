@@ -91,10 +91,10 @@ int main(int argc, char *argv[]) {
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &optimizationSettings->proccessNode);
 
-	optimizationSettings->inputFilePath = "datasets/distributed.dat.";
-	optimizationSettings->outputFilePath = "results/distributed_unittest.txt";
-	char* multicoreDataset = "datasets/distributed.dat.all";
-	char* multicoreResult = "results/distributed_unittest_multicore.txt";
+	optimizationSettings->inputFilePath = "datasets/cluster.dat.";
+	optimizationSettings->outputFilePath = "results/cluster_unittest.txt";
+	char* multicoreDataset = "datasets/cluster.dat.all";
+	char* multicoreResult = "results/cluster_unittest_multicore.txt";
 	optimizationSettings->distributedRowGridFile = 2;
 	optimizationSettings->verbose = false;
 	optimizationSettings->batchSize = 64;

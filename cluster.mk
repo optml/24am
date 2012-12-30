@@ -20,15 +20,15 @@ cluster_generator:
 
 # DISTRIBUTED TEST
 cluster_test: cluster_generator cluster_console
-	mpirun  --mca orte_base_help_aggregate 0 -np 6 build/cluster_console -i datasets/cluster.dat.  -o results/cluster.txt -v true -p double -s 1000 -b 128 -u 1 -a 5 -n 2 -x 2
-	mpirun  --mca orte_base_help_aggregate 0 -np 6 build/cluster_console -i datasets/cluster.dat.  -o results/cluster.txt.2 -v true -p double -s 1000 -b 128 -u 1 -a 5 -n 2 -x 2
-	mpirun  --mca orte_base_help_aggregate 0 -np 6 build/cluster_console -i datasets/cluster.dat.  -o results/cluster.txt.L0_C_L1_PCA.3 -v true -p double -s 1000 -b 128 -u 1 -a 1 -n 2 -x 2 -m 100
-	mpirun  --mca orte_base_help_aggregate 0 -np 6 build/cluster_console -i datasets/cluster.dat.  -o results/cluster.txt.L0_C_L2_PCA.4 -v true -p double -s 1000 -b 128 -u 1 -a 2 -n 2 -x 2
-	mpirun  --mca orte_base_help_aggregate 0 -np 6 build/cluster_console -i datasets/cluster.dat.  -o results/cluster.txt.L1_C_L1_PCA.5 -v true -p double -s 10 -b 10 -u 1 -a 3 -n 2 -x 2 -m 3
-	mpirun  --mca orte_base_help_aggregate 0 -np 6 build/cluster_console -i datasets/cluster.dat.  -o results/cluster.txt.X.7 -v true -p double -s 1000 -b 128 -u 1 -a 5 -n 2 -x 2
-	mpirun  --mca orte_base_help_aggregate 0 -np 6 build/cluster_console -i datasets/cluster.dat.  -o results/cluster.txt.X.8 -v true -p double -s 1000 -b 128 -u 1 -a 6 -n 2 -x 2
-	mpirun  --mca orte_base_help_aggregate 0 -np 6 build/cluster_console -i datasets/cluster.dat.  -o results/cluster.txt.X.9 -v true -p double -s 1000 -b 128 -u 1 -a 7 -n 2 -x 2
-	mpirun  --mca orte_base_help_aggregate 0 -np 6 build/cluster_console -i datasets/cluster.dat.  -o results/cluster.txt.X.10 -v true -p double -s 1000 -b 128 -u 1 -a 8 -n 2 -x 2			
+	mpirun  --mca orte_base_help_aggregate 0 -np 6 build/cluster_console -i datasets/cluster.dat.  -o results/cluster.txt -v true -d double -l 1000 -r 128 -u 1 -f 5 -s 2 -x 2
+	mpirun  --mca orte_base_help_aggregate 0 -np 6 build/cluster_console -i datasets/cluster.dat.  -o results/cluster.txt.2 -v true -d double -l 1000 -r 128 -u 1 -f 5 -s 2 -x 2
+	mpirun  --mca orte_base_help_aggregate 0 -np 6 build/cluster_console -i datasets/cluster.dat.  -o results/cluster.txt.L0_C_L1_PCA.3 -v true -d double -l 1000 -r 128 -u 1 -f 1 -s 2 -x 2 -m 100
+	mpirun  --mca orte_base_help_aggregate 0 -np 6 build/cluster_console -i datasets/cluster.dat.  -o results/cluster.txt.L0_C_L2_PCA.4 -v true -d double -l 1000 -r 128 -u 1 -f 2 -s 2 -x 2
+	mpirun  --mca orte_base_help_aggregate 0 -np 6 build/cluster_console -i datasets/cluster.dat.  -o results/cluster.txt.L1_C_L1_PCA.5 -v true -d double -l 10 -r 10 -u 1 -f 3 -s 2 -x 2 -m 3
+	mpirun  --mca orte_base_help_aggregate 0 -np 6 build/cluster_console -i datasets/cluster.dat.  -o results/cluster.txt.X.7 -v true -d double -l 1000 -r 128 -u 1 -f 5 -s 2 -x 2
+	mpirun  --mca orte_base_help_aggregate 0 -np 6 build/cluster_console -i datasets/cluster.dat.  -o results/cluster.txt.X.8 -v true -d double -l 1000 -r 128 -u 1 -f 6 -s 2 -x 2
+	mpirun  --mca orte_base_help_aggregate 0 -np 6 build/cluster_console -i datasets/cluster.dat.  -o results/cluster.txt.X.9 -v true -d double -l 1000 -r 128 -u 1 -f 7 -s 2 -x 2
+	mpirun  --mca orte_base_help_aggregate 0 -np 6 build/cluster_console -i datasets/cluster.dat.  -o results/cluster.txt.X.10 -v true -d double -l 1000 -r 128 -u 1 -f 8 -s 2 -x 2			
 
 
 

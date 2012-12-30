@@ -62,18 +62,18 @@ int parseConsoleOptions(SolverStructures::OptimizationSettings* optimizationSett
 	bool inputFilePath = false;
 	bool outputFilePath = false;
 	bool algorithm = false;
-	while ((c = getopt(argc, argv, "i:f:o:m:t:s:b:u:v:p:a:n:g:x:")) != -1) {
+	while ((c = getopt(argc, argv, "i:f:o:m:t:l:r:u:v:d:s:g:x:")) != -1) {
 		switch (c) {
 		case 'x':
 			optimizationSettings->distributedRowGridFile = atoi(optarg);
 			break;
-		case 's':
+		case 'l':
 			optimizationSettings->totalStartingPoints = atoi(optarg);
 			break;
-		case 'b':
+		case 'r':
 			optimizationSettings->batchSize = atoi(optarg);
 			break;
-		case 'n':
+		case 's':
 			optimizationSettings->constraintParameter = atoi(optarg);
 			break;
 		case 'g':
@@ -96,13 +96,13 @@ int parseConsoleOptions(SolverStructures::OptimizationSettings* optimizationSett
 		case 't':
 			optimizationSettings->tolerance = atof(optarg);
 			break;
-		case 'p':
+		case 'd':
 			optimizationSettings->useDoublePrecision = true;
 			break;
 		case 'v':
 			optimizationSettings->verbose = true;
 			break;
-		case 'a':
+		case 'f':
 			switch (atoi(optarg)) {
 			case 1:
 				optimizationSettings->formulation=L0_constrained_L1_PCA;
