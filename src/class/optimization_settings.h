@@ -104,7 +104,7 @@ public:
 		batchSize = 64;
 		useSortForHardThresholding = false;
 		useOTF = false;
-		maximumIterations = 100;
+		maximumIterations = 20;
 		getValuesForAllStartingPoints = true;
 		useKSelectionAlgorithmGPU = true;
 		storeIterationsForAllPoints = true;
