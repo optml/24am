@@ -107,7 +107,7 @@ public:
 		maximumIterations = 20;
 		getValuesForAllStartingPoints = true;
 		useKSelectionAlgorithmGPU = true;
-		storeIterationsForAllPoints = true;
+		storeIterationsForAllPoints = false;
 		useDoublePrecision = false;
 	}
 

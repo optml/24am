@@ -12,7 +12,6 @@
  * 
  */
 
-
 /* The following functions are for converting between different Matrix sparse representations
  *
  * COO - Coordinate representation
@@ -28,9 +27,11 @@
 #define MATRIX_CONVERSIONS_H_
 
 template<typename L, typename D>
-void getCSC_CSR_from_COO(std::vector<D> h_Z_values, std::vector<L> h_Z_row_idx, std::vector<L> h_Z_col_idx,
-		std::vector<D>& Z_csc_val, std::vector<L>& Z_csc_rowIdx, std::vector<L>& Z_csc_ColPtr,
-		std::vector<D>& Z_csr_val, std::vector<L>& Z_csr_colIdx, std::vector<L>& Z_csr_RowPtr, L m, L n) {
+void getCSC_CSR_from_COO(std::vector<D> h_Z_values, std::vector<L> h_Z_row_idx,
+		std::vector<L> h_Z_col_idx, std::vector<D>& Z_csc_val,
+		std::vector<L>& Z_csc_rowIdx, std::vector<L>& Z_csc_ColPtr,
+		std::vector<D>& Z_csr_val, std::vector<L>& Z_csr_colIdx,
+		std::vector<L>& Z_csr_RowPtr, L m, L n) {
 	L nnz = h_Z_values.size();
 	Z_csc_val.resize(nnz, 0);
 	Z_csc_rowIdx.resize(nnz, 0);
@@ -78,9 +79,12 @@ void getCSC_CSR_from_COO(std::vector<D> h_Z_values, std::vector<L> h_Z_row_idx, 
 }
 
 template<typename T, typename I>
-void getCSR_from_CSC(const std::vector<T> Z_csc_values, //Input
-		const std::vector<I> Z_csc_row_idx, const std::vector<I> Z_csc_col_ptr, std::vector<T>& Z_csr_val,//Output
-		std::vector<I>& Z_csr_colIdx, std::vector<I>& Z_csr_RowPtr, int m, int n) {
+void getCSR_from_CSC(
+		const std::vector<T> Z_csc_values, //Input
+		const std::vector<I> Z_csc_row_idx, const std::vector<I> Z_csc_col_ptr,
+		std::vector<T>& Z_csr_val, //Output
+		std::vector<I>& Z_csr_colIdx, std::vector<I>& Z_csr_RowPtr, int m,
+		int n) {
 	int nnz = Z_csc_values.size();
 	Z_csr_val.resize(nnz, 0);
 	Z_csr_colIdx.resize(nnz, 0);
@@ -98,7 +102,8 @@ void getCSR_from_CSC(const std::vector<T> Z_csc_values, //Input
 	Z_csr_RowPtr[0] = 0;
 	// ========Fill Data into correct format
 	for (int col = 0; col < n; col++) {
-		for (int tmp = Z_csc_col_ptr[col]; tmp < Z_csc_col_ptr[col + 1]; tmp++) {
+		for (int tmp = Z_csc_col_ptr[col]; tmp < Z_csc_col_ptr[col + 1];
+				tmp++) {
 			int row_id = Z_csc_row_idx[tmp];
 			Z_csr_val[Z_csr_RowPtr[row_id]] = Z_csc_values[tmp];
 			Z_csr_colIdx[Z_csr_RowPtr[row_id]] = col;
@@ -112,8 +117,57 @@ void getCSR_from_CSC(const std::vector<T> Z_csc_values, //Input
 	Z_csr_RowPtr[0] = 0;
 }
 
-void getCSR_from_CSC(const std::vector<int> &Z_csc_row_idx, const std::vector<int>& Z_csc_col_ptr,
-		std::vector<int>& Z_csr_colIdx, std::vector<int>& Z_csr_RowPtr, int m, int n, int nnz) {
+template<typename T, typename I>
+void getCSC_from_CSR(
+		std::vector<T>& Z_csr_val, //Input
+		std::vector<I>& Z_csr_colIdx, std::vector<I>& Z_csr_RowPtr,
+
+		std::vector<T> &Z_csc_values, //Output
+		std::vector<I> &Z_csc_row_idx, std::vector<I> &Z_csc_col_ptr, int m,
+		int n,bool getZeroOne=false) {
+	int nnz = Z_csr_val.size();
+	Z_csc_values.resize(nnz, 0);
+	Z_csc_row_idx.resize(nnz, 0);
+	Z_csc_col_ptr.resize(n + 1, 0);
+	for (int i = 0; i < n + 1; i++) {
+		Z_csc_col_ptr[i] = 0;
+	}
+	for (int i = 0; i < nnz; i++) {
+		Z_csc_col_ptr[Z_csr_colIdx[i]]++;
+	}
+	for (int i = 0; i < n; i++) {
+		Z_csc_col_ptr[i + 1] += Z_csc_col_ptr[i];
+	}
+	for (int i = n; i > 0; i--) {
+		Z_csc_col_ptr[i] = Z_csc_col_ptr[i - 1];
+	}
+	Z_csc_col_ptr[0] = 0;
+
+
+	// ========Fill Data into correct format
+	for (int row = 0; row < m; row++) {
+		for (int tmp = Z_csr_RowPtr[row]; tmp < Z_csr_RowPtr[row + 1];
+				tmp++) {
+			int col_id = Z_csr_colIdx[tmp];
+			if (getZeroOne){
+			Z_csc_values[Z_csc_col_ptr[col_id]] = 1;//Z_csr_val[tmp];
+			}
+			else{
+				Z_csc_values[Z_csc_col_ptr[col_id]] = Z_csr_val[tmp];
+			}
+			Z_csc_row_idx[Z_csc_col_ptr[col_id]] = row;
+			Z_csc_col_ptr[col_id]++;
+		}
+	}
+	for (int i = n; i > 0; i--) {
+		Z_csc_col_ptr[i] = Z_csc_col_ptr[i - 1];
+	}
+	Z_csc_col_ptr[0] = 0;
+}
+
+void getCSR_from_CSC(const std::vector<int> &Z_csc_row_idx,
+		const std::vector<int>& Z_csc_col_ptr, std::vector<int>& Z_csr_colIdx,
+		std::vector<int>& Z_csr_RowPtr, int m, int n, int nnz) {
 	Z_csr_colIdx.resize(nnz, 0);
 	Z_csr_RowPtr.resize(m + 1, 0);
 	for (int i = 0; i < nnz; i++) {
@@ -129,7 +183,8 @@ void getCSR_from_CSC(const std::vector<int> &Z_csc_row_idx, const std::vector<in
 	Z_csr_RowPtr[0] = 0;
 	// ========Fill Data into correct format
 	for (int col = 0; col < n; col++) {
-		for (int tmp = Z_csc_col_ptr[col]; tmp < Z_csc_col_ptr[col + 1]; tmp++) {
+		for (int tmp = Z_csc_col_ptr[col]; tmp < Z_csc_col_ptr[col + 1];
+				tmp++) {
 			int row_id = Z_csc_row_idx[tmp];
 			Z_csr_colIdx[Z_csr_RowPtr[row_id]] = col;
 			Z_csr_RowPtr[row_id]++;
@@ -143,8 +198,10 @@ void getCSR_from_CSC(const std::vector<int> &Z_csc_row_idx, const std::vector<in
 }
 
 template<typename T, typename I>
-void getCSR_from_COO(std::vector<T> &h_Z_values, std::vector<I> &h_Z_row_idx, std::vector<I> &h_Z_col_idx,
-		std::vector<T> &Z_csr_val, std::vector<I> &Z_csr_colIdx, std::vector<I>& Z_csr_RowPtr, int m, int n) {
+void getCSR_from_COO(std::vector<T> &h_Z_values, std::vector<I> &h_Z_row_idx,
+		std::vector<I> &h_Z_col_idx, std::vector<T> &Z_csr_val,
+		std::vector<I> &Z_csr_colIdx, std::vector<I>& Z_csr_RowPtr, int m,
+		int n) {
 	int nnz = h_Z_values.size();
 
 	Z_csr_val.resize(nnz, 0);
@@ -193,8 +250,9 @@ void getCSR_from_COO(std::vector<T> &h_Z_values, std::vector<I> &h_Z_row_idx, st
 //}
 
 template<typename T, typename I>
-void getCSC_from_COO(const std::vector<T> &h_Z_values, const std::vector<I> &h_Z_row_idx,
-		const std::vector<I>& h_Z_col_idx, std::vector<T>& Z_csc_val, std::vector<I>& Z_csc_rowIdx,
+void getCSC_from_COO(const std::vector<T> &h_Z_values,
+		const std::vector<I> &h_Z_row_idx, const std::vector<I>& h_Z_col_idx,
+		std::vector<T>& Z_csc_val, std::vector<I>& Z_csc_rowIdx,
 		std::vector<I>& Z_csc_ColPtr, int m, int n) {
 	unsigned long long nnz = h_Z_values.size();
 	Z_csc_val.resize(nnz);
