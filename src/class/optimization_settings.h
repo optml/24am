@@ -93,6 +93,11 @@ public:
 	unsigned int totalBatches; // number of bathes - is computer by solver
 	bool useOTF; // on the fly generation - not applicable for distributed solver
 
+	bool doColumnMean;
+	bool doRowMean;
+	bool L2RowNormalization;
+	bool tfidf;
+
 	OptimizationSettings() {
 		distributedRowGridFile = 0;
 		proccessNode = 0;
@@ -102,17 +107,24 @@ public:
 		verbose = false;
 		totalStartingPoints = 64;
 		batchSize = 64;
+		doRowMean=false;
 		useSortForHardThresholding = false;
 		useOTF = false;
 		maximumIterations = 20;
 		getValuesForAllStartingPoints = true;
 		useKSelectionAlgorithmGPU = true;
-		storeIterationsForAllPoints = true;
+		storeIterationsForAllPoints = false;
 		useDoublePrecision = false;
+
+		doColumnMean = true;
+		L2RowNormalization = true;
+		tfidf = true;
+
 	}
 
 	bool isConstrainedProblem() {
-		if (this->formulation == L0_penalized_L1_PCA || this->formulation== L0_penalized_L2_PCA
+		if (this->formulation == L0_penalized_L1_PCA
+				|| this->formulation == L0_penalized_L2_PCA
 				|| this->formulation == L1_penalized_L1_PCA
 				|| this->formulation == L1_penalized_L2_PCA) {
 			return false;
@@ -123,7 +135,7 @@ public:
 
 	bool isL1ConstrainedProblem() {
 		if (this->formulation == L0_constrained_L1_PCA
-				|| this->formulation== L0_constrained_L2_PCA) {
+				|| this->formulation == L0_constrained_L2_PCA) {
 			return false;
 		} else {
 			return true;

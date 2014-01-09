@@ -28,7 +28,7 @@ void L1_penalized_thresholding(const unsigned int number_of_experiments,
 		F* max_errors, ValueCoordinateHolder<F>* vals,
 		SolverStructures::OptimizationStatistics* optimizationStatistics, const unsigned int it,unsigned int optimizationStatisticsistical_shift=0) {
 #ifdef _OPENMP
-#pragma omp parallel for
+//#pragma omp parallel for
 #endif
 	for (unsigned int j = 0; j < number_of_experiments; j++) {
 		F fval_current = 0;
@@ -42,6 +42,8 @@ void L1_penalized_thresholding(const unsigned int number_of_experiments,
 				V[n * j + i] = 0;
 			}
 		}
+
+
 		fval_current = sqrt(fval_current);
 		F tmp_error = computeTheError(fval_current, vals[j].val, optimizationSettings);
 		vals[j].current_error=tmp_error;

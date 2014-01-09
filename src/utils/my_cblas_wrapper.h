@@ -39,6 +39,24 @@ void cblas_vector_scale(const int n, float* vector, const float factor) {
 	cblas_sscal(n, factor, vector, 1);
 }
 
+
+
+template<typename F>
+void cblas_vector_scale(std::vector<F> &vector, const F factor) {
+}
+
+template<>
+void cblas_vector_scale(std::vector<double> &vector, const double factor) {
+	cblas_dscal(vector.size(), factor, &vector[0], 1);
+}
+
+template<>
+void cblas_vector_scale(std::vector<float> &vector, const float factor) {
+	cblas_sscal(vector.size(), factor, &vector[0], 1);
+}
+
+
+
 //template<typename F>
 //void cblas_matrix_matrix_multiply(const CBLAS_ORDER Order,
 //		const CBLAS_TRANSPOSE TransA, const CBLAS_TRANSPOSE TransB,
