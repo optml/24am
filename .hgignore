@@ -38,3 +38,6 @@ cpu_test
 tbb40_233oss
 *.pdf
 syncsrceddie.sh
+*.pgm
+*.eps
+*.mexa64
