@@ -31,6 +31,7 @@ synchector.sh
 .htaccess
 .buildpath
 .project
+*.back
 hg/
 octave-core
 cpu_test
