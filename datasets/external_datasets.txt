@@ -1,0 +1,21 @@
+To reproduce all experiments in our paper one have to download text corpora data from
+http://archive.ics.uci.edu/ml/datasets/Bag+of+Words
+
+these files has to be stored into "datasets" folder
+
+one can execute in this folder following commands in bash
+
+wget archive.ics.uci.edu/ml/machine-learning-databases/bag-of-words/docword.nytimes.txt.gz
+wget archive.ics.uci.edu/ml/machine-learning-databases/bag-of-words/docword.pubmed.txt.gz
+wget http://archive.ics.uci.edu/ml/machine-learning-databases/bag-of-words/vocab.nytimes.txt
+wget http://archive.ics.uci.edu/ml/machine-learning-databases/bag-of-words/vocab.pubmed.txt
+
+gunzip docword.nytimes.txt.gz
+gunzip docword.pubmed.txt.gz
+
+
+one small dataset is NIPS papers:
+
+wget http://archive.ics.uci.edu/ml/machine-learning-databases/bag-of-words/vocab.nips.txt
+wget archive.ics.uci.edu/ml/machine-learning-databases/bag-of-words/docword.nips.txt.gz
+gunzip docword.nips.txt.gz
