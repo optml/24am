@@ -1,0 +1,3 @@
+24am is a collection of 24 parallel sparse PCA codes based on an alternating maximization (AM) subroutine. The background and accompanying theory can be found in the following paper:
+
+(1) Peter Richtarik, Martin Takac and Selin D. Ahipasaoglu, [Alternating Maximization: Unifying Framework for 8 Sparse PCA Formulations and Efficient Parallel Codes](http://arxiv.org/abs/1212.4137), arXiv:1212.4137, December 2012
