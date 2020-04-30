@@ -16,7 +16,8 @@ If you use 24am for your research, please cite:
 
 
 ## Usage Guide
-The algorithms can be run using the syntax: `
+The algorithms can be run using the syntax: ``` python3 main.py --numOfTrials 10 --sparsity 128 --formulation L2var_L0cons```
+
 
 ### Dependencies
 * Numpy
