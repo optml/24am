@@ -35,11 +35,30 @@ The algorithms can be run using the syntax: ``` python3 main.py --numOfTrials 10
 * scipy
 
 ### Parameters
-
+```
+ --formulation',     default='L2var_L0cons',
+                     help='L2var_L0cons, L1var_L0cons,
+                           L2var_L1cons, L1var_L1cons,
+                           L2var_L0pen,  L1var_L0pen,
+                           L2var_L1pen,  L1var_L1pen'
+ --dataname',        default = 'ATandT_Database_of_Faces', type=str,
+                     help="AT&T Database of Faces"
+ --dataDir',         default = './data/', type=str, help="data directory"
+ --resultsDir',      default = './results/', type=str, help="log directory"
+ --seed', default = 1, type=int, help="random seed"
+ --density_of_SP',   default = 1, type=float, help="density of starting Point"
+ --sparsity',        default = 16, type=int, help="sparsity target"
+ --tol',             default = 1e-6, type=float, help="tolerance"
+ --maxIter',         default = 200, type=int, help="max num of iterations"
+ --numOfTrials',     default = 10, type=int, help="num Of trials"
+ --stabilityIter',   default = 30, type=int, help="stability of gamma"
+ --incDelta',        default = 1e-3, type=float, help="rate of delta increase"
+ ```
 
 
 ### Logs & Printing
-
+All logs are stored in ```.pkl``` file in ```./results/ ```. For example the log file can be as:
+```L2var_L0cons_expectedVar_numTraial_10_sparsity_128.pkl```.
 
 The output of the 10 runs is:
 ```
