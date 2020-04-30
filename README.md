@@ -19,14 +19,7 @@ This is a Python software package and C++  software package for SPCA.
 
 ## Citation
 If you use 24am for your research, please cite:
-```
-@article{richtarik2012alternating,
-  title={Alternating maximization: Unifying framework for 8 sparse PCA formulations and efficient parallel codes},
-  author={Richt{\'a}rik, Peter and Jahani, Majid and Ahipa{\c{s}}ao{\u{g}}lu, Selin Damla and Tak{\'a}{\v{c}}, Martin },
-  journal={arXiv preprint arXiv:1212.4137},
-  year={2020}
-}
-```
+
 
 ## Usage Guide
 The algorithms can be run using the syntax: ``` python3 main.py --numOfTrials 10 --sparsity 128 --formulation L2var_L0cons```
