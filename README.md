@@ -19,7 +19,8 @@ If you use 24am for your research, please cite:
 The algorithms can be run using the syntax: `
 
 ### Dependencies
-
+* Numpy
+* scipy
 
 ### Parameters
 
