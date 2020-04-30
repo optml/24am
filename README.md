@@ -17,14 +17,16 @@ Given a multivariate data set, sparse principal component analysis (SPCA) aims t
 See [paper](https://arxiv.org/pdf/1212.4137.pdf) for details.
 This is a Python software package and C++  software package for SPCA.
 
-
-## Problem
-
-
 ## Citation
 If you use 24am for your research, please cite:
-
-
+```
+@article{richtarik2012alternating,
+  title={Alternating maximization: Unifying framework for 8 sparse PCA formulations and efficient parallel codes},
+  author={Richt{\'a}rik, Peter and Jahani, Majid and Ahipa{\c{s}}ao{\u{g}}lu, Selin Damla and Tak{\'a}{\v{c}}, Martin },
+  journal={arXiv preprint arXiv:1212.4137},
+  year={2020}
+}
+```
 
 ## Usage Guide
 The algorithms can be run using the syntax: ``` python3 main.py --numOfTrials 10 --sparsity 128 --formulation L2var_L0cons```
@@ -45,7 +47,7 @@ The algorithms can be run using the syntax: ``` python3 main.py --numOfTrials 10
                      help="AT&T Database of Faces"
  --dataDir',         default = './data/', type=str, help="data directory"
  --resultsDir',      default = './results/', type=str, help="log directory"
- --seed', default = 1, type=int, help="random seed"
+ --seed',            default = 1, type=int, help="random seed"
  --density_of_SP',   default = 1, type=float, help="density of starting Point"
  --sparsity',        default = 16, type=int, help="sparsity target"
  --tol',             default = 1e-6, type=float, help="tolerance"
