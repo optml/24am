@@ -5,14 +5,14 @@ Authors: [Peter Richtárik](https://richtarik.org/), [Majid Jahani](http://coral
 
 ## Introduction
 Given a multivariate data set, sparse principal component analysis (SPCA) aims to extract several linear combinations of the variables that together explain the variance in the data as much as possible, while controlling the number of nonzero loadings in these combinations. We consider 8 different optimization formulations for computing a single sparse loading vector:
-- $L_2$ variance with $L_0$ constraint  
-- 
-- 
-- 
-- 
-- 
-- 
-- 
+- L2 variance with L0 constraint  
+- L1 variance with L0 constraint
+- L2 variance with L1 constraint
+- L1 variance with L1 constraint
+- L2 variance with L0 penalty
+- L1 variance with L0 penalty
+- L2 variance with L1 penalty
+- L1 variance with L1 penalty
 
 See [paper](https://arxiv.org/pdf/1212.4137.pdf) for details.
 This is a Python software package and C++  software package for SPCA.
