@@ -14,16 +14,8 @@ Given a multivariate data set, sparse principal component analysis (SPCA) aims t
 - **
 - **
 
-See [paper](https://arxiv.org/abs/1901.09997) for details.
+See [paper](https://arxiv.org/pdf/1212.4137.pdf) for details.
 This is a Python software package and C++  software package for SPCA.
-
-This is a Python software package for solving a toy classification problem using neural networks. More specifically, the user can select one of two methods:
-- **sampled LBFGS (S-LBFGS)**,
-- **sampled LSR1 (S-LSR1)**,
-
-to solve the problem described below. See [paper](https://arxiv.org/pdf/1212.4137.pdf) for details.
-
-Note, the code is extendible to solving other deep learning problems (see comments below).
 
 
 ## Problem
